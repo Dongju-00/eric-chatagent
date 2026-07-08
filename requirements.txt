@@ -1,0 +1,13 @@
+python-dotenv
+torch
+sentencepiece
+fastapi
+uvicorn[standard]
+Korpora
+datasets
+pandas
+langchain-google-genai
+langchain-chroma
+chromadb
+trafilatura
+langgraph

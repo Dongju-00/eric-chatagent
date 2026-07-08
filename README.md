@@ -81,7 +81,7 @@ data/processed/pretrain.txt
 ## Stage 1 사전학습
 
 ```bash
-python main.py train
+python train.py train
 ```
 
 실행 후 아래 모델 파일이 생성됩니다.
@@ -106,7 +106,7 @@ data/processed/qa_val.csv
 ## Stage 2 Q&A 파인튜닝
 
 ```bash
-python main.py train_qa
+python train.py train_qa
 ```
 
 실행 후 아래 모델 파일이 생성됩니다.
@@ -118,7 +118,7 @@ checkpoints/KoreanGPT_qa.pt
 ## CLI 테스트
 
 ```bash
-python main.py chat_qa
+python train.py chat_qa
 ```
 
 예시:
@@ -195,10 +195,10 @@ src/model/checkpoints/
 cd src/model
 
 python scripts/prepare_pretrain.py
-python main.py train
+python train.py train
 
 python scripts/prepare_finetune.py
-python main.py train_qa
+python train.py train_qa
 
 cd ../app
 uvicorn app:app --reload --port 8000
