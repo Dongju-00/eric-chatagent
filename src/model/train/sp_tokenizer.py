@@ -1,8 +1,3 @@
-"""
-SentencePiece 학습/로드 래퍼.
-train_sp(), load_sp()로 SentencePieceProcessor 객체 하나를 만들어두면
-encode/decode를 전부 그 객체로 처리할 수 있습니다.
-"""
 import os
 
 import sentencepiece as spm

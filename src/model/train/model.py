@@ -9,15 +9,16 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+# 성능 향상을 위해 파라미터를 늘림
 # --- hyperparameters ---
-block_size = 256     # 컨텍스트 윈도우 (한 번에 볼 수 있는 최대 토큰 수)
-n_embd = 384         # 임베딩 차원
-n_head = 6           # Multi-Head Attention의 head 개수
-n_layer = 6          # Transformer block(decoder layer) 개수
-batch_size = 16
+block_size = 384     # 컨텍스트 윈도우 (한 번에 볼 수 있는 최대 토큰 수) 256 -> 384
+n_embd = 512         # 임베딩 차원                               384 -> 512
+n_head = 8           # Multi-Head Attention의 head 개수           6 -> 8
+n_layer = 8          # Transformer block(decoder layer) 개수     6 -> 8
+batch_size = 16      # 터지면 16 -> 8
 dropout = 0.2
 
-steps = 50000
+steps = 70000
 lr = 5e-4
 device = (
     "cuda" if torch.cuda.is_available()
@@ -45,11 +46,22 @@ class CausalSelfAttention(nn.Module):
         k = k.view(B, T, n_head, head_dim).transpose(1, 2)
         v = v.view(B, T, n_head, head_dim).transpose(1, 2)
 
+        # 마스킹을 일일히 다 만들고 적용해서 학습 시간이 너무 오래 걸림
+        # 그래서 Pytorch 내장  최적화 어텐션(causal mask 자동처리)
+        """
         att = q @ k.transpose(-2, -1) / head_dim ** 0.5
         causal = torch.tril(torch.ones(T, T, dtype=torch.bool, device=x.device))
         att = att.masked_fill(~causal, float("-inf"))  # 미래 토큰을 못 보게 마스킹
         att = self.drop(F.softmax(att, dim=-1))
         out = att @ v
+        """
+
+        out = F.scaled_dot_product_attention(
+            q, k, v,
+            dropout_p=dropout if self.training else 0.0,
+            is_causal=True,
+        )
+
         out = out.transpose(1, 2).reshape(B, T, C)
         return self.drop(self.proj(out))
 

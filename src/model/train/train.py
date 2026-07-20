@@ -18,13 +18,15 @@ from model.train.train_utils import make_batcher, train_loop, make_qa_batcher
 from model.store.vector_store import ChromaNewsVectorStore
 
 SP_VOCAB_SIZE = 16000
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parents[1]
 
 SP_PREFIX = str(BASE_DIR / "data" / "sp_korean")    # data/sp_korean.model / .vocab 으로 생성됨
 
 CKPT_DIR = BASE_DIR / "checkpoints"
 GEN_CKPT = str(CKPT_DIR / "KoreanGPT.pt")      # Stage 1 가중치
-QA_CKPT = str(CKPT_DIR / "KoreanGPT_qa.pt")    # Stage 2 가중치
+# QA_CKPT = str(CKPT_DIR / "KoreanGPT_qa.pt")    # Stage 2 가중치  # 파인튜닝을 두 번 진행해서 최적화 된 모델 2개를 만듦
+SMALLTALK_CKPT = str(CKPT_DIR / "KoreanGPT_smalltalk.pt")
+NEWS_CKPT = str(CKPT_DIR / "KoreanGPT_news.pt")
 
 EARLY_STOP_PATIENCE = 50     # 연속 10번 평가(=200 step) 동안 개선이 없으면 중단
 EARLY_STOP_MIN_DELTA = 1e-4
@@ -51,7 +53,7 @@ vocab_size = sp.get_piece_size()
 
 
 def train_stage1(model):
-    token_cache = "data/processed/pretrain_tokens.pt"
+    token_cache = "model/data/processed/pretrain_tokens.pt"
 
     if os.path.exists(token_cache):
         print(f"loading token cache: {token_cache}", flush=True)
@@ -89,33 +91,59 @@ def train_stage1(model):
         eval_iters=10,
     )
 
-def train_stage2(model):
-    train_pairs = load_qa_pairs(split="train")
-    val_pairs = load_qa_pairs(split="val")
 
-    print(f"qa train pairs: {len(train_pairs):,}")
-    print(f"qa val pairs: {len(val_pairs):,}, vocab_size: {vocab_size}, device: {device}")
+# 파인 튜닝을 두 번 진행해 두 개의 개별 모델을 만들기 위해 변경 train_stage2 -> train_smalltalk, train_news
+# def train_stage2(model):
+#     train_pairs = load_qa_pairs(split="train")
+#     val_pairs = load_qa_pairs(split="val")
+#
+#     print(f"qa train pairs: {len(train_pairs):,}")
+#     print(f"qa val pairs: {len(val_pairs):,}, vocab_size: {vocab_size}, device: {device}")
+#
+#     get_batch = make_qa_batcher(train_pairs, val_pairs, sp)
+#
+#     if not os.path.exists(GEN_CKPT):
+#         raise FileNotFoundError(f"{GEN_CKPT} 가 없습니다. 먼저 `python train.py train`을 실행하세요.")
+#
+#     model.load_state_dict(torch.load(GEN_CKPT, map_location=device))
+#     print(f"loaded {GEN_CKPT}, fine-tuning device={device}")
+#
+#     train_loop(
+#         model,
+#         get_batch,
+#         FT_STEPS,
+#         FT_LR,
+#         QA_CKPT,
+#         EARLY_STOP_PATIENCE,
+#         EARLY_STOP_MIN_DELTA,
+#         eval_interval=50,
+#         eval_iters=10,
+#     )
+
+def _finetune(model, prefix, ckpt_path):
+    train_pairs = load_qa_pairs(root_dir=None, split="train", prefix=prefix)
+    val_pairs = load_qa_pairs(root_dir=None, split="val", prefix=prefix)
+    print(f"{prefix} — train {len(train_pairs):,}, val {len(val_pairs):,}")
 
     get_batch = make_qa_batcher(train_pairs, val_pairs, sp)
 
     if not os.path.exists(GEN_CKPT):
-        raise FileNotFoundError(f"{GEN_CKPT} 가 없습니다. 먼저 `python train.py train`을 실행하세요.")
+        raise FileNotFoundError(f"{GEN_CKPT} 없음. Colab에서 사전학습한 것을 넣으세요.")
+    model.load_state_dict(torch.load(GEN_CKPT, map_location=device))   # 기본에서 출발
 
-    model.load_state_dict(torch.load(GEN_CKPT, map_location=device))
-    print(f"loaded {GEN_CKPT}, fine-tuning device={device}")
+    train_loop(model, get_batch, FT_STEPS, FT_LR, ckpt_path,
+               EARLY_STOP_PATIENCE, EARLY_STOP_MIN_DELTA,
+               eval_interval=50, eval_iters=10)
 
-    train_loop(
-        model,
-        get_batch,
-        FT_STEPS,
-        FT_LR,
-        QA_CKPT,
-        EARLY_STOP_PATIENCE,
-        EARLY_STOP_MIN_DELTA,
-        eval_interval=50,
-        eval_iters=10,
-    )
+def train_smalltalk(model):
+    _finetune(model, "qa_smalltalk", SMALLTALK_CKPT)
 
+def train_news(model):
+    _finetune(model, "qa_news", NEWS_CKPT)
+
+
+# RAG를 진행하는 도중 제대로 나오는지 확인하기 위해 넣었던 구조들
+"""
 def index_news():
     query = input("검색어 입력: ")
     store = ChromaNewsVectorStore()
@@ -148,11 +176,12 @@ def chat_rag(model):
 
     print("질문 ID:", question_id)
     print("답변:", reply)
-
+"""
 
 MODES = {
     "train": train_stage1,
-    "train_qa": train_stage2,
+    "train_smalltalk": train_smalltalk,
+    "train_news": train_news,
 }
 
 

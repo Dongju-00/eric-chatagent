@@ -6,7 +6,7 @@ from model.train.sp_tokenizer import load_sp
 
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parents[1]
 
 class KoreanGPTEmbedder:
     def __init__(
@@ -18,7 +18,7 @@ class KoreanGPTEmbedder:
             sp_prefix = BASE_DIR / "data" / "sp_korean"
 
         if model_path is None:
-            model_path = BASE_DIR / "checkpoints" / "KoreanGPT_qa.pt"
+            model_path = BASE_DIR / "checkpoints" / "KoreanGPT.pt"
 
         self.sp = load_sp(sp_prefix)
 

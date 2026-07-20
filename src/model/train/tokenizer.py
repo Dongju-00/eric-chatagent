@@ -2,11 +2,11 @@ import csv
 import random
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data"
 
-def load_korean_chatbot_data(root_dir: str = "data") -> str:
-    path = Path(root_dir) / "processed" / "pretrain.txt"
+def load_korean_chatbot_data(root_dir: str = "model") -> str:
+    path = Path(root_dir) / "data" / "processed" / "pretrain.txt"
 
     if not path.exists():
         raise FileNotFoundError(
@@ -15,12 +15,12 @@ def load_korean_chatbot_data(root_dir: str = "data") -> str:
 
     return path.read_text(encoding="utf-8")
 
-
-def load_qa_pairs(root_dir: str = "korean_chatbot_RAG/src/model/data", split: str = "train"):
+# 파인튜닝 부분을 두 부분으로 나눠놨기 때문에 prefix로 확인
+def load_qa_pairs(root_dir: str = None, split: str = "train", prefix: str = "qa"):
     if root_dir is None:
-        path = DATA_DIR / "processed" / f"qa_{split}.csv"
+        path = DATA_DIR / "processed" / f"{prefix}_{split}.csv"
     else:
-        path = Path(root_dir) / "processed" / f"qa_{split}.csv"
+        path = Path(root_dir) / "processed" / f"{prefix}_{split}.csv"
 
     if not path.exists():
         raise FileNotFoundError(
