@@ -28,10 +28,10 @@ GEN_CKPT = str(CKPT_DIR / "KoreanGPT.pt")      # Stage 1 가중치
 SMALLTALK_CKPT = str(CKPT_DIR / "KoreanGPT_smalltalk.pt")
 NEWS_CKPT = str(CKPT_DIR / "KoreanGPT_news.pt")
 
-EARLY_STOP_PATIENCE = 50     # 연속 10번 평가(=200 step) 동안 개선이 없으면 중단
+EARLY_STOP_PATIENCE = 15     # 연속 10번 평가(=200 step) 동안 개선이 없으면 중단
 EARLY_STOP_MIN_DELTA = 1e-4
 
-FT_STEPS = 8000
+FT_STEPS = 2000
 FT_LR = 1e-4                 # Stage 1보다 낮은 lr로 미세조정 (급격한 망각 방지)
 
 def pretrain_path() -> str:

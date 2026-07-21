@@ -1,10 +1,24 @@
+import sys
+from pathlib import Path
 import uvicorn
 
-if __name__ == "__main__":
+ROOT = Path(__file__).resolve().parent
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+
+def serve(host: str = "127.0.0.1", port: int = 8000, reload: bool = False) -> None:
+    """FastAPI 서버 실행."""
+
+    print(f"서버 시작: http://{host}:{port}/docs")
     uvicorn.run(
-        ".src.app:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
+        "app.app:app",
+        host=host,
+        port=port,
+        reload=reload,
+        app_dir=str(SRC),      # reload 모드에서도 src 기준으로 import
     )
 
+if __name__ == "__main__":
+    serve()

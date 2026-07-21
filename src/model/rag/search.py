@@ -9,7 +9,7 @@ load_dotenv()
 client_id = os.getenv("NAVER_CLIENT_ID")
 client_secret = os.getenv("NAVER_CLIENT_SECRET")
 
-def search_stock_news(query, display=10, start=1, sort="sim"):
+def search_stock_news(query, display=10, start=1, sort="date"):
     if not client_id or not client_secret:
         raise ValueError("Client_ID 또는 Client_SECRET이 맞지 않습니다.")
 

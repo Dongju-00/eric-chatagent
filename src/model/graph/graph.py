@@ -66,7 +66,7 @@ def build_graph():
         route = router_chain.invoke({"question" : state["question"]}).strip()
         # gemini가 라우팅을 할 때 `(백틱)을 포함하는 문자로 반환할 때가 있어서 확인용으로 작성했다 지움
         # print(f"{repr(route)}")
-        if "stock" in route or "rag" in route:
+        if "stock" in route:
             route = "stock_rag"
         elif "small" in route or "talk" in route:
             route = "smalltalk"
@@ -77,7 +77,7 @@ def build_graph():
 
 
     def small_talk_node(state: AgentState) -> dict:
-        question= f"질문 : {state["question"]}\n 답변:"
+        question= f"질문: {state["question"]}\n 답변: "
         answer = small_talk_llm.invoke(question)
         return {"answer" : answer, "trace" : ["small_talk_node"]}
 

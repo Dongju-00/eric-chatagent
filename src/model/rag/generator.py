@@ -20,50 +20,12 @@ def _sentence_end_stop_tokens(sp):
 
 
 @torch.no_grad()
-def generate_reply_qa(model, sp, question: str, contexts: list[str], max_new_tokens: int = 120) -> str:
-    """질문 문자열 하나를 받아 "질문: ...\n답변: " 포맷으로 모델에 넣고, 답변 부분만 반환."""
-    stop_tokens = _qa_stop_tokens(sp)
-    context_text = "\n\n".join(contexts[:2])
-
-    prompt = f"""참고 뉴스:
-    {context_text}
-
-    질문: {question}
-    답변: """
-
-    ids = sp.encode(prompt, out_type=int)
-
-    if len(ids) > block_size:
-        ids = ids[-block_size:]
-
-    input_len = len(ids)
-
-    idx = torch.tensor([ids], dtype=torch.long, device=device)
-
-    out = model.generate(
-        idx,
-        max_new_tokens,
-        stop_tokens=stop_tokens,
-        temperature=0.2,
-        top_k=1,
-        repetition_penalty=1.2,
-    )[0].tolist()
-
-    return sp.decode(out[input_len:]).strip()
-
-
-@torch.no_grad()
 def generate_reply_rag(model, sp, question: str, contexts: list[str], max_new_tokens: int = 120) -> str:
     stop_tokens = _qa_stop_tokens(sp)
 
     context_text = "\n\n".join(contexts)
 
-    prompt = f"""아래 참고 뉴스만 바탕으로 답변하세요.
-                모르면 모른다고 답변하세요.
-
-                참고 뉴스: {context_text}
-                질문: {question}
-                답변: """
+    prompt = f"참고 뉴스: {context_text}\n질문: {question}\n답변: "
 
     ids = sp.encode(prompt, out_type=int)
 
