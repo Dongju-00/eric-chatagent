@@ -28,19 +28,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Korean Stock Chatbot Agent API",
-    description="LangGraph 라우팅 Agent (smalltalk / stock_rag / fallback)",
-    version="2.0.0",
     lifespan=lifespan,
 )
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 
 # ──────────────────────────────────────────────
 # 요청 스키마
@@ -109,7 +98,7 @@ async def agent_chat(request: ChatRequest) -> dict[str, Any]:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
-""" 검색이 제대로 되는지 확인하기 위한 디버깅 코드
+""" 검색이 제대로 되는지 확인하기 위한 디버깅 코드, 실제 배포에서는 필요 없음
 @app.post("/rag/index", include_in_schema=False)
 async def index_news(request: IndexRequest) -> dict[str, Any]:
     store = resources.get("store")

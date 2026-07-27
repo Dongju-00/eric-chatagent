@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+
+# large training data
+src/model/data/raw_hf/
+src/model/data/processed/
+src/model/data/raw_aihub/
+
+
+# generated tokenizer
+src/model/data/sp_korean.model
+src/model/data/sp_korean.vocab
+
+# model checkpoints
+src/model/checkpoints/
