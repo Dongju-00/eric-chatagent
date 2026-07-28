@@ -5,6 +5,7 @@ from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from model.graph.graph import build_graph
@@ -29,6 +30,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],   # 배포 시엔 실제 도메인으로 제한
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ──────────────────────────────────────────────
@@ -97,6 +105,7 @@ async def agent_chat(request: ChatRequest) -> dict[str, Any]:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
+app.mount("/", StaticFiles(directory="src/app/static", html=True), name="home")
 
 """ 검색이 제대로 되는지 확인하기 위한 디버깅 코드, 실제 배포에서는 필요 없음
 @app.post("/rag/index", include_in_schema=False)

@@ -11,7 +11,6 @@ if str(SRC) not in sys.path:
 def serve(host: str = "127.0.0.1", port: int = 8000, reload: bool = False) -> None:
     """FastAPI 서버 실행."""
 
-    print(f"서버 시작: http://{host}:{port}/docs")
     uvicorn.run(
         "app.app:app",
         host=host,
