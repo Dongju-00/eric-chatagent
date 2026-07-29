@@ -1,6 +1,6 @@
 services:
   eric-chatbot:
-    image: ktb4eric/eric-chatbot
+    image: ktb4eric/eric-chatagent
     env_file:
       - .env
     ports:

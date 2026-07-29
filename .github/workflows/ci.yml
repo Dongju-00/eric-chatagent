@@ -62,7 +62,7 @@ jobs:
       - name: Build and Push Docker Image
         run: |                            # run: | ← 파이프 기호는 "여러 줄 명령"이라는 뜻
           docker build --platform linux/amd64 -t ${{ secrets.DOCKER_USERNAME }}/eric-chatagent:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/eric-chatbot:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/eric-chatagent:latest
           # ↑ Mac에서 손으로 하던 buildx build --push와 같은 일을 VM이 대신함
           # VM 자체가 x86이지만 --platform 명시는 유지 (의도를 분명히)
 
