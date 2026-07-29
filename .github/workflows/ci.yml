@@ -1,49 +1,114 @@
-# 워크플로우 이름을 "Node.js CI"로 설정합니다.
-name: Node.js CI
+# ─────────────────────────────────────────────
+# 워크플로 이름. Actions 탭 목록에 이 이름으로 표시됨
+# ─────────────────────────────────────────────
+name: Python CI/CD
 
-# 어떤 이벤트가 발생했을 때 워크플로우를 실행할지 정의합니다.
+# ─────────────────────────────────────────────
+# on: "언제 이 워크플로를 실행할까?" (트리거 정의)
+# yml 문법: 들여쓰기(스페이스 2칸)가 계층 구조를 나타냄. 탭 쓰면 에러남!
+# ─────────────────────────────────────────────
 on:
-  push: # 코드가 저장소로 푸시될 때 워크플로우를 실행합니다.
+  push:              # git push가 일어났을 때
     branches:
-      - main # main 브랜치에 코드가 푸시될 때 실행합니다.
-  pull_request: # 풀 리퀘스트가 생성 또는 갱신될 때도 워크플로우를 실행합니다.
+      - main         # 단, main 브랜치에 push된 경우만 (- 는 리스트 항목 표시)
+  pull_request:      # PR이 열리거나 갱신됐을 때
     branches:
-      - main # main 브랜치로 풀 리퀘스트가 열리거나 갱신될 때 실행합니다.
+      - main         # main을 대상으로 하는 PR만
 
-# 실행할 작업을 정의하는 영역입니다.
+# ─────────────────────────────────────────────
+# jobs: 실제로 수행할 작업 묶음. 여기선 test, build-and-push-image, deploy 3개
+# 각 job은 기본적으로 "별도의 가상머신에서, 동시에" 실행됨
+# → 순서를 강제하려면 needs: 를 써야 함 (아래에 나옴)
+# ─────────────────────────────────────────────
 jobs:
-  build: # 작업의 이름을 "build"로 정의합니다.
-    runs-on: ubuntu-latest # 최신 Ubuntu 환경에서 작업을 수행합니다.
 
-    # 작업을 다양한 환경에서 병렬로 실행할 수 있도록 전략을 정의합니다.
-    strategy:
-      # 병렬 실행을 위한 환경 변수 집합을 설정합니다.
-      matrix:
-        # Node.js 버전 19.x, 20.x, 22.x 환경에서 병렬로 작업을 실행합니다.
-        node-version: [19.x, 20.x, 22.x]
+  # ── job 1: 의존성 설치가 되는지 검증 (CI의 최소 단위) ──
+  test:                        # job 이름 (자유롭게 지정, Actions 화면에 표시됨)
+    runs-on: ubuntu-latest     # 이 job을 실행할 가상머신 종류. GitHub가 우분투 VM을 새로 빌려줌
 
-    # 각 작업에서 실행할 단계(step)들을 정의합니다.
+    # steps: 이 job 안에서 순서대로 실행되는 단계들
+    # 각 단계는 uses(남이 만든 액션 재사용) 또는 run(셸 명령 직접 실행) 중 하나
     steps:
-      # 소스 코드를 체크아웃합니다.
-      - name: Checkout repository
-        # GitHub 공식 checkout 액션을 사용하여 저장소의 코드를 가져옵니다.
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4        # 저장소 코드를 VM으로 내려받음 (거의 모든 job의 1단계)
+                                          # "actions/checkout"은 GitHub 공식 액션, @v4는 버전
 
-      # Node.js 환경을 설정합니다.
-      - name: Set up Node.js
-        # Node.js를 설치하기 위한 공식 액션을 사용합니다.
-        uses: actions/setup-node@v2
-        # 액션에 추가적인 매개변수를 전달합니다.
-        with:
-          # 설정한 Node.js 버전을 사용하여 환경을 세팅합니다.
-          node-version: ${{ matrix.node-version }}
+      - name: Install uv                  # name: 은 단계에 붙이는 표시용 이름 (로그에서 이 이름으로 보임)
+        uses: astral-sh/setup-uv@v4       # uv 설치 액션 (astral-sh는 uv 제작사)
+        with:                             # with: 액션에 전달하는 옵션(매개변수)
+          python-version: "3.14"          # 파이썬 3.14 설치 (여러분 프로젝트와 동일 버전)
 
-      # 프로젝트의 의존성 패키지들을 설치합니다.
       - name: Install dependencies
-        # npm install 명령을 실행하여 의존성을 설치합니다.
-        run: npm install
+        run: uv sync --locked             # run: 셸 명령 실행. uv.lock 기준 의존성 설치
+                                          # 이게 실패하면 → 뒤 job들이 아예 실행 안 됨 (배포 사고 예방)
 
-      # 프로젝트의 테스트를 실행합니다.
-      - name: Run tests
-        # npm test 명령을 실행하여 테스트를 수행합니다.
-        run: npm test
+  # ── job 2: Docker 이미지 빌드 + Docker Hub에 push ──
+  build-and-push-image:
+    needs: test                # "test job이 성공해야 이 job 시작" — job 간 순서/의존성 지정
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'   # 조건부 실행: main 브랜치일 때만
+                                          # → PR에서는 test만 돌고 배포는 안 되게 하는 안전장치
+                                          # github.ref는 GitHub가 제공하는 내장 변수(현재 브랜치 정보)
+
+    steps:
+      - uses: actions/checkout@v4         # job마다 VM이 새것이라 코드도 다시 받아야 함
+
+      - name: Docker Hub Login
+        uses: docker/login-action@v3      # Docker 공식 로그인 액션
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}   # ${{ }} : 변수를 값으로 치환하는 문법
+          password: ${{ secrets.DOCKER_TOKEN }}      # secrets.XXX = 저장소 Settings에 등록한 비밀값
+                                                      # 값이 로그에 찍혀도 *** 로 가려짐
+
+      - name: Build and Push Docker Image
+        run: |                            # run: | ← 파이프 기호는 "여러 줄 명령"이라는 뜻
+          docker build --platform linux/amd64 -t ${{ secrets.DOCKER_USERNAME }}/eric-chatagent:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/eric-chatbot:latest
+          # ↑ Mac에서 손으로 하던 buildx build --push와 같은 일을 VM이 대신함
+          # VM 자체가 x86이지만 --platform 명시는 유지 (의도를 분명히)
+
+  # ── job 3: EC2에 SSH 접속해서 새 이미지로 재배포 ──
+  deploy:
+    needs: build-and-push-image           # 이미지가 Hub에 올라간 뒤에만 실행
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Prepare SSH Key
+        run: |
+          mkdir -p ~/.ssh                                        # VM에 .ssh 폴더 생성
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa  # Secret에 넣어둔 pem 내용을 파일로 복원
+          chmod 600 ~/.ssh/id_rsa                                # 키 권한 설정 (여러분이 chmod 400 했던 것과 같은 이유)
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+          # ↑ EC2의 호스트 지문을 미리 등록 (첫 접속 시 "yes/no" 물어보는 걸 생략하기 위함)
+
+      - name: Check if Docker is installed
+        id: check-docker                  # id: 이 단계에 식별자 부여 → 다른 단계에서 결과 참조용
+        run: |
+          DOCKER_EXISTS=$(ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} 'command -v docker >/dev/null && echo "true" || echo "false"')
+          # ↑ EC2에 접속해 docker 명령이 있는지 검사, 결과를 true/false 문자열로 받음
+          echo "docker_exists=$DOCKER_EXISTS" >> $GITHUB_OUTPUT
+          # ↑ 이 단계의 "출력값"으로 저장 → 아래 if에서 참조 가능
+
+      - name: Install Docker on EC2
+        if: steps.check-docker.outputs.docker_exists == 'false'
+        # ↑ 위 단계의 출력이 false일 때만 실행 (docker 없으면 설치, 있으면 통째로 건너뜀)
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            # << 'EOF' ~ EOF : "히어독" 문법. 사이의 모든 줄을 원격 서버에서 실행
+            sudo apt-get update
+            sudo apt-get install -y ca-certificates curl gnupg lsb-release
+            sudo mkdir -p /etc/apt/keyrings
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            sudo apt-get update
+            sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+            # ↑ Docker 공식 apt 저장소 등록 후 설치 (여러분이 snap으로 했던 것의 정석 버전)
+            sudo usermod -aG docker $USER   # ubuntu 유저를 docker 그룹에 추가 (sudo 없이 쓰게)
+          EOF
+
+      - name: Deploy to EC2 via Docker Compose
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            cd /home/${{ secrets.SERVER_USER }}/eric-chatagent   # compose 파일 있는 폴더로 이동
+            docker compose pull      # Hub에서 방금 올라간 새 이미지 받기
+            docker compose up -d     # -d: 백그라운드 실행 (없으면 워크플로가 로그에 붙잡혀 안 끝남)
+          EOF
