@@ -11,7 +11,10 @@ RUN uv sync --locked --no-install-project --no-dev
 COPY . .
 RUN uv sync --locked --no-dev
 
-ENV PATH="/.venv/bin:$PATH"
+RUN uv run python -c "from huggingface_hub import snapshot_download; \
+    snapshot_download('Dongju-00/eric-chatagent', local_dir='.')"
+
+ENV PATH="/app/.venv/bin:$PATH"
 
 EXPOSE 8000
 

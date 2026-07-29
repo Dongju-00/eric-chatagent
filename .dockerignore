@@ -16,8 +16,8 @@ src/model/data/raw_aihub/
 
 
 # generated tokenizer
-#src/model/data/sp_korean.model
-#src/model/data/sp_korean.vocab
+src/model/data/sp_korean.model
+src/model/data/sp_korean.vocab
 
 # model checkpoints
-#src/model/checkpoints/
+src/model/checkpoints/
