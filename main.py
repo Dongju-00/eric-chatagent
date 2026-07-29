@@ -8,7 +8,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 
-def serve(host: str = "127.0.0.1", port: int = 8000, reload: bool = False) -> None:
+def serve(host: str = "0.0.0.0", port: int = 8000, reload: bool = False) -> None:
     """FastAPI 서버 실행."""
 
     uvicorn.run(

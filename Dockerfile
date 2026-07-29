@@ -11,8 +11,8 @@ RUN uv sync --locked --no-install-project --no-dev
 COPY . .
 RUN uv sync --locked --no-dev
 
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/.venv/bin:$PATH"
 
 EXPOSE 8000
 
-CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run","python", "main.py"]
