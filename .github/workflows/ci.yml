@@ -1,0 +1,49 @@
+# 워크플로우 이름을 "Node.js CI"로 설정합니다.
+name: Node.js CI
+
+# 어떤 이벤트가 발생했을 때 워크플로우를 실행할지 정의합니다.
+on:
+  push: # 코드가 저장소로 푸시될 때 워크플로우를 실행합니다.
+    branches:
+      - main # main 브랜치에 코드가 푸시될 때 실행합니다.
+  pull_request: # 풀 리퀘스트가 생성 또는 갱신될 때도 워크플로우를 실행합니다.
+    branches:
+      - main # main 브랜치로 풀 리퀘스트가 열리거나 갱신될 때 실행합니다.
+
+# 실행할 작업을 정의하는 영역입니다.
+jobs:
+  build: # 작업의 이름을 "build"로 정의합니다.
+    runs-on: ubuntu-latest # 최신 Ubuntu 환경에서 작업을 수행합니다.
+
+    # 작업을 다양한 환경에서 병렬로 실행할 수 있도록 전략을 정의합니다.
+    strategy:
+      # 병렬 실행을 위한 환경 변수 집합을 설정합니다.
+      matrix:
+        # Node.js 버전 19.x, 20.x, 22.x 환경에서 병렬로 작업을 실행합니다.
+        node-version: [19.x, 20.x, 22.x]
+
+    # 각 작업에서 실행할 단계(step)들을 정의합니다.
+    steps:
+      # 소스 코드를 체크아웃합니다.
+      - name: Checkout repository
+        # GitHub 공식 checkout 액션을 사용하여 저장소의 코드를 가져옵니다.
+        uses: actions/checkout@v2
+
+      # Node.js 환경을 설정합니다.
+      - name: Set up Node.js
+        # Node.js를 설치하기 위한 공식 액션을 사용합니다.
+        uses: actions/setup-node@v2
+        # 액션에 추가적인 매개변수를 전달합니다.
+        with:
+          # 설정한 Node.js 버전을 사용하여 환경을 세팅합니다.
+          node-version: ${{ matrix.node-version }}
+
+      # 프로젝트의 의존성 패키지들을 설치합니다.
+      - name: Install dependencies
+        # npm install 명령을 실행하여 의존성을 설치합니다.
+        run: npm install
+
+      # 프로젝트의 테스트를 실행합니다.
+      - name: Run tests
+        # npm test 명령을 실행하여 테스트를 수행합니다.
+        run: npm test

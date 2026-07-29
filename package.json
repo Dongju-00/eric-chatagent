@@ -1,0 +1,29 @@
+{
+  "name": "eric-chatagent",
+  "version": "1.0.0",
+  "description": "한국어 챗봇 모델을 직접 학습하고, 네이버 뉴스 검색 기반 RAG 흐름까지 연결하는 프로젝트입니다.   기본 모델은 Decoder-only Transformer 구조의 `KoreanGPT`이며, SentencePiece 토크나이저를 사용합니다.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node test.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dongju-00/eric-chatagent.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Dongju-00/eric-chatagent/issues"
+  },
+  "homepage": "https://github.com/Dongju-00/eric-chatagent#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "supertest": "^7.2.2"
+  }
+}
