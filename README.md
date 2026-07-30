@@ -1,282 +1,295 @@
-# Korean Chatbot RAG
+# eric-chatagent
 
-한국어 챗봇 모델을 직접 학습하고, 네이버 뉴스 검색 기반 RAG 흐름까지 연결하는 프로젝트입니다.  
-기본 모델은 Decoder-only Transformer 구조의 `KoreanGPT`이며, SentencePiece 토크나이저를 사용합니다.
+한국어 대화 모델을 직접 학습하고, 네이버 뉴스 검색 기반 RAG와 LangGraph 라우팅을 연결한 주식 정보 챗봇입니다.
+사전학습 모델을 가져다 쓰는 대신 **Decoder-only Transformer(KoreanGPT)를 직접 설계·학습**하고, 여기에 검색 증강 생성과 서비스 배포까지 붙였습니다.
 
-## 프로젝트 목표
+<br>
 
-1. 한국어 텍스트로 SentencePiece 토크나이저를 학습합니다.
-2. GPT 모델을 다음 토큰 예측 방식으로 사전학습합니다.
-3. `질문 -> 답변` 형식의 QA 데이터로 파인튜닝합니다.
-4. 네이버 뉴스 검색 API로 사용자 질문 관련 뉴스를 가져옵니다.
-5. 뉴스 HTML 태그를 제거하고 chunking 합니다.
-6. 직접 학습한 `KoreanGPTEmbedder`로 뉴스 chunk를 임베딩합니다.
-7. ChromaDB에 질문과 뉴스 chunk를 저장합니다.
-8. 검색된 참고 뉴스를 기반으로 답변을 생성합니다.
+## 목차
 
-## 실행 위치
+- [주요 기능](#주요-기능)
+- [아키텍처](#아키텍처)
+- [기술 스택](#기술-스택)
+- [프로젝트 구조](#프로젝트-구조)
+- [시작하기](#시작하기)
+- [API](#api)
+- [배포 파이프라인](#배포-파이프라인)
+- [서버 초기 세팅](#서버-초기-세팅)
+- [모델](#모델)
+- [알려진 한계](#알려진-한계)
 
-Mac 기준 프로젝트 루트:
+<br>
 
-`main.py`를 직접 실행하면 상대 import 때문에 오류가 날 수 있습니다.
+## 주요 기능
 
-```bash
-# 권장
-python -m korean_chatbot_RAG.src.model.main train_qa
+| 기능 | 설명 |
+| --- | --- |
+| **질문 라우팅** | LangGraph 라우터가 질문을 분류해 세 경로 중 하나로 분기 |
+| **스몰톡** | 일상 대화 전용으로 파인튜닝한 KoreanGPT가 응답 |
+| **주식 뉴스 RAG** | 네이버 뉴스 수집 → 벡터 인덱싱 → 유사도 검색 → 뉴스 전용 모델이 응답 |
+| **폴백** | 처리 범위를 벗어난 질문은 정형 응답으로 안내 |
+| **세션 유지** | `thread_id` 기반으로 대화 상태를 이어서 관리 |
+| **웹 채팅 UI** | 카카오톡 스타일 채팅 인터페이스 제공 |
+
+<br>
+
+## 아키텍처
+
+```
+                        ┌─────────────────────────┐
+   브라우저  ──────────▶  │  FastAPI (:8000)        │
+   (채팅 UI)             │  · 정적 파일 서빙          │
+                        │  · POST /agent/chat     │
+                        └───────────┬─────────────┘
+                                    │
+                        ┌───────────▼─────────────┐
+                        │      LangGraph          │
+                        │      router_node        │
+                        └───┬───────┬─────────┬───┘
+                            │       │         │
+                  smalltalk │       │ stock_rag         fallback
+                            │       │         │
+              ┌─────────────▼─┐  ┌──▼──────────────┐  ┌▼──────────┐
+              │ KoreanGPT     │  │ search_news     │  │ 정형 응답   │
+              │ _smalltalk    │  │   ↓ 네이버 API    │  └───────────┘
+              └───────────────┘  │ retrieve_news   │
+                                 │   ↓ ChromaDB    │
+                                 │ generate        │
+                                 │   ↓ KoreanGPT   │
+                                 │     _news       │
+                                 └─────────────────┘
 ```
 
+**RAG 흐름**: 주식 질문이 들어오면 네이버 뉴스를 수집해 `KoreanGPT.pt`(임베딩 전용)로 벡터화하고 ChromaDB에 저장합니다. 같은 임베더로 질문을 벡터화해 유사 뉴스를 검색한 뒤, 검색 결과를 컨텍스트로 넣어 `KoreanGPT_news.pt`가 답변을 생성합니다.
 
-## 주요 구조
+<br>
 
-```text
-korean_stock_chatbot/
+## 기술 스택
+
+**모델**
+`PyTorch` · `SentencePiece` · Decoder-only Transformer (자체 구현)
+
+**RAG / 오케스트레이션**
+`LangChain` · `LangGraph` · `ChromaDB` · 네이버 뉴스 검색 API
+
+**서빙**
+`FastAPI` · `Uvicorn` · Vanilla JS 채팅 UI
+
+**인프라**
+`Docker` · `Docker Compose` · `GitHub Actions` · `AWS EC2` · `Docker Hub` · `Hugging Face Hub`
+
+**패키지 관리**
+`uv`
+
+<br>
+
+## 프로젝트 구조
+
+```
+eric-chatagent/
+├── main.py                      # 진입점 (uvicorn 실행)
+├── pyproject.toml               # 의존성 정의 (torch는 CPU 빌드 고정)
+├── uv.lock
+├── Dockerfile
+├── docker-compose.yml
+├── .dockerignore
+├── .github/
+│   └── workflows/
+│       └── ci.yml               # CI/CD 파이프라인
 └── src/
-    └──  app/
-        └──  app.py
-
+    ├── app/
+    │   ├── app.py               # FastAPI 앱, 엔드포인트
+    │   └── static/              # 채팅 UI (index.html, app.js)
     └── model/
-        └── checkpoints/
-            ├── KoreanGPT.pt
-            └── KoreanGPT_qa.pt
-
-        └── data/
-            └── processed/
-
-            └── raw_hf/
-                └── news/
-
-                └── nlpbada/
-                    
-                └── smalltalk/
-
-                    
-        └── embed/
-            └── embedder.py          # KoreanGPT 기반 임베딩 생성
-       
-        └── rag/
-            ├── baseline.py
-            └── evaluate_rag.py
-        
-        └── scripts/
-            ├── prepare_pretrain.py  
-            └── prepare_finetune.py  # QA 파인튜닝 CSV 생성
-        
-        └── store/
-            └── vector_store.py      # 뉴스 파싱, chunking, ChromaDB 저장/검색
-            
-        └── train/
-            ├── model.py             # Decoder-only KoreanGPT 모델
-            ├── tokenizer.py         # 학습/파인튜닝 데이터 로딩
-            ├── sp_tokenizer.py      # SentencePiece 학습/로드/인코딩
-            ├── train.py              # 실행 진입점
-            └── train_utils.py       # batch 생성, 학습 루프, QA 파인튜닝 배처
-            
-        ├── chat.py              # 일반 대화, QA 대화, RAG 답변 생성
-        └── search.py            # 네이버 뉴스 검색 API 호출
-        
-├── .gitignore
-├── .python-version
-├── main.py
-├── pyproject.toml
-├── README.md
-├── requirements.txt
-└── uv.lock
+        ├── train/               # 모델 정의, SentencePiece 토크나이저
+        ├── embed/               # KoreanGPT 기반 임베더
+        ├── store/               # ChromaDB 벡터 스토어
+        ├── rag/                 # 검색, LLM 래퍼, 프롬프트
+        ├── graph/               # LangGraph 그래프 정의
+        ├── data/                # 토크나이저 파일 (HF에서 주입)
+        └── checkpoints/         # 모델 가중치 (HF에서 주입)
 ```
 
-## 설치
+> `data/`, `checkpoints/`의 실제 파일은 Git에 포함되지 않습니다. 이미지 빌드 시 Hugging Face Hub에서 내려받습니다. ([모델](#모델) 참고)
 
-가상환경 생성 후 의존성을 설치합니다.
+<br>
+
+## 시작하기
+
+### 요구 사항
+
+- Python 3.14
+- [uv](https://docs.astral.sh/uv/)
+- 네이버 검색 API 키
+
+### 로컬 실행
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# 1. 저장소 클론
+git clone https://github.com/Dongju-00/eric-chatagent.git
+cd eric-chatagent
+
+# 2. 의존성 설치
+uv sync
+
+# 3. 모델 파일 다운로드 (Hugging Face)
+uv run python -c "from huggingface_hub import snapshot_download; \
+    snapshot_download('Dongju-00/eric-chatagent', local_dir='.')"
+
+# 4. 환경 변수 설정
+cp .env.example .env      # 네이버 API 키 등을 입력
+
+# 5. 서버 실행
+uv run python main.py
 ```
 
-주요 의존성:
+- 채팅 UI: http://localhost:8000
+- API 문서: http://localhost:8000/docs
 
-```text
-torch
-sentencepiece
-fastapi
-uvicorn[standard]
-Korpora
-datasets
-pandas
-chromadb
-python-dotenv
-google-genai
-```
-
-## 환경변수
-
-프로젝트 루트에 `.env`를 만들고 API 키를 설정합니다.
-
-```env
-NAVER_CLIENT_ID=네이버_클라이언트_ID
-NAVER_CLIENT_SECRET=네이버_클라이언트_SECRET
-GOOGLE_API_KEY=Gemini_API_KEY
-```
-
-역할:
-
-| 환경변수 | 사용 위치 | 용도 |
-|---|---|---|
-| `NAVER_CLIENT_ID` | `search.py` | 네이버 뉴스 검색 API 인증 |
-| `NAVER_CLIENT_SECRET` | `search.py` | 네이버 뉴스 검색 API 인증 |
-| `GOOGLE_API_KEY` | `evaluate_rag.py` | Gemini 2.5 Flash retrieval 평가 |
-
-## 데이터 준비
-
-최종적으로 QA 파인튜닝 파일은 아래 위치에 있어야 합니다.
-
-```text
-data/processed/qa_train.csv
-data/processed/qa_val.csv
-```
-
-정상이라면 최소한 아래 파일이 보여야 합니다.
-
-```text
-pretrain.txt
-qa_train.csv
-qa_val.csv
-```
-
-QA CSV 기본 형식:
-
-```csv
-question,answer
-"질문 내용","답변 내용"
-```
-
-RAG instruction fine-tuning에 사용할 형식:
-
-```csv
-question,answer
-"참고 뉴스:
-제목: 삼성전자 반도체 실적 개선 기대
-내용: 삼성전자의 반도체 업황 회복 기대감이 커지고 있다는 내용의 뉴스입니다.
-
-질문: 삼성전자 주식 뉴스 알려줘","참고 뉴스에 따르면 삼성전자는 반도체 업황 회복 기대감과 관련해 주목받고 있습니다."
-```
-
-중요한 점은 `question` 컬럼 안에 이미 `참고 뉴스 + 질문`이 들어간다는 것입니다.
-
-## 학습 흐름
-
-### 1. Stage 1 사전학습
-
-한국어 텍스트를 다음 토큰 예측 방식으로 학습합니다.
+### Docker로 실행
 
 ```bash
-python -m korean_chatbot_RAG.src.model.main train
+docker compose up -d
 ```
 
-생성되는 체크포인트:
+<br>
 
-```text
-korean_chatbot_RAG/src/model/checkpoints/KoreanGPT.pt
+## API
+
+### `POST /agent/chat`
+
+질문을 라우팅해 답변을 반환합니다.
+
+**Request**
+
+```json
+{
+  "question": "삼성전자 주식 뉴스 알려줘",
+  "thread_id": "session-f703c100"
+}
 ```
 
-### 2. Stage 2 QA 파인튜닝
+`thread_id`를 생략하면 새 세션이 발급됩니다. 이후 요청에 같은 값을 넘기면 대화 상태가 유지됩니다.
 
-`qa_train.csv`, `qa_val.csv`를 이용해 질문-답변 형식으로 파인튜닝합니다.
+**Response**
+
+```json
+{
+  "question": "삼성전자 주식 뉴스 알려줘",
+  "answer": "제공된 참고 뉴스에 따르면 ...",
+  "route": "stock_rag",
+  "trace": ["router_node", "search_news_node", "retrieve_news_node", "generate_node"],
+  "contexts": ["제목: ... \n내용: ... \n링크: ..."],
+  "question_id": "q_20260729_021237_65e9df64",
+  "thread_id": "session-f703c100"
+}
+```
+
+| 필드 | 설명 |
+| --- | --- |
+| `route` | 라우팅 결과 (`smalltalk` / `stock_rag` / `fallback`) |
+| `trace` | 그래프가 거친 노드 목록 |
+| `contexts` | RAG가 참고한 뉴스 원문 |
+
+### `GET /health`
+
+서버와 그래프 로딩 상태를 반환합니다.
+
+<br>
+
+## 배포 파이프라인
+
+`main` 브랜치에 push하면 전체 배포가 자동으로 진행됩니다.
+
+```
+git push origin main
+      │
+      ▼
+┌─────────────────────────────────────────────────────────┐
+│ GitHub Actions                                          │
+│                                                         │
+│  test                  uv sync --locked 검증             │
+│    │ needs                                              │
+│  build-and-push        Docker 이미지 빌드                  │
+│    │                   (HF에서 모델 주입) → Docker Hub     │
+│    │ needs                                              │
+│  deploy                EC2 SSH 접속                      │
+│                        → docker login                   │
+│                        → compose pull                   │
+│                        → compose up -d                  │
+└─────────────────────────────────────────────────────────┘
+      │
+      ▼
+   EC2에 새 버전 반영
+```
+
+### 필요한 GitHub Secrets
+
+| 이름 | 설명 |
+| --- | --- |
+| `DOCKER_USERNAME` | Docker Hub 사용자명 |
+| `DOCKER_TOKEN` | Docker Hub Access Token |
+| `SERVER_HOST` | EC2 퍼블릭 주소 (Elastic IP 권장) |
+| `SERVER_USER` | EC2 사용자명 (`ubuntu`) |
+| `SSH_PRIVATE_KEY` | EC2 접속용 `.pem` 파일 전문 |
+
+<br>
+
+## 서버 초기 세팅
+
+새 EC2 인스턴스에 배포할 때 필요한 작업입니다. **코드와 모델은 이미지에 포함되므로 서버에는 아래 항목만 준비하면 됩니다.**
 
 ```bash
-python -m korean_chatbot_RAG.src.model.main train_qa
+# 1. 배포 디렉터리 생성 (EC2)
+mkdir -p ~/your directory
+
+# 2. 실행에 필요한 파일 전송 (로컬)
+scp -i <key>.pem docker-compose.yml .env ubuntu@<host>:~/your directory/
 ```
 
-생성되는 체크포인트:
+**체크리스트**
 
-```text
-korean_chatbot_RAG/src/model/checkpoints/KoreanGPT_qa.pt
-```
+- [ ] `~/your directory`에 `docker-compose.yml`, `.env` 존재
+- [ ] compose 파일에 `build: .`이 **없을** 것 (배포 서버는 pull만 수행)
+- [ ] 보안 그룹 인바운드: `22`(SSH), `8000`(웹)
+- [ ] Elastic IP 연결 (재시작 시 주소 고정)
+- [ ] 인스턴스 타입 `t3.medium` 이상 (모델 로딩에 메모리 필요)
 
-## RAG 흐름
+> Docker 설치와 Docker Hub 로그인은 워크플로가 자동으로 처리합니다.
 
-```mermaid
-flowchart TD
-    A["사용자 질문"] --> B["네이버 뉴스 검색"]
-    B --> C["HTML 제거 및 뉴스 파싱"]
-    C --> D["뉴스 chunking"]
-    D --> E["KoreanGPTEmbedder 임베딩"]
-    E --> F["ChromaDB 저장"]
-    A --> G["질문 임베딩"]
-    G --> H["유사 뉴스 chunk 검색"]
-    H --> I["참고 뉴스 기반 답변 생성"]
-```
-흐름:
+<br>
 
-1. 사용자 질문 입력
-2. 질문으로 네이버 뉴스 검색
-3. 검색 뉴스 chunk 저장
-4. ChromaDB에서 유사 chunk 검색
-5. 검색된 참고 뉴스를 prompt에 넣음
-6. `KoreanGPT_qa.pt` 모델이 답변 생성
+## 모델
 
+학습한 모델 가중치와 토크나이저는 Hugging Face Hub에 공개되어 있습니다.
 
-현재 문제점:
-- 검색과 retrieval 자체는 동작합니다.
-- 하지만 모델이 "참고 뉴스만 보고 답변하는 방식"을 충분히 학습하지 않았습니다.
-- 따라서 뉴스 내용을 모델에 계속 넣어 학습시키는 것보다, 참고문서 기반 답변 형식을 fine-tuning 해야 합니다.
+**[Dongju-00/eric-chatagent](https://huggingface.co/Dongju-00/eric-chatagent)**
 
-## Retrieval 평가
+| 파일 | 역할 |
+| --- | --- |
+| `KoreanGPT.pt` | 임베딩 생성 (RAG 벡터 검색용) |
+| `KoreanGPT_news.pt` | 뉴스 기반 답변 생성 |
+| `KoreanGPT_smalltalk.pt` | 스몰톡 답변 생성 |
+| `sp_korean.model` / `.vocab` | SentencePiece 토크나이저 |
 
-Gemini 2.5 Flash로 검색된 뉴스 chunk가 질문과 관련 있는지 평가합니다.
+가중치는 Git에 커밋하지 않고 Hub에서 주입합니다. 덕분에 저장소는 코드만 유지하고, 로컬·CI·서버 어느 환경에서든 동일한 모델을 사용할 수 있습니다.
 
-```bash
-python -m korean_chatbot_RAG.src.model.evaluate_rag
-```
+<br>
 
-평가 기준:
+## 알려진 한계
 
-| 항목 | 의미 |
-|---|---|
-| `retrieval_relevance` | 검색 결과가 질문과 의미적으로 관련 있는지 |
-| `keyword_match` | 질문의 핵심 키워드가 검색 결과에 반영되었는지 |
-| `context_usefulness` | 해당 chunk만으로 답변을 만들 수 있는지 |
-| `pass` | RAG 답변 생성에 사용할 만한 검색 결과인지 |
-| `reason` | 평가 이유 |
+- **환각(Hallucination)** — 소형 모델 특성상 검색된 뉴스에 없는 내용을 생성하는 경우가 있습니다. 컨텍스트 품질에 답변이 크게 좌우됩니다.
+- **검색 품질** — 질문을 그대로 검색 쿼리로 사용하고 있어 종목과 무관한 기사가 섞일 수 있습니다. 종목명 추출과 관련도 임계값 도입이 필요합니다.
+- **메모리 사용량** — 모델 3종을 시작 시 모두 로드하는 구조로, 2GB 환경에서 OOM이 발생합니다. 지연 로딩과 모델 서버 분리를 검토 중입니다.
+- **문장 완성도** — 자체 학습한 소형 모델이라 조사·어미가 부자연스러운 출력이 나올 수 있습니다.
 
-Gemini 평가 결과는 답변 품질이 아니라 retrieval 품질을 보는 용도입니다.
+<br>
 
-## 실행 명령어 요약
+## 로드맵
 
-```bash
-# 프로젝트 루트 이동
-cd /Users/djdj1473/PythonProject/KTB4-eric-AI/week6
-
-# 의존성 설치
-pip install -r requirements.txt
-
-# Stage 1 사전학습
-python -m korean_chatbot_RAG.src.model.main train
-
-# Stage 2 QA/RAG instruction 파인튜닝
-python -m korean_chatbot_RAG.src.model.main train_qa
-
-# 네이버 뉴스 검색 후 ChromaDB 색인
-python -m korean_chatbot_RAG.src.model.main index_news
-
-# RAG 답변 생성
-python -m korean_chatbot_RAG.src.model.main chat_rag
-
-# Gemini 기반 retrieval 평가
-python -m korean_chatbot_RAG.src.model.evaluate_rag
-```
-
-## 현재 상태 요약
-
-완료된 것:
-
-- 네이버 뉴스 검색 API 연결
-- 사용자 질문 기반 뉴스 검색
-- 뉴스 HTML 태그 제거 및 텍스트 파싱
-- 뉴스 chunking
-- `KoreanGPTEmbedder` 기반 embedding
-- ChromaDB에 질문 ID, 뉴스 chunk 저장
-- 유사 뉴스 chunk 검색
-- Gemini 2.5 Flash 기반 retrieval 평가
-- RAG 답변 생성 흐름 연결
-
+- [ ] nginx 리버스 프록시 도입 (80 포트 서빙, 정적 파일 분리)
+- [ ] 모델 추론을 별도 서버로 분리하여 장애 격리
+- [ ] Gemini API 사용 부분을 공개 가중치 모델로 변경
+- [ ] 검색 파이프라인 개선 (종목명 추출, `top_k` 확대, 관련도 임계값)
+- [ ] 생성 파라미터 튜닝 (temperature 조정으로 환각 완화)
+- [ ] HTTPS 적용
