@@ -67,7 +67,7 @@ jobs:
           # VM 자체가 x86이지만 --platform 명시는 유지 (의도를 분명히)
 
   # ── job 3: EC2에 SSH 접속해서 새 이미지로 재배포 ──
-  deploy:
+  deploy-model:
     needs: build-and-push-image           # 이미지가 Hub에 올라간 뒤에만 실행
     runs-on: ubuntu-latest
 
@@ -77,13 +77,13 @@ jobs:
           mkdir -p ~/.ssh                                        # VM에 .ssh 폴더 생성
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa  # Secret에 넣어둔 pem 내용을 파일로 복원
           chmod 600 ~/.ssh/id_rsa                                # 키 권한 설정 (여러분이 chmod 400 했던 것과 같은 이유)
-          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.MODEL_SERVER_HOST }} >> ~/.ssh/known_hosts
           # ↑ EC2의 호스트 지문을 미리 등록 (첫 접속 시 "yes/no" 물어보는 걸 생략하기 위함)
 
       - name: Check if Docker is installed
         id: check-docker                  # id: 이 단계에 식별자 부여 → 다른 단계에서 결과 참조용
         run: |
-          DOCKER_EXISTS=$(ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} 'command -v docker >/dev/null && echo "true" || echo "false"')
+          DOCKER_EXISTS=$(ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.MODEL_SERVER_HOST }} 'command -v docker >/dev/null && echo "true" || echo "false"')
           # ↑ EC2에 접속해 docker 명령이 있는지 검사, 결과를 true/false 문자열로 받음
           echo "docker_exists=$DOCKER_EXISTS" >> $GITHUB_OUTPUT
           # ↑ 이 단계의 "출력값"으로 저장 → 아래 if에서 참조 가능
@@ -92,7 +92,7 @@ jobs:
         if: steps.check-docker.outputs.docker_exists == 'false'
         # ↑ 위 단계의 출력이 false일 때만 실행 (docker 없으면 설치, 있으면 통째로 건너뜀)
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.MODEL_SERVER_HOST }} << 'EOF'
             # << 'EOF' ~ EOF : "히어독" 문법. 사이의 모든 줄을 원격 서버에서 실행
             sudo apt-get update
             sudo apt-get install -y ca-certificates curl gnupg lsb-release
@@ -107,13 +107,73 @@ jobs:
 
       - name: Docker login on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST}} << 'EOF'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.MODEL_SERVER_HOST}} \
             "echo '${{ secrets.DOCKER_TOKEN }}' | sudo docker login -u '${{ secrets.DOCKER_USERNAME }}' --password-stdin"
 
       - name: Deploy to EC2 via Docker Compose
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.MODEL_SERVER_HOST }} \
             cd /home/${{ secrets.SERVER_USER }}/eric-chatagent   # compose 파일 있는 폴더로 이동
-            docker compose pull      # Hub에서 방금 올라간 새 이미지 받기
-            docker compose up -d     # -d: 백그라운드 실행 (없으면 워크플로가 로그에 붙잡혀 안 끝남)
+            sudo docker compose pull      # Hub에서 방금 올라간 새 이미지 받기
+            sudo docker compose up -d     # -d: 백그라운드 실행 (없으면 워크플로가 로그에 붙잡혀 안 끝남)
+          EOF
+
+  deploy-web:
+    needs: deploy-model
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare SSH KEY
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.WEB_SERVER_HOST }} >> ~/.ssh/known_hosts
+          
+            - name: Check if Docker is installed
+        id: check-docker                  # id: 이 단계에 식별자 부여 → 다른 단계에서 결과 참조용
+        run: |
+          DOCKER_EXISTS=$(ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.WEB_SERVER_HOST }} 'command -v docker >/dev/null && echo "true" || echo "false"')
+          # ↑ EC2에 접속해 docker 명령이 있는지 검사, 결과를 true/false 문자열로 받음
+          echo "docker_exists=$DOCKER_EXISTS" >> $GITHUB_OUTPUT
+          # ↑ 이 단계의 "출력값"으로 저장 → 아래 if에서 참조 가능
+
+      - name: Install Docker on EC2
+        if: steps.check-docker.outputs.docker_exists == 'false'
+        # ↑ 위 단계의 출력이 false일 때만 실행 (docker 없으면 설치, 있으면 통째로 건너뜀)
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.WEB_SERVER_HOST }} << 'EOF'
+            # << 'EOF' ~ EOF : "히어독" 문법. 사이의 모든 줄을 원격 서버에서 실행
+            sudo apt-get update
+            sudo apt-get install -y ca-certificates curl gnupg lsb-release
+            sudo mkdir -p /etc/apt/keyrings
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            sudo apt-get update
+            sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+            # ↑ Docker 공식 apt 저장소 등록 후 설치 (여러분이 snap으로 했던 것의 정석 버전)
+            sudo usermod -aG docker $USER   # ubuntu 유저를 docker 그룹에 추가 (sudo 없이 쓰게)
+          EOF
+
+      - name: Copy nginx config
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.WEB_SERVER_HOST }} \
+            "mkdir -p ~/eric-chatagent"
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+            nginx.conf docker-compose.web.yml \
+            ${{ secrets.SERVER_USER }}@${{ secrets.WEB_SERVER_HOST }}:~/eric-chatagent/
+
+      - name: Docker login on EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.WEB_SERVER_HOST}} \
+            "echo '${{ secrets.DOCKER_TOKEN }}' | sudo docker login -u '${{ secrets.DOCKER_USERNAME }}' --password-stdin"
+
+      - name: Deploy Web Server
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.WEB_SERVER_HOST }} << 'EOF'
+            cd /home/${{ secrets.SERVER_USER }}/eric-chatagent
+            sudo docker compose -f docker-compose.web.yml up -d
+            sudo docker compose -f docker-compose.web.yml exec -T nginx nginx -s reload || true
           EOF

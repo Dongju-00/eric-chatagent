@@ -26,7 +26,7 @@ PROJECT_DIR = Path(__file__).resolve().parents[1]
 small_talk_llm = build_llm("small_talk")
 stock_news_llm = build_llm("stock_news")
 route_llm = GoogleGenerativeAI(
-    model="gemini-2.5-flash",
+    model="gemini-3.6-flash",
     google_api_key=os.getenv("GOOGLE_API_KEY"),
 )
 
@@ -86,7 +86,7 @@ def build_graph():
         return {"question_id" : question_id ,"trace" : ["search_news_node"]}
 
     def retrieve_news_node(state: AgentState) -> dict:
-        result = store.search_similar_news(state["question"], top_k=1)
+        result = store.search_similar_news(state["question"], top_k=3)
         return {"contexts" : result["documents"][0], "retrieved_docs" : result["metadatas"][0], "trace" : ["retrieve_news_node"]}
 
 
