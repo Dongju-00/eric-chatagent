@@ -132,7 +132,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.WEB_SERVER_HOST }} >> ~/.ssh/known_hosts
           
-            - name: Check if Docker is installed
+      - name: Check if Docker is installed
         id: check-docker                  # id: 이 단계에 식별자 부여 → 다른 단계에서 결과 참조용
         run: |
           DOCKER_EXISTS=$(ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.WEB_SERVER_HOST }} 'command -v docker >/dev/null && echo "true" || echo "false"')
