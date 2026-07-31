@@ -72,6 +72,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Prepare SSH Key
         run: |
           mkdir -p ~/.ssh                                        # VM에 .ssh 폴더 생성
