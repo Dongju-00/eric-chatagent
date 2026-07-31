@@ -46,16 +46,6 @@ class CausalSelfAttention(nn.Module):
         k = k.view(B, T, n_head, head_dim).transpose(1, 2)
         v = v.view(B, T, n_head, head_dim).transpose(1, 2)
 
-        # 마스킹을 일일히 다 만들고 적용해서 학습 시간이 너무 오래 걸림
-        # 그래서 Pytorch 내장  최적화 어텐션(causal mask 자동처리)
-        """
-        att = q @ k.transpose(-2, -1) / head_dim ** 0.5
-        causal = torch.tril(torch.ones(T, T, dtype=torch.bool, device=x.device))
-        att = att.masked_fill(~causal, float("-inf"))  # 미래 토큰을 못 보게 마스킹
-        att = self.drop(F.softmax(att, dim=-1))
-        out = att @ v
-        """
-
         out = F.scaled_dot_product_attention(
             q, k, v,
             dropout_p=dropout if self.training else 0.0,

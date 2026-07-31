@@ -60,12 +60,10 @@ class AgentState(TypedDict):
 
 def build_graph():
     # 노드 :  route_node, small_talk_node, search_news_node, retrieval_news_node, generate_answer_node
-
     def router_node(state: AgentState) -> dict:
-        # strip()을 안넣었더니 Gemini가 조건부 엣지의 딕셔너리 키랑 안맞아서 틀어짐
+
         route = router_chain.invoke({"question" : state["question"]}).strip()
-        # gemini가 라우팅을 할 때 `(백틱)을 포함하는 문자로 반환할 때가 있어서 확인용으로 작성했다 지움
-        # print(f"{repr(route)}")
+
         if "stock" in route:
             route = "stock_rag"
         elif "small" in route or "talk" in route:
@@ -88,16 +86,6 @@ def build_graph():
     def retrieve_news_node(state: AgentState) -> dict:
         result = store.search_similar_news(state["question"], top_k=3)
         return {"contexts" : result["documents"][0], "retrieved_docs" : result["metadatas"][0], "trace" : ["retrieve_news_node"]}
-
-
-    # 파인튜닝 모델을 두 가지로 바꾸면서 출력 형식을 각각 다르게 만들어 변경
-    # def generate_node(state: AgentState) -> dict:
-    #     context_text = "\n\n".join(state["contexts"])
-    #
-    #     filled = prompt.format(context=context_text, question=state["question"])
-    #     answer = stock_news_llm.invoke(filled)
-    #
-    #     return {"answer" : answer, "trace" : ["generate_node"]}
 
     def generate_node(state: AgentState) -> dict:
         context_text = "\n\n".join(state["contexts"])

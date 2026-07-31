@@ -44,11 +44,12 @@ def evaluate_retrieval_with_gemini(question, contexts, metadatas):
 답변 생성 품질이 아니라, 검색된 문서가 질문에 적절한지만 평가합니다.
 
 평가 기준:
-1. retrieval_relevance: 검색 결과가 질문과 의미적으로 관련 있는가? 1~5점
-2. keyword_match: 질문의 핵심 키워드가 검색 결과에 잘 반영되었는가? 1~5점
-3. context_usefulness: 이 검색 결과를 바탕으로 답변을 만들 수 있는가? 1~5점
-4. pass: 검색 결과가 RAG 답변 생성에 사용할 만하면 true, 아니면 false
-5. reason: 평가 이유를 한국어로 짧게 설명
+1. keyword_search: 질문 내용이 검색하는 내용과 잘 맞는가? 1~5점
+2. retrieval_relevance: 검색 결과가 질문과 의미적으로 관련 있는가? 1~5점
+3. keyword_match: 질문의 핵심 키워드가 검색 결과에 잘 반영되었는가? 1~5점
+4. context_usefulness: 이 검색 결과를 바탕으로 답변을 만들 수 있는가? 1~5점
+5. pass: 검색 결과가 RAG 답변 생성에 사용할 만하면 true, 아니면 false
+6. reason: 평가 이유를 한국어로 짧게 설명
 
 반드시 JSON 형식으로만 답변하세요.
 
@@ -60,7 +61,7 @@ def evaluate_retrieval_with_gemini(question, contexts, metadatas):
 """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-3.6-flash",
         contents=prompt,
     )
 

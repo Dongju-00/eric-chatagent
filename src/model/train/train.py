@@ -91,35 +91,6 @@ def train_stage1(model):
         eval_iters=10,
     )
 
-
-# 파인 튜닝을 두 번 진행해 두 개의 개별 모델을 만들기 위해 변경 train_stage2 -> train_smalltalk, train_news
-# def train_stage2(model):
-#     train_pairs = load_qa_pairs(split="train")
-#     val_pairs = load_qa_pairs(split="val")
-#
-#     print(f"qa train pairs: {len(train_pairs):,}")
-#     print(f"qa val pairs: {len(val_pairs):,}, vocab_size: {vocab_size}, device: {device}")
-#
-#     get_batch = make_qa_batcher(train_pairs, val_pairs, sp)
-#
-#     if not os.path.exists(GEN_CKPT):
-#         raise FileNotFoundError(f"{GEN_CKPT} 가 없습니다. 먼저 `python train.py train`을 실행하세요.")
-#
-#     model.load_state_dict(torch.load(GEN_CKPT, map_location=device))
-#     print(f"loaded {GEN_CKPT}, fine-tuning device={device}")
-#
-#     train_loop(
-#         model,
-#         get_batch,
-#         FT_STEPS,
-#         FT_LR,
-#         QA_CKPT,
-#         EARLY_STOP_PATIENCE,
-#         EARLY_STOP_MIN_DELTA,
-#         eval_interval=50,
-#         eval_iters=10,
-#     )
-
 def _finetune(model, prefix, ckpt_path):
     train_pairs = load_qa_pairs(root_dir=None, split="train", prefix=prefix)
     val_pairs = load_qa_pairs(root_dir=None, split="val", prefix=prefix)
@@ -142,41 +113,6 @@ def train_news(model):
     _finetune(model, "qa_news", NEWS_CKPT)
 
 
-# RAG를 진행하는 도중 제대로 나오는지 확인하기 위해 넣었던 구조들
-"""
-def index_news():
-    query = input("검색어 입력: ")
-    store = ChromaNewsVectorStore()
-    question_id = store.build_news_vector_db(query)
-    print("저장된 질문 ID:", question_id)
-
-def chat_rag(model):
-    model.load_state_dict(torch.load(QA_CKPT, map_location=device))
-    model.eval()
-
-    store = ChromaNewsVectorStore()
-
-    question = input("질문 입력: ").strip()
-
-    if not question:
-        print("질문이 비어 있습니다.")
-        return
-
-    question_id = store.build_news_vector_db(question)
-    result = store.search_similar_news(question, top_k=3)
-
-    contexts = result["documents"][0]
-
-    reply = generate_reply_rag(
-        model=model,
-        sp=sp,
-        question=question,
-        contexts=contexts,
-    )
-
-    print("질문 ID:", question_id)
-    print("답변:", reply)
-"""
 
 MODES = {
     "train": train_stage1,
