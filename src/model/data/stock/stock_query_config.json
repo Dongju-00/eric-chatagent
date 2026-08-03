@@ -1,0 +1,1661 @@
+{
+  "metadata": {
+    "generated_at": "2026-08-03T14:05:00+09:00",
+    "description": "eric-chatagent 주식 뉴스 질의 재작성용 통합 설정",
+    "version": "1.0.0"
+  },
+  "companies": [
+    {
+      "rank": 1,
+      "canonical_name": "삼성전자",
+      "ticker": "005930",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "반도체",
+        "전자",
+        "IT"
+      ],
+      "aliases": [
+        "삼성전자",
+        "005930",
+        "삼전",
+        "Samsung Electronics",
+        "Samsung Elec"
+      ],
+      "business_keywords": [
+        "HBM",
+        "DRAM",
+        "NAND",
+        "낸드",
+        "파운드리",
+        "메모리",
+        "갤럭시",
+        "스마트폰",
+        "AI 반도체"
+      ]
+    },
+    {
+      "rank": 2,
+      "canonical_name": "SK하이닉스",
+      "ticker": "000660",
+      "market": "KOSPI",
+      "group": "SK",
+      "sector": [
+        "반도체",
+        "메모리"
+      ],
+      "aliases": [
+        "SK하이닉스",
+        "000660",
+        "하이닉스",
+        "에스케이하이닉스",
+        "SK Hynix"
+      ],
+      "business_keywords": [
+        "HBM",
+        "HBM3E",
+        "HBM4",
+        "DRAM",
+        "NAND",
+        "낸드",
+        "서버 메모리",
+        "AI 반도체"
+      ]
+    },
+    {
+      "rank": 3,
+      "canonical_name": "SK스퀘어",
+      "ticker": "402340",
+      "market": "KOSPI",
+      "group": "SK",
+      "sector": [
+        "지주",
+        "투자"
+      ],
+      "aliases": [
+        "SK스퀘어",
+        "402340",
+        "에스케이스퀘어",
+        "SK Square"
+      ],
+      "business_keywords": [
+        "SK하이닉스 지분",
+        "투자회사",
+        "포트폴리오",
+        "주주환원",
+        "자사주"
+      ]
+    },
+    {
+      "rank": 4,
+      "canonical_name": "현대자동차",
+      "ticker": "005380",
+      "market": "KOSPI",
+      "group": "현대자동차그룹",
+      "sector": [
+        "자동차",
+        "전기차",
+        "모빌리티"
+      ],
+      "aliases": [
+        "현대자동차",
+        "005380",
+        "현대차",
+        "Hyundai Motor",
+        "Hyundai Motor Company"
+      ],
+      "business_keywords": [
+        "전기차",
+        "EV",
+        "하이브리드",
+        "제네시스",
+        "판매량",
+        "관세",
+        "환율",
+        "자율주행"
+      ]
+    },
+    {
+      "rank": 5,
+      "canonical_name": "삼성전기",
+      "ticker": "009150",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "전자부품",
+        "IT부품"
+      ],
+      "aliases": [
+        "삼성전기",
+        "009150",
+        "Samsung Electro-Mechanics",
+        "SEMCO"
+      ],
+      "business_keywords": [
+        "MLCC",
+        "카메라모듈",
+        "패키지기판",
+        "FC-BGA",
+        "AI 서버"
+      ]
+    },
+    {
+      "rank": 6,
+      "canonical_name": "LG에너지솔루션",
+      "ticker": "373220",
+      "market": "KOSPI",
+      "group": "LG",
+      "sector": [
+        "2차전지",
+        "배터리"
+      ],
+      "aliases": [
+        "LG에너지솔루션",
+        "373220",
+        "LG엔솔",
+        "엘지엔솔",
+        "엘지에너지솔루션",
+        "LG Energy Solution"
+      ],
+      "business_keywords": [
+        "전기차",
+        "ESS",
+        "북미 공장",
+        "수주",
+        "양극재",
+        "원통형 배터리"
+      ]
+    },
+    {
+      "rank": 7,
+      "canonical_name": "삼성바이오로직스",
+      "ticker": "207940",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "바이오",
+        "제약",
+        "CDMO"
+      ],
+      "aliases": [
+        "삼성바이오로직스",
+        "207940",
+        "삼바",
+        "Samsung Biologics"
+      ],
+      "business_keywords": [
+        "CDMO",
+        "CMO",
+        "바이오의약품",
+        "수주",
+        "공장 가동률",
+        "생산능력"
+      ]
+    },
+    {
+      "rank": 8,
+      "canonical_name": "KB금융",
+      "ticker": "105560",
+      "market": "KOSPI",
+      "group": "KB금융그룹",
+      "sector": [
+        "금융",
+        "은행"
+      ],
+      "aliases": [
+        "KB금융",
+        "105560",
+        "KB금융지주",
+        "케이비금융",
+        "KB Financial"
+      ],
+      "business_keywords": [
+        "NIM",
+        "순이자마진",
+        "대손충당금",
+        "가계대출",
+        "배당",
+        "자사주",
+        "주주환원"
+      ]
+    },
+    {
+      "rank": 9,
+      "canonical_name": "삼성생명",
+      "ticker": "032830",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "보험",
+        "생명보험"
+      ],
+      "aliases": [
+        "삼성생명",
+        "032830",
+        "Samsung Life",
+        "Samsung Life Insurance"
+      ],
+      "business_keywords": [
+        "보험손익",
+        "투자손익",
+        "CSM",
+        "지급여력",
+        "배당",
+        "삼성전자 지분"
+      ]
+    },
+    {
+      "rank": 10,
+      "canonical_name": "삼성물산",
+      "ticker": "028260",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "지주",
+        "건설",
+        "상사"
+      ],
+      "aliases": [
+        "삼성물산",
+        "028260",
+        "Samsung C&T"
+      ],
+      "business_keywords": [
+        "건설",
+        "상사",
+        "패션",
+        "리조트",
+        "바이오 지분",
+        "주주환원"
+      ]
+    },
+    {
+      "rank": 11,
+      "canonical_name": "HD현대중공업",
+      "ticker": "329180",
+      "market": "KOSPI",
+      "group": "HD현대",
+      "sector": [
+        "조선",
+        "방산"
+      ],
+      "aliases": [
+        "HD현대중공업",
+        "329180",
+        "현대중공업",
+        "에이치디현대중공업",
+        "HD Hyundai Heavy Industries"
+      ],
+      "business_keywords": [
+        "LNG선",
+        "선박",
+        "수주",
+        "수주잔고",
+        "함정",
+        "특수선",
+        "후판 가격"
+      ]
+    },
+    {
+      "rank": 12,
+      "canonical_name": "기아",
+      "ticker": "000270",
+      "market": "KOSPI",
+      "group": "현대자동차그룹",
+      "sector": [
+        "자동차",
+        "전기차"
+      ],
+      "aliases": [
+        "기아",
+        "000270",
+        "기아차",
+        "KIA",
+        "Kia Corporation"
+      ],
+      "business_keywords": [
+        "전기차",
+        "EV",
+        "하이브리드",
+        "판매량",
+        "관세",
+        "환율",
+        "PBV"
+      ]
+    },
+    {
+      "rank": 13,
+      "canonical_name": "한화에어로스페이스",
+      "ticker": "012450",
+      "market": "KOSPI",
+      "group": "한화",
+      "sector": [
+        "방산",
+        "항공우주"
+      ],
+      "aliases": [
+        "한화에어로스페이스",
+        "012450",
+        "한화에어로",
+        "Hanwha Aerospace"
+      ],
+      "business_keywords": [
+        "K9",
+        "천무",
+        "수출",
+        "수주",
+        "항공엔진",
+        "우주",
+        "국방예산"
+      ]
+    },
+    {
+      "rank": 14,
+      "canonical_name": "신한금융지주",
+      "ticker": "055550",
+      "market": "KOSPI",
+      "group": "신한금융그룹",
+      "sector": [
+        "금융",
+        "은행"
+      ],
+      "aliases": [
+        "신한금융지주",
+        "055550",
+        "신한지주",
+        "신한금융",
+        "Shinhan Financial"
+      ],
+      "business_keywords": [
+        "NIM",
+        "순이자마진",
+        "대손충당금",
+        "가계대출",
+        "배당",
+        "자사주",
+        "주주환원"
+      ]
+    },
+    {
+      "rank": 15,
+      "canonical_name": "두산에너빌리티",
+      "ticker": "034020",
+      "market": "KOSPI",
+      "group": "두산",
+      "sector": [
+        "원전",
+        "에너지",
+        "발전설비"
+      ],
+      "aliases": [
+        "두산에너빌리티",
+        "034020",
+        "두산중공업",
+        "Doosan Enerbility"
+      ],
+      "business_keywords": [
+        "원전",
+        "SMR",
+        "가스터빈",
+        "발전설비",
+        "수주",
+        "체코 원전"
+      ]
+    },
+    {
+      "rank": 16,
+      "canonical_name": "현대모비스",
+      "ticker": "012330",
+      "market": "KOSPI",
+      "group": "현대자동차그룹",
+      "sector": [
+        "자동차부품"
+      ],
+      "aliases": [
+        "현대모비스",
+        "012330",
+        "Hyundai Mobis"
+      ],
+      "business_keywords": [
+        "전동화",
+        "ADAS",
+        "자율주행",
+        "모듈",
+        "A/S",
+        "현대차그룹"
+      ]
+    },
+    {
+      "rank": 17,
+      "canonical_name": "셀트리온",
+      "ticker": "068270",
+      "market": "KOSPI",
+      "group": "셀트리온그룹",
+      "sector": [
+        "바이오",
+        "제약"
+      ],
+      "aliases": [
+        "셀트리온",
+        "068270",
+        "Celltrion"
+      ],
+      "business_keywords": [
+        "바이오시밀러",
+        "신약",
+        "미국 판매",
+        "유럽 판매",
+        "합병",
+        "원가율",
+        "램시마",
+        "짐펜트라"
+      ]
+    },
+    {
+      "rank": 18,
+      "canonical_name": "하나금융지주",
+      "ticker": "086790",
+      "market": "KOSPI",
+      "group": "하나금융그룹",
+      "sector": [
+        "금융",
+        "은행"
+      ],
+      "aliases": [
+        "하나금융지주",
+        "086790",
+        "하나금융",
+        "Hana Financial"
+      ],
+      "business_keywords": [
+        "NIM",
+        "순이자마진",
+        "대손충당금",
+        "배당",
+        "자사주",
+        "주주환원"
+      ]
+    },
+    {
+      "rank": 19,
+      "canonical_name": "NAVER",
+      "ticker": "035420",
+      "market": "KOSPI",
+      "group": "네이버",
+      "sector": [
+        "인터넷",
+        "플랫폼",
+        "AI"
+      ],
+      "aliases": [
+        "NAVER",
+        "035420",
+        "네이버",
+        "Naver",
+        "네이버주식"
+      ],
+      "business_keywords": [
+        "검색광고",
+        "커머스",
+        "핀테크",
+        "웹툰",
+        "클라우드",
+        "AI",
+        "하이퍼클로바",
+        "데이터센터"
+      ]
+    },
+    {
+      "rank": 20,
+      "canonical_name": "삼성SDI",
+      "ticker": "006400",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "2차전지",
+        "배터리"
+      ],
+      "aliases": [
+        "삼성SDI",
+        "006400",
+        "삼성에스디아이",
+        "Samsung SDI"
+      ],
+      "business_keywords": [
+        "전기차",
+        "ESS",
+        "전고체 배터리",
+        "수주",
+        "각형 배터리"
+      ]
+    },
+    {
+      "rank": 21,
+      "canonical_name": "SK",
+      "ticker": "034730",
+      "market": "KOSPI",
+      "group": "SK",
+      "sector": [
+        "지주"
+      ],
+      "aliases": [
+        "SK",
+        "034730",
+        "SK주식회사",
+        "SK㈜",
+        "에스케이주식회사",
+        "SK Inc."
+      ],
+      "business_keywords": [
+        "지주사",
+        "투자",
+        "포트폴리오",
+        "주주환원",
+        "자사주",
+        "SK그룹"
+      ]
+    },
+    {
+      "rank": 22,
+      "canonical_name": "LS ELECTRIC",
+      "ticker": "010120",
+      "market": "KOSPI",
+      "group": "LS",
+      "sector": [
+        "전력기기",
+        "전기장비"
+      ],
+      "aliases": [
+        "LS ELECTRIC",
+        "010120",
+        "LS일렉트릭",
+        "엘에스일렉트릭",
+        "LS산전"
+      ],
+      "business_keywords": [
+        "변압기",
+        "배전",
+        "스마트그리드",
+        "데이터센터",
+        "북미 전력망",
+        "수주"
+      ]
+    },
+    {
+      "rank": 23,
+      "canonical_name": "LG전자",
+      "ticker": "066570",
+      "market": "KOSPI",
+      "group": "LG",
+      "sector": [
+        "전자",
+        "가전",
+        "전장"
+      ],
+      "aliases": [
+        "LG전자",
+        "066570",
+        "엘지전자",
+        "LG Electronics"
+      ],
+      "business_keywords": [
+        "가전",
+        "TV",
+        "전장",
+        "VS사업본부",
+        "HVAC",
+        "웹OS",
+        "AI 데이터센터"
+      ]
+    },
+    {
+      "rank": 24,
+      "canonical_name": "HD한국조선해양",
+      "ticker": "009540",
+      "market": "KOSPI",
+      "group": "HD현대",
+      "sector": [
+        "조선",
+        "지주"
+      ],
+      "aliases": [
+        "HD한국조선해양",
+        "009540",
+        "한국조선해양",
+        "에이치디한국조선해양",
+        "HD KSOE"
+      ],
+      "business_keywords": [
+        "LNG선",
+        "수주",
+        "수주잔고",
+        "친환경 선박",
+        "엔진",
+        "조선 지주"
+      ]
+    },
+    {
+      "rank": 25,
+      "canonical_name": "한화오션",
+      "ticker": "042660",
+      "market": "KOSPI",
+      "group": "한화",
+      "sector": [
+        "조선",
+        "방산"
+      ],
+      "aliases": [
+        "한화오션",
+        "042660",
+        "대우조선해양",
+        "Hanwha Ocean"
+      ],
+      "business_keywords": [
+        "LNG선",
+        "잠수함",
+        "함정",
+        "특수선",
+        "수주",
+        "미국 조선소"
+      ]
+    },
+    {
+      "rank": 26,
+      "canonical_name": "HD현대일렉트릭",
+      "ticker": "267260",
+      "market": "KOSPI",
+      "group": "HD현대",
+      "sector": [
+        "전력기기",
+        "전기장비"
+      ],
+      "aliases": [
+        "HD현대일렉트릭",
+        "267260",
+        "현대일렉트릭",
+        "에이치디현대일렉트릭",
+        "HD Hyundai Electric"
+      ],
+      "business_keywords": [
+        "변압기",
+        "배전",
+        "북미 전력망",
+        "데이터센터",
+        "수주잔고"
+      ]
+    },
+    {
+      "rank": 27,
+      "canonical_name": "우리금융지주",
+      "ticker": "316140",
+      "market": "KOSPI",
+      "group": "우리금융그룹",
+      "sector": [
+        "금융",
+        "은행"
+      ],
+      "aliases": [
+        "우리금융지주",
+        "316140",
+        "우리금융",
+        "Woori Financial"
+      ],
+      "business_keywords": [
+        "NIM",
+        "순이자마진",
+        "대손충당금",
+        "배당",
+        "자사주",
+        "주주환원"
+      ]
+    },
+    {
+      "rank": 28,
+      "canonical_name": "삼성화재",
+      "ticker": "000810",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "보험",
+        "손해보험"
+      ],
+      "aliases": [
+        "삼성화재",
+        "000810",
+        "Samsung Fire",
+        "Samsung Fire & Marine"
+      ],
+      "business_keywords": [
+        "보험손익",
+        "자동차보험",
+        "장기보험",
+        "CSM",
+        "배당",
+        "지급여력"
+      ]
+    },
+    {
+      "rank": 29,
+      "canonical_name": "POSCO홀딩스",
+      "ticker": "005490",
+      "market": "KOSPI",
+      "group": "포스코",
+      "sector": [
+        "철강",
+        "2차전지소재",
+        "지주"
+      ],
+      "aliases": [
+        "POSCO홀딩스",
+        "005490",
+        "포스코홀딩스",
+        "포스코",
+        "POSCO Holdings"
+      ],
+      "business_keywords": [
+        "철강",
+        "리튬",
+        "니켈",
+        "양극재",
+        "2차전지소재",
+        "중국 철강",
+        "원자재 가격"
+      ]
+    },
+    {
+      "rank": 30,
+      "canonical_name": "효성중공업",
+      "ticker": "298040",
+      "market": "KOSPI",
+      "group": "효성",
+      "sector": [
+        "전력기기",
+        "중공업"
+      ],
+      "aliases": [
+        "효성중공업",
+        "298040",
+        "Hyosung Heavy Industries"
+      ],
+      "business_keywords": [
+        "변압기",
+        "북미 전력망",
+        "데이터센터",
+        "수주",
+        "건설"
+      ]
+    }
+  ],
+  "ambiguous_companies": {
+    "삼성": [
+      "삼성전자",
+      "삼성전기",
+      "삼성바이오로직스",
+      "삼성생명",
+      "삼성물산",
+      "삼성SDI",
+      "삼성화재"
+    ],
+    "SK": [
+      "SK하이닉스",
+      "SK스퀘어",
+      "SK"
+    ],
+    "에스케이": [
+      "SK하이닉스",
+      "SK스퀘어",
+      "SK"
+    ],
+    "LG": [
+      "LG에너지솔루션",
+      "LG전자"
+    ],
+    "엘지": [
+      "LG에너지솔루션",
+      "LG전자"
+    ],
+    "현대": [
+      "현대자동차",
+      "현대모비스",
+      "HD현대중공업",
+      "HD한국조선해양",
+      "HD현대일렉트릭"
+    ],
+    "현대차그룹": [
+      "현대자동차",
+      "기아",
+      "현대모비스"
+    ],
+    "HD현대": [
+      "HD현대중공업",
+      "HD한국조선해양",
+      "HD현대일렉트릭"
+    ],
+    "한화": [
+      "한화에어로스페이스",
+      "한화오션"
+    ],
+    "금융주": [
+      "KB금융",
+      "신한금융지주",
+      "하나금융지주",
+      "우리금융지주"
+    ],
+    "은행주": [
+      "KB금융",
+      "신한금융지주",
+      "하나금융지주",
+      "우리금융지주"
+    ],
+    "보험주": [
+      "삼성생명",
+      "삼성화재"
+    ],
+    "조선주": [
+      "HD현대중공업",
+      "HD한국조선해양",
+      "한화오션"
+    ],
+    "배터리주": [
+      "LG에너지솔루션",
+      "삼성SDI"
+    ],
+    "반도체주": [
+      "삼성전자",
+      "SK하이닉스",
+      "삼성전기"
+    ],
+    "전력기기주": [
+      "LS ELECTRIC",
+      "HD현대일렉트릭",
+      "효성중공업"
+    ]
+  },
+  "stock_intents": {
+    "latest_news": {
+      "keywords": [
+        "뉴스",
+        "소식",
+        "기사",
+        "최근",
+        "오늘",
+        "이슈",
+        "무슨 일",
+        "근황"
+      ],
+      "query_terms": [
+        "최근 뉴스"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "earnings": {
+      "keywords": [
+        "실적",
+        "매출",
+        "영업이익",
+        "순이익",
+        "영업손실",
+        "적자",
+        "흑자",
+        "이익률",
+        "마진",
+        "분기 실적",
+        "연간 실적"
+      ],
+      "query_terms": [
+        "실적"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "earnings_cause": {
+      "keywords": [
+        "왜 늘었",
+        "왜 줄었",
+        "증가 이유",
+        "감소 이유",
+        "실적 원인",
+        "배경",
+        "왜",
+        "이유",
+        "원인"
+      ],
+      "query_terms": [
+        "실적 원인"
+      ],
+      "sort": "sim",
+      "requires_fresh_data": true
+    },
+    "price_outlook": {
+      "keywords": [
+        "주가",
+        "주식",
+        "전망",
+        "오를까",
+        "내릴까",
+        "상승 가능성",
+        "하락 가능성",
+        "향후 주가"
+      ],
+      "query_terms": [
+        "주가 전망"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "price_movement_cause": {
+      "keywords": [
+        "급등",
+        "급락",
+        "상한가",
+        "하한가",
+        "주가 상승 이유",
+        "주가 하락 이유",
+        "왜 올랐",
+        "왜 내렸"
+      ],
+      "query_terms": [
+        "주가 변동 원인"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "positive_factor": {
+      "keywords": [
+        "호재",
+        "긍정",
+        "좋은 소식",
+        "성장 요인",
+        "상승 요인",
+        "기회",
+        "수혜"
+      ],
+      "query_terms": [
+        "호재 긍정 요인"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "risk_factor": {
+      "keywords": [
+        "악재",
+        "리스크",
+        "위험",
+        "부담",
+        "우려",
+        "하방",
+        "불확실성",
+        "주의할 점"
+      ],
+      "query_terms": [
+        "악재 위험 요인"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "dividend": {
+      "keywords": [
+        "배당",
+        "배당금",
+        "배당률",
+        "배당수익률",
+        "배당기준일",
+        "배당락",
+        "분기배당",
+        "중간배당"
+      ],
+      "query_terms": [
+        "배당"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "shareholder_return": {
+      "keywords": [
+        "주주환원",
+        "자사주",
+        "자사주 소각",
+        "자사주 매입",
+        "밸류업",
+        "환원율"
+      ],
+      "query_terms": [
+        "주주환원 자사주"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "target_price": {
+      "keywords": [
+        "목표주가",
+        "적정주가",
+        "증권사 전망",
+        "투자의견",
+        "컨센서스"
+      ],
+      "query_terms": [
+        "목표주가 투자의견"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "valuation": {
+      "keywords": [
+        "PER",
+        "PBR",
+        "ROE",
+        "밸류에이션",
+        "고평가",
+        "저평가",
+        "기업가치",
+        "시가총액"
+      ],
+      "query_terms": [
+        "밸류에이션"
+      ],
+      "sort": "sim",
+      "requires_fresh_data": true
+    },
+    "supply_contract": {
+      "keywords": [
+        "수주",
+        "계약",
+        "공급계약",
+        "납품",
+        "수주잔고",
+        "고객사",
+        "계약 규모"
+      ],
+      "query_terms": [
+        "수주 공급계약"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "investment_capex": {
+      "keywords": [
+        "투자",
+        "설비투자",
+        "CAPEX",
+        "증설",
+        "공장",
+        "생산능력",
+        "라인",
+        "데이터센터"
+      ],
+      "query_terms": [
+        "투자 증설"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "merger_acquisition": {
+      "keywords": [
+        "인수",
+        "합병",
+        "매각",
+        "M&A",
+        "분할",
+        "물적분할",
+        "지분 인수",
+        "공개매수"
+      ],
+      "query_terms": [
+        "인수 합병"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "financing": {
+      "keywords": [
+        "유상증자",
+        "무상증자",
+        "전환사채",
+        "CB",
+        "신주인수권",
+        "BW",
+        "회사채",
+        "차입",
+        "자금조달"
+      ],
+      "query_terms": [
+        "자금조달 증자"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "listing_delisting": {
+      "keywords": [
+        "상장",
+        "IPO",
+        "재상장",
+        "상장폐지",
+        "거래정지",
+        "관리종목",
+        "심사"
+      ],
+      "query_terms": [
+        "상장 거래정지"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "disclosure": {
+      "keywords": [
+        "공시",
+        "전자공시",
+        "사업보고서",
+        "분기보고서",
+        "잠정실적",
+        "정정공시"
+      ],
+      "query_terms": [
+        "공시"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "foreign_institution_flow": {
+      "keywords": [
+        "외국인",
+        "기관",
+        "개인",
+        "순매수",
+        "순매도",
+        "수급",
+        "공매도",
+        "대차잔고"
+      ],
+      "query_terms": [
+        "외국인 기관 수급"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "governance": {
+      "keywords": [
+        "지배구조",
+        "경영권",
+        "주주총회",
+        "이사회",
+        "대주주",
+        "최대주주",
+        "행동주의",
+        "승계"
+      ],
+      "query_terms": [
+        "지배구조 경영권"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "regulation_legal": {
+      "keywords": [
+        "규제",
+        "법안",
+        "소송",
+        "벌금",
+        "과징금",
+        "조사",
+        "제재",
+        "허가",
+        "승인"
+      ],
+      "query_terms": [
+        "규제 소송"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "macro_effect": {
+      "keywords": [
+        "금리",
+        "환율",
+        "원달러",
+        "유가",
+        "관세",
+        "인플레이션",
+        "경기침체",
+        "중국 경기",
+        "미국 경기"
+      ],
+      "query_terms": [
+        "금리 환율 영향"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true
+    },
+    "competitor_comparison": {
+      "keywords": [
+        "비교",
+        "경쟁사",
+        "점유율",
+        "누가 더",
+        "차이",
+        "경쟁력"
+      ],
+      "query_terms": [
+        "경쟁사 비교"
+      ],
+      "sort": "sim",
+      "requires_fresh_data": true
+    },
+    "investment_decision": {
+      "keywords": [
+        "사도 돼",
+        "매수",
+        "매도",
+        "손절",
+        "물타기",
+        "투자해도",
+        "추천",
+        "살까",
+        "팔까"
+      ],
+      "query_terms": [
+        "실적 주가 리스크"
+      ],
+      "sort": "date",
+      "requires_fresh_data": true,
+      "response_policy": "기사만으로 매수·매도를 단정하지 않고 근거와 위험을 분리합니다."
+    }
+  },
+  "stock_keywords": {
+    "financial_metrics": [
+      "매출",
+      "영업이익",
+      "순이익",
+      "영업손실",
+      "당기순이익",
+      "매출총이익",
+      "영업이익률",
+      "순이익률",
+      "EBITDA",
+      "EPS",
+      "BPS",
+      "ROE",
+      "ROA",
+      "PER",
+      "PBR",
+      "PSR",
+      "부채비율",
+      "현금흐름",
+      "잉여현금흐름",
+      "FCF",
+      "수주잔고",
+      "판매량",
+      "출하량",
+      "점유율",
+      "가동률"
+    ],
+    "price_market": [
+      "주가",
+      "시가",
+      "종가",
+      "고가",
+      "저가",
+      "상승",
+      "하락",
+      "급등",
+      "급락",
+      "상한가",
+      "하한가",
+      "변동성",
+      "거래량",
+      "거래대금",
+      "시가총액",
+      "코스피",
+      "코스닥",
+      "지수",
+      "수급",
+      "외국인",
+      "기관",
+      "개인",
+      "순매수",
+      "순매도",
+      "공매도",
+      "대차잔고",
+      "신용잔고"
+    ],
+    "corporate_actions": [
+      "배당",
+      "배당금",
+      "배당기준일",
+      "배당락",
+      "자사주",
+      "자사주 매입",
+      "자사주 소각",
+      "유상증자",
+      "무상증자",
+      "액면분할",
+      "주식병합",
+      "전환사채",
+      "신주인수권부사채",
+      "CB",
+      "BW",
+      "회사채",
+      "공개매수",
+      "합병",
+      "분할",
+      "인수",
+      "매각",
+      "상장",
+      "상장폐지",
+      "거래정지"
+    ],
+    "business_events": [
+      "수주",
+      "공급계약",
+      "신제품",
+      "출시",
+      "임상",
+      "허가",
+      "승인",
+      "특허",
+      "증설",
+      "공장",
+      "설비투자",
+      "CAPEX",
+      "가동",
+      "생산능력",
+      "투자",
+      "파트너십",
+      "협력",
+      "고객사",
+      "리콜",
+      "파업",
+      "화재",
+      "사고"
+    ],
+    "risk_terms": [
+      "원가 부담",
+      "수요 둔화",
+      "재고 증가",
+      "경쟁 심화",
+      "점유율 하락",
+      "환율 부담",
+      "금리 상승",
+      "관세",
+      "규제",
+      "소송",
+      "과징금",
+      "제재",
+      "적자",
+      "실적 부진",
+      "가이던스 하향",
+      "목표주가 하향",
+      "신용등급 하락",
+      "희석",
+      "오버행",
+      "유동성",
+      "부채",
+      "공급과잉",
+      "가격 하락"
+    ],
+    "positive_terms": [
+      "실적 개선",
+      "흑자 전환",
+      "사상 최대",
+      "역대 최대",
+      "수주 증가",
+      "점유율 상승",
+      "가이던스 상향",
+      "목표주가 상향",
+      "증설",
+      "신규 고객",
+      "원가 개선",
+      "마진 개선",
+      "주주환원",
+      "자사주 소각",
+      "배당 확대",
+      "수요 증가",
+      "가격 상승",
+      "정책 수혜",
+      "시장 확대"
+    ],
+    "industry_terms": {
+      "semiconductor": [
+        "반도체",
+        "HBM",
+        "DRAM",
+        "NAND",
+        "파운드리",
+        "웨이퍼",
+        "패키징",
+        "AI 반도체"
+      ],
+      "battery": [
+        "2차전지",
+        "배터리",
+        "양극재",
+        "음극재",
+        "전해액",
+        "분리막",
+        "ESS",
+        "전기차"
+      ],
+      "automobile": [
+        "자동차",
+        "전기차",
+        "하이브리드",
+        "자율주행",
+        "ADAS",
+        "판매량",
+        "관세"
+      ],
+      "bio": [
+        "바이오",
+        "제약",
+        "임상",
+        "신약",
+        "바이오시밀러",
+        "CDMO",
+        "FDA",
+        "허가"
+      ],
+      "finance": [
+        "은행",
+        "보험",
+        "증권",
+        "NIM",
+        "대손충당금",
+        "연체율",
+        "CSM",
+        "주주환원"
+      ],
+      "shipbuilding": [
+        "조선",
+        "LNG선",
+        "컨테이너선",
+        "수주잔고",
+        "후판",
+        "함정",
+        "특수선"
+      ],
+      "defense": [
+        "방산",
+        "수출",
+        "국방예산",
+        "K9",
+        "천무",
+        "미사일",
+        "항공엔진"
+      ],
+      "power_equipment": [
+        "전력기기",
+        "변압기",
+        "배전",
+        "송전",
+        "전력망",
+        "데이터센터",
+        "수주"
+      ],
+      "internet_platform": [
+        "플랫폼",
+        "검색광고",
+        "커머스",
+        "핀테크",
+        "웹툰",
+        "클라우드",
+        "AI"
+      ],
+      "steel_materials": [
+        "철강",
+        "리튬",
+        "니켈",
+        "원자재",
+        "중국 철강",
+        "양극재"
+      ]
+    }
+  },
+  "time_expressions": {
+    "relative": {
+      "오늘": {
+        "normalized": "오늘",
+        "sort": "date"
+      },
+      "어제": {
+        "normalized": "어제",
+        "sort": "date"
+      },
+      "최근": {
+        "normalized": "최근",
+        "sort": "date"
+      },
+      "최신": {
+        "normalized": "최신",
+        "sort": "date"
+      },
+      "이번주": {
+        "normalized": "이번 주",
+        "sort": "date"
+      },
+      "이번 주": {
+        "normalized": "이번 주",
+        "sort": "date"
+      },
+      "지난주": {
+        "normalized": "지난 주",
+        "sort": "date"
+      },
+      "지난 주": {
+        "normalized": "지난 주",
+        "sort": "date"
+      },
+      "이번달": {
+        "normalized": "이번 달",
+        "sort": "date"
+      },
+      "이번 달": {
+        "normalized": "이번 달",
+        "sort": "date"
+      },
+      "지난달": {
+        "normalized": "지난 달",
+        "sort": "date"
+      },
+      "지난 달": {
+        "normalized": "지난 달",
+        "sort": "date"
+      },
+      "올해": {
+        "normalized": "올해",
+        "sort": "date"
+      },
+      "작년": {
+        "normalized": "작년",
+        "sort": "date"
+      }
+    },
+    "periods": [
+      "1분기",
+      "2분기",
+      "3분기",
+      "4분기",
+      "상반기",
+      "하반기",
+      "연간",
+      "분기",
+      "월간",
+      "주간"
+    ],
+    "date_patterns": [
+      "\\d{4}년",
+      "\\d{4}년\\s*\\d{1,2}월",
+      "\\d{1,2}월",
+      "\\d{1,2}일"
+    ]
+  },
+  "query_rules": {
+    "defaults": {
+      "company_only_query_terms": [
+        "최근",
+        "실적",
+        "주가 전망"
+      ],
+      "stock_word_only_query_terms": [
+        "실적",
+        "주가 전망"
+      ],
+      "default_sort": "sim",
+      "fresh_sort": "date",
+      "max_query_terms": 8,
+      "top_k": 3,
+      "search_display": 10
+    },
+    "stop_words": [
+      "알려줘",
+      "말해줘",
+      "설명해줘",
+      "정리해줘",
+      "보여줘",
+      "찾아줘",
+      "궁금해",
+      "어때",
+      "어떻게 돼",
+      "뭐야",
+      "무엇이야",
+      "관련해서",
+      "관련",
+      "좀",
+      "혹시",
+      "주세요",
+      "해줘"
+    ],
+    "generic_stock_words": [
+      "주식",
+      "종목",
+      "회사",
+      "기업",
+      "관련주"
+    ],
+    "preserve_rules": [
+      "정확한 회사명 또는 종목코드는 항상 유지합니다.",
+      "질문에 명시된 기간은 유지합니다.",
+      "매출·영업이익·배당·수주·HBM 같은 핵심 명사는 제거하지 않습니다.",
+      "LG·삼성·SK·현대처럼 여러 상장사를 가리키는 표현은 임의로 하나로 변환하지 않습니다.",
+      "실시간 주가·오늘 종가·등락률은 뉴스 RAG가 아니라 별도 시세 API 대상으로 분류합니다."
+    ],
+    "ambiguity_policy": {
+      "ask_clarification": true,
+      "never_guess_company": true
+    },
+    "retrieval_policy": {
+      "filter_by_question_id": true,
+      "company_name_must_match": true,
+      "allow_alias_match": true,
+      "max_distance": null,
+      "note": "max_distance는 실제 거리 분포를 평가한 후 설정합니다."
+    },
+    "response_policy": {
+      "use_context_only": true,
+      "reject_unknown_target_price": true,
+      "reject_unknown_current_price": true,
+      "do_not_make_buy_sell_decision": true,
+      "no_context_message": "질문과 관련성이 충분한 뉴스를 찾지 못했습니다."
+    }
+  }
+}

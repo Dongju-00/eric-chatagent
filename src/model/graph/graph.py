@@ -15,6 +15,7 @@ from typing import Literal, Any
 
 from model.store.vector_store import ChromaNewsVectorStore
 from model.rag.baseline import build_llm, prompt, KoreanGPTLLM
+from model.graph.query_rewrite import rewrite_stock_query
 
 load_dotenv()
 
@@ -52,8 +53,10 @@ class AgentState(TypedDict):
     contexts : list[str]
 
     route : RouteType
-    route_reason : str
     rewritten_query : str
+    ticker : str
+    search_sort : str
+
 
     fallback : str
     trace: Annotated[list[str], operator.add]
@@ -79,16 +82,51 @@ def build_graph():
         answer = small_talk_llm.invoke(question)
         return {"answer" : answer, "trace" : ["small_talk_node"]}
 
+    def rewrite_query_node(state: AgentState) -> dict:
+        result = rewrite_stock_query(state["question"])
+
+        print("원래 질문:", state["question"])
+        print("재작성 검색어:", result["rewritten_query"])
+        print("기업:", result["company"])
+        print("질문 의도:", result["matched_intents"])
+
+        return {
+            "company": result["company"],
+            "ticker": result["ticker"],
+            "rewritten_query": result["rewritten_query"],
+            "search_sort": result["sort"],
+            "trace": ["rewrite_query_node"],
+        }
+
     def search_news_node(state: AgentState) -> dict:
-        question_id = store.build_news_vector_db(state["question"])
+        query = state.get("rewritten_query", state["question"])
+        sort = state.get("search_sort", "sim")
+        question_id = store.build_news_vector_db(query=query, display=10, sort=sort)
         return {"question_id" : question_id ,"trace" : ["search_news_node"]}
 
+    # def retrieve_news_node(state: AgentState) -> dict:
+    #     result = store.search_similar_news(state["question"], question_id=state["question_id"], top_k=3)
+    #     return {"contexts" : result["documents"][0], "retrieved_docs" : result["metadatas"][0], "trace" : ["retrieve_news_node"]}
+
     def retrieve_news_node(state: AgentState) -> dict:
-        result = store.search_similar_news(state["question"], top_k=3)
-        return {"contexts" : result["documents"][0], "retrieved_docs" : result["metadatas"][0], "trace" : ["retrieve_news_node"]}
+        result = store.search_similar_news(question=state["question"], question_id=state["question_id"], top_k=3, max_distance=None,)
+
+        contexts = result["documents"][0]
+        metadatas = result["metadatas"][0]
+        distances = result["distances"][0]
+
+        print("검색 결과 거리 확인")
+
+        for metadata, distance in zip(metadatas, distances,):
+            print(metadata.get("title", ""), "/ distance:", distance)
+
+        return {"contexts": contexts, "retrieved_docs": metadatas, "trace": ["retrieve_news_node"]}
 
     def generate_node(state: AgentState) -> dict:
-        context_text = "\n\n".join(state["contexts"])
+        contexts = state["contexts"]
+        if not contexts:
+            return {"answer": ("질문과 관련성이 충분한 뉴스를 \n찾지 못했습니다."), "trace": ["generate_node"]}
+        context_text = "\n\n".join(contexts)
         filled = f"참고 뉴스: {context_text}\n질문: {state['question']}\n답변: "
         answer = stock_news_llm.invoke(filled)
         return {"answer": answer, "trace": ["generate_node"]}

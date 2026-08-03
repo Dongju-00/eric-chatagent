@@ -5,6 +5,7 @@ from html import unescape
 import chromadb
 from model.rag.search import search_stock_news
 from model.embed.embedder import KoreanGPTEmbedder
+import trafilatura
 
 class HTMLTextExtractor(HTMLParser):
     def __init__(self):
@@ -25,6 +26,69 @@ def html_to_text(html_text):
     parser.feed(unescape(html_text or ""))
     return parser.get_text()
 
+def extract_article_body(url: str) -> str:
+    if not url:
+        return ""
+
+    try:
+        downloaded = trafilatura.fetch_url(url)
+
+        if not downloaded:
+            return ""
+
+        body = trafilatura.extract(
+            downloaded,
+            include_comments=False,
+            include_tables=False,
+            favor_precision=True,
+        )
+
+        return body.strip() if body else ""
+
+    except Exception as e:
+        print(f"기사 본문 추출 실패: {url} / {e}")
+        return ""
+
+# def parse_news_items(items):
+#     documents = []
+#
+#     for item in items:
+#         title = html_to_text(item.get("title", ""))
+#         description = html_to_text(item.get("description", ""))
+#         link = item.get("link", "")
+#         pub_date = item.get("pubDate", "")
+#
+#         text = f"""
+# 제목: {title}
+# 내용: {description}
+# 링크: {link}
+# 작성일: {pub_date}
+# """.strip()
+#
+#         documents.append({
+#             "text": text,
+#             "metadata": {
+#                 "title": title,
+#                 "link": link,
+#                 "pubDate": pub_date,
+#                 "source": "naver_news",
+#             }
+#         })
+#
+#     return documents
+
+def extract_news_body(original_link, naver_link, min_length=100):
+    body = extract_article_body(original_link)
+
+    if body and len(body) >= min_length:
+        return body, original_link, "article_body"
+
+    body = extract_article_body(naver_link)
+
+    if body and len(body) >= min_length:
+        return body, naver_link, "article_body"
+
+    return "", original_link or naver_link, "naver_description"
 
 def parse_news_items(items):
     documents = []
@@ -32,28 +96,35 @@ def parse_news_items(items):
     for item in items:
         title = html_to_text(item.get("title", ""))
         description = html_to_text(item.get("description", ""))
-        link = item.get("link", "")
+
+        # 원문 링크를 우선 사용하고, 없으면 네이버 링크 사용
+        original_link = item.get("originallink", "")
+        naver_link = item.get("link", "")
         pub_date = item.get("pubDate", "")
 
+        article_body, article_link, content_type = extract_news_body(original_link, naver_link)
+        content = article_body if article_body else description
+        # 너무 긴 기사는 최대 길이 제한
+        content = content[:5000]
+
         text = f"""
-제목: {title}
-내용: {description}
-링크: {link}
-작성일: {pub_date}
-""".strip()
+                제목: {title}
+                작성일: {pub_date}
+                내용: {content}
+                """.strip()
 
         documents.append({
             "text": text,
             "metadata": {
                 "title": title,
-                "link": link,
+                "link": article_link,
                 "pubDate": pub_date,
                 "source": "naver_news",
+                "content_type": content_type,
             }
         })
 
     return documents
-
 
 def chunk_text(text, chunk_size=500, overlap=100):
     chunks = []
@@ -131,6 +202,7 @@ class ChromaNewsVectorStore:
                 "link": metadata.get("link", ""),
                 "pubDate": metadata.get("pubDate", ""),
                 "source": metadata.get("source", "naver_news"),
+                "content_type": metadata.get("content_type", "naver_description"),
                 "created_at": datetime.now().isoformat(),
             })
 
@@ -141,12 +213,14 @@ class ChromaNewsVectorStore:
             metadatas=metadatas,
         )
 
-    def build_news_vector_db(self, query, display=10):
+        return len(documents)
+
+    def build_news_vector_db(self, query, display=10, sort="sim"):
         # 사용자 질문 저장
         question_id = self.save_question(query)
 
         # 네이버 뉴스 검색
-        result = search_stock_news(query, display=display)
+        result = search_stock_news(query=query, display=display, sort=sort)
         documents = parse_news_items(result["items"])
 
         # 파싱
@@ -166,22 +240,67 @@ class ChromaNewsVectorStore:
                 })
 
         # 인덱싱
-        self.save_news_chunks(question_id, chunked_docs)
+        save_count = self.save_news_chunks(question_id, chunked_docs)
 
         print(f"질문 ID: {question_id}")
-        print(f"{len(chunked_docs)}개 chunk 저장 완료")
+        print(f"{save_count}개 chunk 저장 완료")
 
         return question_id
 
     # Retrieval 임베딩
-    def search_similar_news(self, question, top_k=3):
+    def search_similar_news(self, question: str, question_id: str, top_k=3, max_distance: float | None = None):
         query_embedding = self.embedder.embed_text(question)
 
-        return self.news_collection.query(
-            query_embeddings=[query_embedding],
-            n_results=top_k,
-            include=["documents", "metadatas", "distances"],
-        )
+        query_args = {
+            "query_embeddings": [query_embedding],
+            # 필터링 후 부족할 수 있으므로 조금 더 많이 검색
+            "n_results": max(top_k * 3, top_k),
+            "include": [
+                "documents",
+                "metadatas",
+                "distances",
+            ],
+        }
+
+        # 현재 질문으로 수집한 뉴스만 검색
+        if question_id:
+            query_args["where"] = {
+                "question_id": question_id
+            }
+
+        result = self.news_collection.query(**query_args)
+
+        documents = result["documents"][0]
+        metadatas = result["metadatas"][0]
+        distances = result["distances"][0]
+
+        filtered = []
+
+        for document, metadata, distance in zip(
+                documents,
+                metadatas,
+                distances,
+        ):
+            # max_distance가 없으면 일단 모두 허용
+            if max_distance is None or distance <= max_distance:
+                filtered.append(
+                    (document, metadata, distance)
+                )
+
+        filtered = filtered[:top_k]
+
+        return {
+            "documents": [[item[0] for item in filtered]],
+            "metadatas": [[item[1] for item in filtered]],
+            "distances": [[item[2] for item in filtered]],
+        }
+
+        # return self.news_collection.query(
+        #     query_embeddings=[query_embedding],
+        #     n_results=max(top_k * 3, top_k),
+        #     where={"question_id": question_id},
+        #     include=["documents", "metadatas", "distances"],
+        # )
 
     def get_chunks_by_question_id(self, question_id):
         return self.news_collection.get(

@@ -53,22 +53,62 @@ class KoreanGPTLLM(LLM):
             if self.sp.id_to_piece(i).endswith("\n")
         }
 
+    def _encode_prompt(self, prompt: str) -> list[int]:
+        ids = self.sp.encode(prompt, out_type=int)
+
+        if len(ids) <= block_size:
+            return ids
+
+        question_marker = "\n질문:"
+        marker_index = prompt.rfind(question_marker)
+
+        # RAG 형식이 아닌 일반 프롬프트
+        if marker_index == -1:
+            return ids[-block_size:]
+
+        # 뉴스 부분과 질문 부분 분리
+        context_text = prompt[:marker_index]
+        question_text = prompt[marker_index:]
+
+        question_ids = self.sp.encode(
+            question_text,
+            out_type=int,
+        )
+
+        # 질문이 너무 길 경우 질문 뒷부분을 우선 보존
+        if len(question_ids) >= block_size:
+            return question_ids[-block_size:]
+
+        # 질문을 제외하고 뉴스에 사용할 수 있는 토큰 수
+        context_budget = block_size - len(question_ids)
+
+        context_ids = self.sp.encode(
+            context_text,
+            out_type=int,
+        )
+
+        # 뉴스는 앞부분부터 보존
+        context_ids = context_ids[:context_budget]
+
+        return context_ids + question_ids
+
     @property
     def _llm_type(self) -> str:
         return "korean_gpt"
 
     @torch.no_grad()
     def _call(self, prompt: str, stop=None, **kwargs) -> str:
-        ids = self.sp.encode(prompt, out_type=int)
-        if len(ids) > block_size:
-            ids = ids[-block_size:]        # block_size 256 초과 시 뒤쪽만
+        ids = self._encode_prompt(prompt)
+        # if len(ids) > block_size:
+        #     ids = ids[-block_size:]        # block_size 256 초과 시 뒤쪽만
 
         idx = torch.tensor([ids], dtype=torch.long, device=device)
+
         out = self.model.generate(
             idx, self.max_new_tokens,
             stop_tokens=self.stop_ids,
-            temperature=0.8,  # 0.2 → 0.8
-            top_k=40,  # 1 → 40
+            temperature=0.2,  # 0.2 → 0.8
+            top_k=5,  # 1 → 40
             repetition_penalty=1.3,
         )[0].tolist()
 
