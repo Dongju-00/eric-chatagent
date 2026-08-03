@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 .env
+storage/
 
 # large training data
 src/model/data/raw_hf/

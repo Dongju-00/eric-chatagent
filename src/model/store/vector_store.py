@@ -6,6 +6,10 @@ import chromadb
 from model.rag.search import search_stock_news
 from model.embed.embedder import KoreanGPTEmbedder
 import trafilatura
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+DEFAULT_CHROMA_PATH = PROJECT_ROOT / "storage" / "chroma"
 
 class HTMLTextExtractor(HTMLParser):
     def __init__(self):
@@ -142,8 +146,10 @@ def chunk_text(text, chunk_size=500, overlap=100):
     return chunks
 
 class ChromaNewsVectorStore:
-    def __init__(self, persist_path="storage/chroma"):
-        self.client = chromadb.PersistentClient(path=persist_path)
+    def __init__(self, persist_path=None):
+        path = Path(persist_path) if persist_path else DEFAULT_PERSIST_PATH
+        path.mkdir(parents=True, exist_ok=True)
+        self.client = chromadb.PersistentClient(path=str(path))
 
         self.question_collection = self.client.get_or_create_collection(
             name="user_questions"
