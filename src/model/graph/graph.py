@@ -111,7 +111,7 @@ FALLBACK_PROMPT = PromptTemplate.from_template(
 #     return "fallback"
 
 router_prompt = PromptTemplate.from_template(ROUTER_PROMPT)
-router_chain = ROUTER_PROMPT | route_llm | StrOutputParser()
+router_chain = router_prompt | route_llm | StrOutputParser()
 
 fallback_chain = FALLBACK_PROMPT | route_llm | StrOutputParser()
 
