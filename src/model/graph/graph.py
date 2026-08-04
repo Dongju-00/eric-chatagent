@@ -72,6 +72,15 @@ fallback
 질문: {question}
 분류:"""
 
+FALLBACK_PROMPT = PromptTemplate.from_template(
+    """당신은 한국 주식 정보를 안내하는 챗봇입니다.
+사용자가 주식과 무관한 질문을 했습니다. 간단히 답하되, 3문장 이내로 짧게 작성하세요.
+답변 마지막에 주식 관련 질문을 안내해 주세요.
+
+질문: {question}
+답변:"""
+)
+
 # 공개 가중치 모델로 라우팅
 # VALID = {"smalltalk", "stock_rag", "fallback"}
 #
@@ -101,9 +110,10 @@ fallback
 #         return "smalltalk"
 #     return "fallback"
 
-# router_chain = ROUTER_PROMPT | route_llm | StrOutputParser()
+router_prompt = PromptTemplate.from_template(ROUTER_PROMPT)
+router_chain = ROUTER_PROMPT | route_llm | StrOutputParser()
 
-RouteType = Literal["smalltalk", "stock_rag", "fallback"]
+fallback_chain = FALLBACK_PROMPT | route_llm | StrOutputParser()
 
 class AgentState(TypedDict):
     question : str
@@ -113,7 +123,6 @@ class AgentState(TypedDict):
     retrieved_docs: list[dict[str, Any]]
     contexts : list[str]
 
-    route : RouteType
     rewritten_query : str
     ticker : str
     search_sort : str
@@ -127,7 +136,7 @@ def build_graph():
     # 노드 :  route_node, small_talk_node, search_news_node, retrieval_news_node, generate_answer_node
     def router_node(state: AgentState) -> dict:
 
-        route = route_llm.invoke(state["question"])
+        route = router_chain.invoke({"question": state["question"]}).strip().lower()
 
         if "stock" in route:
             route = "stock_rag"
@@ -199,8 +208,7 @@ def build_graph():
         return {"answer": answer, "trace": ["generate_node"]}
 
     def fallback_node(state: AgentState) -> dict:
-        question = state["question"]
-        answer = route_llm.invoke(state["answer"])
+        answer = route_llm.invoke(state["question"])
         return {"answer" : "주어진 자료로는 판단할 수 없습니다", "trace" : ["fallback_node"]}
 
     graph_builder = StateGraph(AgentState)
