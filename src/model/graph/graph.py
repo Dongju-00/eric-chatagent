@@ -5,7 +5,7 @@ import sys
 
 from dotenv import load_dotenv
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import GoogleGenerativeAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import END
