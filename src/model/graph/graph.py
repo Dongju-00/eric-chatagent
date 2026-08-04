@@ -30,24 +30,25 @@ PROJECT_DIR = Path(__file__).resolve().parents[1]
 small_talk_llm = build_llm("small_talk")
 stock_news_llm = build_llm("stock_news")
 
-MODEL_ID = "Qwen/Qwen2.5-1.5B-Instruct"
-
-_tok = None
-_model = None
-
-def load_model():
-    global _tok, _model
-    if _model is None:
-        _tok = AutoTokenizer.from_pretrained(MODEL_ID)
-        _model = AutoModelForCausalLM.from_pretrained(MODEL_ID, torch_dtype=torch.float16,)
-        _model.eval()
-    return _tok, _model
-
+# 공개 가중치 모델 로드
+# MODEL_ID = "Qwen/Qwen2.5-1.5B-Instruct"
 #
-# route_llm = GoogleGenerativeAI(
-#     model="gemini-3.6-flash",
-#     google_api_key=os.getenv("GOOGLE_API_KEY"),
-# )
+# _tok = None
+# _model = None
+#
+# def load_model():
+#     global _tok, _model
+#     if _model is None:
+#         _tok = AutoTokenizer.from_pretrained(MODEL_ID)
+#         _model = AutoModelForCausalLM.from_pretrained(MODEL_ID, torch_dtype=torch.float16,)
+#         _model.eval()
+#     return _tok, _model
+
+
+route_llm = GoogleGenerativeAI(
+    model="gemini-3.6-flash",
+    google_api_key=os.getenv("GOOGLE_API_KEY"),
+)
 
 ROUTER_PROMPT = """사용자의 질문을 아래 세 가지 중 하나로 분류하세요.
 
@@ -71,33 +72,34 @@ fallback
 질문: {question}
 분류:"""
 
-VALID = {"smalltalk", "stock_rag", "fallback"}
-
-def classify(question: str) -> str:
-    tok, model = load_model()
-    messages = [{"role": "user", "content": ROUTER_PROMPT.format(question=question)}]
-    text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-    inputs = tok(text, return_tensors="pt")
-
-    with torch.no_grad():
-        out = model.generate(**inputs, max_new_tokens=8, do_sample=False,
-                             pad_token_id=tok.eos_token_id)
-
-    raw = tok.decode(out[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
-    print(f"[라우터 원본 출력] {raw!r}", flush=True)      # ← 디버깅용
-
-    cleaned = raw.strip().lower().replace("`", "").replace("_", "_")
-
-    # 부분 매칭 (긴 라벨부터 검사)
-    for label in ["stock_rag", "smalltalk", "fallback"]:
-        if label in cleaned:
-            return label
-    # 느슨한 매칭
-    if "stock" in cleaned:
-        return "stock_rag"
-    if "small" in cleaned or "talk" in cleaned:
-        return "smalltalk"
-    return "fallback"
+# 공개 가중치 모델로 라우팅
+# VALID = {"smalltalk", "stock_rag", "fallback"}
+#
+# def classify(question: str) -> str:
+#     tok, model = load_model()
+#     messages = [{"role": "user", "content": ROUTER_PROMPT.format(question=question)}]
+#     text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+#     inputs = tok(text, return_tensors="pt")
+#
+#     with torch.no_grad():
+#         out = model.generate(**inputs, max_new_tokens=8, do_sample=False,
+#                              pad_token_id=tok.eos_token_id)
+#
+#     raw = tok.decode(out[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
+#     print(f"[라우터 원본 출력] {raw!r}", flush=True)      # ← 디버깅용
+#
+#     cleaned = raw.strip().lower().replace("`", "").replace("_", "_")
+#
+#     # 부분 매칭 (긴 라벨부터 검사)
+#     for label in ["stock_rag", "smalltalk", "fallback"]:
+#         if label in cleaned:
+#             return label
+#     # 느슨한 매칭
+#     if "stock" in cleaned:
+#         return "stock_rag"
+#     if "small" in cleaned or "talk" in cleaned:
+#         return "smalltalk"
+#     return "fallback"
 
 # router_chain = ROUTER_PROMPT | route_llm | StrOutputParser()
 
@@ -125,7 +127,7 @@ def build_graph():
     # 노드 :  route_node, small_talk_node, search_news_node, retrieval_news_node, generate_answer_node
     def router_node(state: AgentState) -> dict:
 
-        route = classify(state["question"])
+        route = route_llm.invoke(state["question"])
 
         if "stock" in route:
             route = "stock_rag"
@@ -197,6 +199,8 @@ def build_graph():
         return {"answer": answer, "trace": ["generate_node"]}
 
     def fallback_node(state: AgentState) -> dict:
+        question = state["question"]
+        answer = route_llm.invoke(state["answer"])
         return {"answer" : "주어진 자료로는 판단할 수 없습니다", "trace" : ["fallback_node"]}
 
     graph_builder = StateGraph(AgentState)
