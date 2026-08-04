@@ -7,12 +7,7 @@ from typing import Any
 # query_rewrite.py가 src/model/graph 안에 있는 경우
 MODEL_DIR = Path(__file__).resolve().parents[1]
 
-CONFIG_PATH = (
-    MODEL_DIR
-    / "data"
-    / "stock"
-    / "stock_query_config.json"
-)
+CONFIG_PATH = MODEL_DIR / "data" / "stock" / "stock_query_config.json"
 
 with CONFIG_PATH.open("r", encoding="utf-8") as f:
     stock_config = json.load(f)

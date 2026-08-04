@@ -8,7 +8,8 @@ storage/
 src/model/data/raw_hf/
 src/model/data/processed/
 src/model/data/raw_aihub/
-
+src/model/data/news/
+src/model/data/stock/
 
 # generated tokenizer
 src/model/data/sp_korean.model

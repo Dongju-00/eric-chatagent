@@ -12,11 +12,13 @@ OUT_DIR = ROOT / "data" / "processed"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 SMALLTALK_PATH = RAW_DIR / "smalltalk" / "smalltalk_all.csv"
-NEWS_TRAIN_PATH = RAW_DIR / "news" / "news_train.csv"
+NEWS_TRAIN_PATH = RAW_DIR / "news" / "news_.csv"
 NEWS_VAL_PATH = RAW_DIR / "news" / "news_val.csv"
 
 TRAIN_PATH = OUT_DIR / "qa_train.csv"
 VAL_PATH = OUT_DIR / "qa_val.csv"
+
+
 
 def clean_text(text):
     return str(text).replace("\n", " ").strip()

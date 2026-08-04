@@ -38,7 +38,7 @@ class KoreanGPTLLM(LLM):
 
     model: object = None
     sp: object = None
-    max_new_tokens: int = 120
+    max_new_tokens: int = 80
     stop_ids: object = None
 
     def __init__(self, model_path, sp_prefix, **kwargs):
@@ -109,7 +109,7 @@ class KoreanGPTLLM(LLM):
             stop_tokens=self.stop_ids,
             temperature=0.2,  # 0.2 → 0.8
             top_k=5,  # 1 → 40
-            repetition_penalty=1.3,
+            repetition_penalty=1.5,
         )[0].tolist()
 
         return self.sp.decode(out[len(ids):]).strip()
@@ -122,7 +122,7 @@ def build_llm(model="small_talk"):
         )
     elif model == "stock_news":
         return KoreanGPTLLM(
-            model_path = MODEL_DIR / "KoreanGPT_news.pt",
+            model_path = MODEL_DIR / "KoreanGPT_news_v2.pt",
             sp_prefix=str(DATA_DIR / "sp_korean"),
         )
     else:

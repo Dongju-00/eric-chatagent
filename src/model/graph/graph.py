@@ -17,6 +17,9 @@ from model.store.vector_store import ChromaNewsVectorStore
 from model.rag.baseline import build_llm, prompt, KoreanGPTLLM
 from model.graph.query_rewrite import rewrite_stock_query
 
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+
 load_dotenv()
 
 store = ChromaNewsVectorStore()
@@ -26,21 +29,77 @@ PROJECT_DIR = Path(__file__).resolve().parents[1]
 # graph에 적용할 llm들 빌드해놓기
 small_talk_llm = build_llm("small_talk")
 stock_news_llm = build_llm("stock_news")
-route_llm = GoogleGenerativeAI(
-    model="gemini-3.6-flash",
-    google_api_key=os.getenv("GOOGLE_API_KEY"),
-)
 
-ROUTER_PROMPT = ChatPromptTemplate.from_messages([
-    ("system",
-     "질문을 아래 네 템플릿 중 하나로 분류하세요.\n"
-     "- smalltalk: 인사, 잡담, 감정표현\n"
-     "- stock_rag: 주식, 뉴스, 경제 관련 질문\n"
-     "- fallback: 그 외 질문들"),
-    ("human", "{question}")
-])
+MODEL_ID = "Qwen/Qwen2.5-1.5B-Instruct"
 
-router_chain = ROUTER_PROMPT | route_llm | StrOutputParser()
+_tok = None
+_model = None
+
+def load_model():
+    global _tok, _model
+    if _model is None:
+        _tok = AutoTokenizer.from_pretrained(MODEL_ID)
+        _model = AutoModelForCausalLM.from_pretrained(MODEL_ID, torch_dtype=torch.float16,)
+        _model.eval()
+    return _tok, _model
+
+#
+# route_llm = GoogleGenerativeAI(
+#     model="gemini-3.6-flash",
+#     google_api_key=os.getenv("GOOGLE_API_KEY"),
+# )
+
+ROUTER_PROMPT = """사용자의 질문을 아래 세 가지 중 하나로 분류하세요.
+
+smalltalk:
+- 인사, 감사, 잡담, 감정, 일상 대화
+- 예: 안녕, 반가워, 고마워, 오늘 기분 어때?, 뭐 하고 있어?
+
+stock_rag:
+- 주식, 기업, 종목, 주가, 실적, 배당, 투자 관련 질문
+- 예: 삼성전자 주가 알려줘, SK하이닉스 실적은 어때?
+
+fallback:
+- smalltalk과 stock_rag에 해당하지 않는 질문
+- 예: 파이썬 리스트 사용법 알려줘, 서울 날씨 알려줘
+
+반드시 다음 중 하나만 출력하세요.
+smalltalk
+stock_rag
+fallback
+
+질문: {question}
+분류:"""
+
+VALID = {"smalltalk", "stock_rag", "fallback"}
+
+def classify(question: str) -> str:
+    tok, model = load_model()
+    messages = [{"role": "user", "content": ROUTER_PROMPT.format(question=question)}]
+    text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    inputs = tok(text, return_tensors="pt")
+
+    with torch.no_grad():
+        out = model.generate(**inputs, max_new_tokens=8, do_sample=False,
+                             pad_token_id=tok.eos_token_id)
+
+    raw = tok.decode(out[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
+    print(f"[라우터 원본 출력] {raw!r}", flush=True)      # ← 디버깅용
+
+    cleaned = raw.strip().lower().replace("`", "").replace("_", "_")
+
+    # 부분 매칭 (긴 라벨부터 검사)
+    for label in ["stock_rag", "smalltalk", "fallback"]:
+        if label in cleaned:
+            return label
+    # 느슨한 매칭
+    if "stock" in cleaned:
+        return "stock_rag"
+    if "small" in cleaned or "talk" in cleaned:
+        return "smalltalk"
+    return "fallback"
+
+# router_chain = ROUTER_PROMPT | route_llm | StrOutputParser()
 
 RouteType = Literal["smalltalk", "stock_rag", "fallback"]
 
@@ -56,7 +115,8 @@ class AgentState(TypedDict):
     rewritten_query : str
     ticker : str
     search_sort : str
-
+    company : str
+    company_aliases : list[str]
 
     fallback : str
     trace: Annotated[list[str], operator.add]
@@ -65,7 +125,7 @@ def build_graph():
     # 노드 :  route_node, small_talk_node, search_news_node, retrieval_news_node, generate_answer_node
     def router_node(state: AgentState) -> dict:
 
-        route = router_chain.invoke({"question" : state["question"]}).strip()
+        route = classify(state["question"])
 
         if "stock" in route:
             route = "stock_rag"
@@ -88,28 +148,33 @@ def build_graph():
         print("원래 질문:", state["question"])
         print("재작성 검색어:", result["rewritten_query"])
         print("기업:", result["company"])
+        print("기업 별칭:", result["company_aliases"])
         print("질문 의도:", result["matched_intents"])
 
         return {
             "company": result["company"],
             "ticker": result["ticker"],
+            "company_aliases": result["company_aliases"],
             "rewritten_query": result["rewritten_query"],
             "search_sort": result["sort"],
             "trace": ["rewrite_query_node"],
         }
 
     def search_news_node(state: AgentState) -> dict:
-        query = state.get("rewritten_query", state["question"])
-        sort = state.get("search_sort", "sim")
-        question_id = store.build_news_vector_db(query=query, display=10, sort=sort)
-        return {"question_id" : question_id ,"trace" : ["search_news_node"]}
-
+        question_id = store.build_news_vector_db(
+            query=state.get("rewritten_query", state["question"]),
+            display=10,
+            sort=state.get("search_sort", "sim"),
+            company=state.get("company"),
+            aliases=state.get("company_aliases", []),
+        )
+        return {"question_id": question_id, "trace": ["search_news_node"]}
     # def retrieve_news_node(state: AgentState) -> dict:
     #     result = store.search_similar_news(state["question"], question_id=state["question_id"], top_k=3)
     #     return {"contexts" : result["documents"][0], "retrieved_docs" : result["metadatas"][0], "trace" : ["retrieve_news_node"]}
 
     def retrieve_news_node(state: AgentState) -> dict:
-        result = store.search_similar_news(question=state["question"], question_id=state["question_id"], top_k=3, max_distance=None,)
+        result = store.search_similar_news(question=state["question"], question_id=state["question_id"], top_k=2, max_distance=1.25,)
 
         contexts = result["documents"][0]
         metadatas = result["metadatas"][0]
@@ -127,7 +192,7 @@ def build_graph():
         if not contexts:
             return {"answer": ("질문과 관련성이 충분한 뉴스를 \n찾지 못했습니다."), "trace": ["generate_node"]}
         context_text = "\n\n".join(contexts)
-        filled = f"참고 뉴스: {context_text}\n질문: {state['question']}\n답변: "
+        filled = f"참고 뉴스:\n{context_text}\n\n질문: {state['question']}\n답변: "
         answer = stock_news_llm.invoke(filled)
         return {"answer": answer, "trace": ["generate_node"]}
 
@@ -138,6 +203,7 @@ def build_graph():
 
     graph_builder.add_node("router",router_node)
     graph_builder.add_node("small_talk",small_talk_node)
+    graph_builder.add_node("rewrite_query",rewrite_query_node)
     graph_builder.add_node("search_news",search_news_node)
     graph_builder.add_node("retrieve_news",retrieve_news_node)
     graph_builder.add_node("generate",generate_node)
@@ -150,12 +216,13 @@ def build_graph():
         lambda state:state["route"],
         {
             "smalltalk" : "small_talk",
-            "stock_rag" : "search_news",
+            "stock_rag" : "rewrite_query",
             "fallback" : "fallback",
         }
     )
 
     # RAG 파이프라인
+    graph_builder.add_edge("rewrite_query","search_news")
     graph_builder.add_edge("search_news","retrieve_news")
     graph_builder.add_edge("retrieve_news","generate")
 
@@ -164,15 +231,3 @@ def build_graph():
     graph_builder.add_edge("fallback",END)
 
     return graph_builder.compile(checkpointer=MemorySaver())
-
-if __name__ == "__main__":
-    graph = build_graph()
-    for q in ["안녕 반가워", "삼성전자 주가 어때?", "리만 적분이 뭐야?"]:
-        result = graph.invoke(
-            {"question": q},
-            config={"configurable": {"thread_id": "t1"}},  # MemorySaver 쓸 때만
-        )
-        print(f"\n[{q}]")
-        print("route:", result["route"])
-        print("trace:", result["trace"])
-        print("answer:", result["answer"])

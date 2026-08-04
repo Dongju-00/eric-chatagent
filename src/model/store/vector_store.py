@@ -8,6 +8,10 @@ from model.embed.embedder import KoreanGPTEmbedder
 import trafilatura
 from pathlib import Path
 
+from datetime import datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
+from model.graph.query_rewrite import rewrite_stock_query
+
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_CHROMA_PATH = PROJECT_ROOT / "storage" / "chroma"
 
@@ -111,14 +115,15 @@ def parse_news_items(items):
         # 너무 긴 기사는 최대 길이 제한
         content = content[:5000]
 
-        text = f"""
-                제목: {title}
-                작성일: {pub_date}
-                내용: {content}
-                """.strip()
+        # text = f"""
+        #         제목: {title}
+        #         작성일: {pub_date}
+        #         내용: {content}
+        #         """.strip()
 
         documents.append({
-            "text": text,
+            # 아직 제목과 날짜를 합치지 않고 본문만 저장
+            "content": content,
             "metadata": {
                 "title": title,
                 "link": article_link,
@@ -145,9 +150,22 @@ def chunk_text(text, chunk_size=500, overlap=100):
 
     return chunks
 
+CUTOFF_DAYS = 30
+
+
+def is_recent(item, days=CUTOFF_DAYS):
+    """네이버 pubDate(RFC 822 형식)를 파싱해 최근 기사인지 확인"""
+    try:
+        pub = parsedate_to_datetime(item["pubDate"])
+        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+        return pub > cutoff
+    except Exception:
+        return True  # 파싱 실패 시 일단 통과
+
+
 class ChromaNewsVectorStore:
     def __init__(self, persist_path=None):
-        path = Path(persist_path) if persist_path else DEFAULT_PERSIST_PATH
+        path = Path(persist_path) if persist_path else DEFAULT_CHROMA_PATH
         path.mkdir(parents=True, exist_ok=True)
         self.client = chromadb.PersistentClient(path=str(path))
 
@@ -221,26 +239,54 @@ class ChromaNewsVectorStore:
 
         return len(documents)
 
-    def build_news_vector_db(self, query, display=10, sort="sim"):
+    def build_news_vector_db(self, query, display=10, sort="sim", company = None, aliases = None):
         # 사용자 질문 저장
         question_id = self.save_question(query)
+        result = search_stock_news(query=query, display=display*3, sort=sort)
+        items = result["items"]
 
-        # 네이버 뉴스 검색
-        result = search_stock_news(query=query, display=display, sort=sort)
-        documents = parse_news_items(result["items"])
+        # 최근 + 제목에 종목명(별칭 포함) 매칭
+        def matches_company(item):
+            if not company:
+                return True
+            text = (html_to_text(item.get("title", "")) + " " +
+                    html_to_text(item.get("description", "")))
+            return any(a.lower() in text.lower() for a in [company, *(aliases or [])])
+
+        recent = [it for it in items if is_recent(it) and matches_company(it)]
+        print(f"[수집] 전체 {len(items)}건 → 최근+종목매칭 {len(recent)}건", flush=True)
+
+        # 필터 후 남은 게 없으면 원본 사용 (검색 결과 0건 방지)
+        if not recent:
+            recent = items[:display]
+
+        documents = parse_news_items(recent[:display])
 
         # 파싱
         chunked_docs = []
 
         # 청킹
         for doc in documents:
-            chunks = chunk_text(doc["text"])
+            # chunks = chunk_text(doc["text"])
+            content = doc["content"]
+            metadata = doc["metadata"]
+
+            # 직접 만든 모델의 block_size가 작으므로
+            # 500자보다 조금 작게 자르는 편이 좋음
+            chunks = chunk_text(content, chunk_size=358, overlap=50,)
 
             for idx, chunk in enumerate(chunks):
+                # 모든 chunk에 제목과 작성일을 다시 붙임
+                formatted_chunk = (
+                    f"제목: {metadata.get('title', '')}\n"
+                    f"작성일: {metadata.get('pubDate', '')}\n"
+                    f"내용: {chunk}"
+                )
+
                 chunked_docs.append({
-                    "text": chunk,
+                    "text": formatted_chunk,
                     "metadata": {
-                        **doc["metadata"],
+                        **metadata,
                         "chunk_id": idx,
                     }
                 })
@@ -254,7 +300,7 @@ class ChromaNewsVectorStore:
         return question_id
 
     # Retrieval 임베딩
-    def search_similar_news(self, question: str, question_id: str, top_k=3, max_distance: float | None = None):
+    def search_similar_news(self, question: str, question_id: str, top_k=3, max_distance: float = 1.25):
         query_embedding = self.embedder.embed_text(question)
 
         query_args = {
