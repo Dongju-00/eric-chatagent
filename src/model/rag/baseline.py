@@ -24,7 +24,7 @@ DATA_DIR = PROJECT_ROOT / "data"
 store = ChromaNewsVectorStore()
 
 def retriever(question: str) -> str:
-    result = store.search_similar_news(question, top_k=5)
+    result = store.search_similar_news(question, top_k=10)
     docs = result["documents"][0]
     seen, uniq = set(), []
     for d in docs:
@@ -108,8 +108,8 @@ class KoreanGPTLLM(LLM):
             idx, self.max_new_tokens,
             stop_tokens=self.stop_ids,
             temperature=0.2,  # 0.2 → 0.8
-            top_k=5,  # 1 → 40
-            repetition_penalty=1.5,
+            top_k=10,  # 1 → 40
+            repetition_penalty=1.15,
         )[0].tolist()
 
         return self.sp.decode(out[len(ids):]).strip()

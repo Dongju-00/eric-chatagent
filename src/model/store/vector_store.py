@@ -106,9 +106,7 @@ def extract_news_body(original_link, naver_link, min_length=100):
     return "", original_link or naver_link, "naver_description"
 
 def parse_news_items(items):
-    documents = []
-
-    for item in items:
+    def build(item):
         title = html_to_text(item.get("title", ""))
         description = html_to_text(item.get("description", ""))
 
@@ -128,7 +126,7 @@ def parse_news_items(items):
         #         내용: {content}
         #         """.strip()
 
-        documents.append({
+        return ({
             # 아직 제목과 날짜를 합치지 않고 본문만 저장
             "content": content,
             "metadata": {
@@ -140,7 +138,9 @@ def parse_news_items(items):
             }
         })
 
-    return documents
+    with ThreadPoolExecutor(max_workers=10) as ex:
+        return list(ex.map(build, items))
+
 
 def chunk_text(text, chunk_size=500, overlap=100):
     chunks = []
