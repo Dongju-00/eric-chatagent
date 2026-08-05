@@ -168,9 +168,6 @@ flowchart TB
 
     style V fill:#e8f8e8,stroke:#5cb85c,stroke-width:2px,color:#111111
     style D fill:#fff4e6,stroke:#f5a623,stroke-width:2px,color:#111111
-    style R stroke-width:2px,color:#111111
-    style C stroke-width:2px,color:#111111
-    style L stroke-width:2px,color:#111111
 ```
 
 | 방식 | 백엔드 | 메모리 | 특징                                                   |
@@ -690,8 +687,8 @@ flowchart LR
     SKILL -->|SimpleText 응답| CH
     CH --> KT
 
-    style SKILL fill:#fee500,stroke:#3c1e1e
-    style API fill:#e8f4f8,stroke:#4a90d9
+    style SKILL fill:#fee500,stroke:#3c1e1e,stroke-width:2px,color:#111111
+    style API fill:#e8f4f8,stroke:#4a90d9,stroke-width:2px,color:#111111
 ```
 
 | 항목 | 현재 | 카카오톡 이식 시 |
