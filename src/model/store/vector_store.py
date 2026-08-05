@@ -12,8 +12,15 @@ from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from model.graph.query_rewrite import rewrite_stock_query
 
+from concurrent.futures import ThreadPoolExecutor
+from trafilatura.settings import use_config
+
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_CHROMA_PATH = PROJECT_ROOT / "storage" / "chroma"
+
+# 응답 없는 사이트에서 무한 대기하는 걸 방지
+_TRAFILATURA_CFG = use_config()
+_TRAFILATURA_CFG.set("DEFAULT", "DOWNLOAD_TIMEOUT", "5")
 
 class HTMLTextExtractor(HTMLParser):
     def __init__(self):
@@ -39,7 +46,7 @@ def extract_article_body(url: str) -> str:
         return ""
 
     try:
-        downloaded = trafilatura.fetch_url(url)
+        downloaded = trafilatura.fetch_url(url, config=_TRAFILATURA_CFG) # config=_TRAFILATURA_CFG
 
         if not downloaded:
             return ""

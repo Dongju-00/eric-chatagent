@@ -113,7 +113,7 @@ jobs:
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.MODEL_SERVER_HOST }} \
           "mkdir -p ~/eric-chatagent"
           scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
-            docker-compose.yml \
+            docker-compose.yml .env\
             ${{ secrets.SERVER_USER }}@${{ secrets.MODEL_SERVER_HOST }}:~/eric-chatagent/
 
 
