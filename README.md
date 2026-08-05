@@ -197,18 +197,32 @@ Vector DB에 뉴스를 저장해 최근에 물어본 주식관련 뉴스는 바�
 ### STEP 2 — 본문 추출과 필터링
 
 ```mermaid
-flowchart LR
-    Q[질문] --> F1{질문 재작성br/>입력 데이터 전처리]
-    F1 --> N[네이버 API<br/>display x3 수집]
-    N --> F1{날짜 필터<br/>30일 이내}
-    F1 --> F2{종목명 매칭<br/>제목·요약}
-    F2 --> B[trafilatura<br/>본문 병렬 추출]
-    B --> CH[청킹 500자<br/>overlap 100]
-    CH --> EM[임베딩]
-    EM --> DB[(ChromaDB)]
+flowchart TB
+    Q["질문"] --> R["질문 재작성<br/>입력 데이터 전처리"]
+    R --> N["네이버 API<br/>display × 3 수집"]
+    N --> D{"최근 30일<br/>이내인가?"}
 
-    style F1 fill:#fff4e6
-    style F2 fill:#fff4e6
+    D -- "아니요" --> X1["제외"]
+    D -- "예" --> M{"종목명이<br/>일치하는가?"}
+
+    M -- "아니요" --> X2["제외"]
+    M -- "예" --> B["trafilatura<br/>본문 추출"]
+
+    B --> CH["청킹 500자<br/>overlap 100"]
+    CH --> EM["임베딩"]
+    EM --> DB[("ChromaDB")]
+
+    classDef basic fill:#ffffff,stroke:#333333,color:#111111
+    classDef process fill:#fff4e6,stroke:#e67e22,color:#111111
+    classDef decision fill:#fff2cc,stroke:#b8860b,color:#111111
+    classDef exclude fill:#ffe6e6,stroke:#cc0000,color:#111111
+    classDef database fill:#e6f2ff,stroke:#3366cc,color:#111111
+
+    class Q,N,B,CH,EM basic
+    class R process
+    class D,M decision
+    class X1,X2 exclude
+    class DB database
 ```
 
 - **`trafilatura` 본문 추출** — `description` 대신 원문 링크에서 기사 본문을 가져옴
