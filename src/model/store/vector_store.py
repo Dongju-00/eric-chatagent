@@ -246,7 +246,7 @@ class ChromaNewsVectorStore:
 
         return len(documents)
 
-    def build_news_vector_db(self, query, display=10, sort="sim", company = None, aliases = None):
+    def build_news_vector_db(self, query, display=3, sort="sim", company = None, aliases = None):
         # 사용자 질문 저장
         question_id = self.save_question(query)
         result = search_stock_news(query=query, display=display*3, sort=sort)
