@@ -41,10 +41,10 @@ flowchart TB
     B -.->|POST /agent/chat| API[FastAPI]
     API -.->|answer| B
 
-    style UI fill:#b2c7d9,stroke:#7a94ab
-    style H fill:#a9c0d5,stroke:#7a94ab
-    style B fill:#ffffff,stroke:#cccccc
-    style I fill:#ffffff,stroke:#cccccc
+    style UI fill:#b2c7d9,stroke:#7a94ab,stroke-width:2px,color:#111111
+    style H fill:#a9c0d5,stroke:#7a94ab,stroke-width:2px,color:#111111
+    style B fill:#ffffff,stroke:#cccccc,stroke-width:2px,color:#111111
+    style I fill:#ffffff,stroke:#cccccc,stroke-width:2px,color:#111111
 ```
 
 **카카오톡 UI를 따른 이유**: 국내 사용자에게 가장 익숙한 채팅 인터페이스이므로 별도 학습 없이 사용할 수 있고, 이후 **카카오톡 채널 챗봇으로 이식할 때 사용자 경험의 단절이 없다.** 말풍선 정렬·시간 표기·Enter 전송 규칙 등 인터랙션 컨벤션을 미리 맞춰 두었다.
@@ -77,9 +77,9 @@ graph LR
     Graph -->|캐시 미스 시| Naver[네이버 뉴스 API]
     Graph -->|의도 분류| VLLM[vLLM 서버]
 
-    style WEB fill:#e8f4f8,stroke:#4a90d9
-    style MODEL fill:#fff4e6,stroke:#f5a623
-    style VLLM fill:#e8f8e8,stroke:#5cb85c
+    style WEB fill:#e8f4f8,stroke:#4a90d9,stroke-width:2px,color:#111111
+    style MODEL fill:#fff4e6,stroke:#f5a623,stroke-width:2px,color:#111111
+    style VLLM fill:#e8f8e8,stroke:#5cb85c,stroke-width:2px,color:#111111
 ```
 
 서버를 나눈 이유는 OOM 장애 때문이다. 초기에는 단일 인스턴스에서 웹 서빙과 모델 추론을 함께 처리했는데, 모델이 메모리를 소진하면 웹 서버까지 동시에 죽어 서비스 전체가 중단됐다. 역할을 분리한 뒤로는 모델 서버에 장애가 발생해도 nginx가 살아 있어 사용자에게 상태를 안내할 수 있다.
@@ -101,8 +101,8 @@ flowchart LR
     V --> NM[[KoreanGPT_news_v2.pt]]
     E --> EM[[KoreanGPT.pt]]
 
-    style P fill:#e8f4f8
-    style V fill:#ffe8e8
+    style P fill:#e8f4f8,stroke-width:2px,color:#111111
+    style V fill:#ffe8e8,stroke-width:2px,color:#111111
 ```
 
 단계를 나눈 이유는 각 Stage가 서로 다른 능력을 순서대로 쌓기 위해서다. 처음부터 도메인 응답 포맷으로만 학습하면 언어 자체를 충분히 익히지 못한 채 형식만 흉내 내는 모델이 된다. 먼저 대규모 텍스트로 언어 패턴을 익힌 뒤, 그 위에 태스크를 순차적으로 올리는 전이학습 구조다.
@@ -156,7 +156,7 @@ GPT-2와 동일한 Decoder-only Transformer를 Multi-Head Attention부터 직접
 질문 분류에는 지시를 따르는 능력이 필요해 자체 모델(42M) 대신 Instruct 계열 공개 가중치를 사용한다. `VLLM_BASE_URL` 환경변수 유무로 서빙 방식이 자동 분기된다.
 
 ```mermaid
-flowchart LR
+flowchart TB
     R[router_node] --> C{VLLM_BASE_URL<br/>설정?}
     C -->|있음| V[vLLM 서버<br/>OpenAI 호환 API]
     C -->|없음| L[로컬 Transformers<br/>폴백]
@@ -166,8 +166,11 @@ flowchart LR
     D -->|예| OUT([smalltalk / stock_rag / fallback])
     D -->|아니오| FB([fallback])
 
-    style V fill:#e8f8e8,stroke:#5cb85c
-    style D fill:#fff4e6,stroke:#f5a623
+    style V fill:#e8f8e8,stroke:#5cb85c,stroke-width:2px,color:#111111
+    style D fill:#fff4e6,stroke:#f5a623,stroke-width:2px,color:#111111
+    style R stroke-width:2px,color:#111111
+    style C stroke-width:2px,color:#111111
+    style L stroke-width:2px,color:#111111
 ```
 
 | 방식 | 백엔드 | 메모리 | 특징                                                   |
@@ -198,31 +201,31 @@ Vector DB에 뉴스를 저장해 최근에 물어본 주식관련 뉴스는 바�
 
 ```mermaid
 flowchart TB
-    Q["질문"] --> R["질문 재작성<br/>입력 데이터 전처리"]
+    Q[질문] --> R["질문 재작성<br/>입력 데이터 전처리"]
     R --> N["네이버 API<br/>display × 3 수집"]
+
     N --> D{"최근 30일<br/>이내인가?"}
+    D -- 아니요 --> X1[Fallback]
+    D -- 예 --> M{"종목명이<br/>일치하는가?"}
 
-    D -- "아니요" --> X1["제외"]
-    D -- "예" --> M{"종목명이<br/>일치하는가?"}
-
-    M -- "아니요" --> X2["제외"]
-    M -- "예" --> B["trafilatura<br/>본문 추출"]
+    M -- 아니요 --> X2[Fallback]
+    M -- 예 --> B["trafilatura<br/>본문 병렬 추출"]
 
     B --> CH["청킹 500자<br/>overlap 100"]
-    CH --> EM["임베딩"]
-    EM --> DB[("ChromaDB")]
+    CH --> EM[임베딩]
+    EM --> DB[(ChromaDB)]
 
-    classDef basic fill:#ffffff,stroke:#333333,color:#111111
-    classDef process fill:#fff4e6,stroke:#e67e22,color:#111111
-    classDef decision fill:#fff2cc,stroke:#b8860b,color:#111111
-    classDef exclude fill:#ffe6e6,stroke:#cc0000,color:#111111
-    classDef database fill:#e6f2ff,stroke:#3366cc,color:#111111
-
-    class Q,N,B,CH,EM basic
-    class R process
-    class D,M decision
-    class X1,X2 exclude
-    class DB database
+    style Q fill:#ffffff,stroke:#222222,stroke-width:2px,color:#111111
+    style R fill:#fff4e6,stroke:#d35400,stroke-width:2px,color:#111111
+    style N fill:#ffffff,stroke:#222222,stroke-width:2px,color:#111111
+    style D fill:#fff4e6,stroke:#d35400,stroke-width:2px,color:#111111
+    style M fill:#fff4e6,stroke:#d35400,stroke-width:2px,color:#111111
+    style X1 fill:#ffe6e6,stroke:#cc0000,stroke-width:2px,color:#111111
+    style X2 fill:#ffe6e6,stroke:#cc0000,stroke-width:2px,color:#111111
+    style B fill:#ffffff,stroke:#222222,stroke-width:2px,color:#111111
+    style CH fill:#ffffff,stroke:#222222,stroke-width:2px,color:#111111
+    style EM fill:#ffffff,stroke:#222222,stroke-width:2px,color:#111111
+    style DB fill:#e6f2ff,stroke:#2457a6,stroke-width:2px,color:#111111
 ```
 
 - **`trafilatura` 본문 추출** — `description` 대신 원문 링크에서 기사 본문을 가져옴
@@ -289,9 +292,9 @@ flowchart TD
     NF --> E
     FB --> E
 
-    style Router fill:#ffe8e8,stroke:#d9534f
-    style CA fill:#e8f8e8,stroke:#5cb85c
-    style GEN fill:#fff4e6,stroke:#f5a623
+    style Router fill:#ffe8e8,stroke:#d9534f,stroke-width:2px,color:#111111
+    style CA fill:#e8f8e8,stroke:#5cb85c,stroke-width:2px,color:#111111
+    style GEN fill:#fff4e6,stroke:#f5a623,stroke-width:2px,color:#111111
 ```
 
 ```
@@ -337,8 +340,8 @@ flowchart LR
 
     BEFORE -.->|개선| AFTER
 
-    style BEFORE fill:#ffe8e8,stroke:#d9534f
-    style AFTER fill:#e8f8e8,stroke:#5cb85c
+    style BEFORE fill:#ffe8e8,stroke:#d9534f,stroke-width:2px,color:#111111
+    style AFTER fill:#e8f8e8,stroke:#5cb85c,stroke-width:2px,color:#111111
 ```
 
 ### 개선 1 — 본문 추출 병렬화
@@ -408,8 +411,8 @@ flowchart LR
 
     M1 & M2 & M3 --> REP[리포트 출력]
 
-    style M3 fill:#ffe8e8,stroke:#d9534f
-    style REP fill:#e8f8e8,stroke:#5cb85c
+    style M3 fill:#ffe8e8,stroke:#d9534f,stroke-width:2px,color:#111111
+    style REP fill:#e8f8e8,stroke:#5cb85c,stroke-width:2px,color:#111111
 ```
 
 ### 평가 지표
@@ -517,7 +520,7 @@ flowchart LR
     DM --> EC2M
     DW --> EC2W[Web 서버]
 
-    style GHA fill:#f0f0f5,stroke:#6c757d
+    style GHA fill:#f0f0f5,stroke:#6c757d,stroke-width:2px,color:#111111
 ```
 
 **모델 배포를 분리한 이유**: 초기에는 모델 가중치를 로컬에서 이미지에 직접 복사했는데, `.gitignore`와 `.dockerignore` 떄문에 CI 환경에서 빌드를 실패했었다. 그래서 Hugging Face에 모델을 업로드하고 Dockerfile을 통해 자동으로 다운로드하게 만들었다.
