@@ -109,7 +109,7 @@ class KoreanGPTLLM(LLM):
             stop_tokens=self.stop_ids,
             temperature=0.2,  # 0.2 → 0.8
             top_k=10,  # 1 → 40
-            repetition_penalty=1.15,
+            repetition_penalty=1.3,
         )[0].tolist()
 
         return self.sp.decode(out[len(ids):]).strip()
@@ -121,17 +121,37 @@ def build_llm(model="small_talk"):
         sp_prefix=str(DATA_DIR / "sp_korean"),
         )
     elif model == "stock_news":
-        return KoreanGPTLLM(
-            model_path = MODEL_DIR / "KoreanGPT_news_v2.pt",
-            sp_prefix=str(DATA_DIR / "sp_korean"),
+        # return KoreanGPTLLM(
+        #     model_path = MODEL_DIR / "KoreanGPT_news_v2.pt",
+        #     sp_prefix=str(DATA_DIR / "sp_korean"),
+        # )
+        return ChatGoogleGenerativeAI(
+            model="gemini-3.6-flash",
+            google_api_key=os.getenv("GOOGLE_API_KEY"),
         )
     else:
         return ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
+            model="gemini-3.6-flash",
             google_api_key=os.getenv("GOOGLE_API_KEY"),
         )
 
 llm = build_llm("stock_news")
+
+STOCK_NEWS_PROMPT = PromptTemplate.from_template("""당신은 한국 주식 뉴스를 요약하는 챗봇입니다.
+아래 참고 뉴스만 근거로 답변하세요. 뉴스에 없는 내용은 추측하지 마세요.
+답변은 5문장 이내로 간결하게 작성하세요.
+투자 판단(매수/매도)을 할만하다, 할만하지 않다 정도만 전달하고, 정보만 전달하세요.
+그리고 지금 주가 흐름도 설명하시오.
+
+참고 뉴스:
+{context_text}
+
+질문: {question}
+
+답변:"""
+)
+
+stock_news_chain = STOCK_NEWS_PROMPT | llm | StrOutputParser()
 
 prompt = PromptTemplate.from_template(
     "참고 뉴스: {context}\n질문: {question}\n답변: "

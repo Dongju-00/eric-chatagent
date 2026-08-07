@@ -2,6 +2,7 @@ import operator
 from pathlib import Path
 import os
 import sys
+import httpx
 
 from dotenv import load_dotenv
 from langchain_core.output_parsers import StrOutputParser
@@ -25,6 +26,9 @@ load_dotenv()
 store = ChromaNewsVectorStore()
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
+
+VLLM_BASE_URL = os.environ.get("VLLM_BASE_URL")
+VLLM_API_KEY = os.environ.get("VLLM_API_KEY")
 
 # graph에 적용할 llm들 빌드해놓기
 small_talk_llm = build_llm("small_talk")
@@ -81,39 +85,43 @@ fallback
 # 답변:"""
 # )
 
-# 공개 가중치 모델로 라우팅
-VALID = {"smalltalk", "stock_rag", "fallback"}
-
-def classify(question: str) -> str:
-    tok, model = load_model()
-    messages = [{"role": "user", "content": ROUTER_PROMPT.format(question=question)}]
-    text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-    inputs = tok(text, return_tensors="pt")
-
-    with torch.no_grad():
-        out = model.generate(**inputs, max_new_tokens=8, do_sample=False,
-                             pad_token_id=tok.eos_token_id)
-
-    raw = tok.decode(out[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
-    print(f"[라우터 원본 출력] {raw!r}", flush=True)      # ← 디버깅용
-
-    cleaned = raw.strip().lower().replace("`", "").replace("_", "_")
-
-    # 부분 매칭 (긴 라벨부터 검사)
+def _parse_label(raw: str) -> str:
+    cleaned = raw.strip().lower().replace("`", "")
     for label in ["stock_rag", "smalltalk", "fallback"]:
         if label in cleaned:
             return label
-    # 느슨한 매칭
     if "stock" in cleaned:
         return "stock_rag"
     if "small" in cleaned or "talk" in cleaned:
         return "smalltalk"
     return "fallback"
 
+
+def classify(question: str) -> str:
+    try:
+        resp = httpx.post(
+            f"{VLLM_BASE_URL}/chat/completions",
+            headers={"Authorization": f"Bearer {VLLM_API_KEY}"},
+            json={
+                "model": MODEL_ID,
+                "messages": [{"role": "user", "content": ROUTER_PROMPT.format(question=question)}],
+                "max_tokens": 8,
+                "temperature": 0,
+            },
+            timeout=60,
+        )
+        resp.raise_for_status()
+        raw = resp.json()["choices"][0]["message"]["content"]
+        print(f"[vLLM 라우터 출력] {raw!r}", flush=True)
+        return _parse_label(raw)
+    except Exception as e:
+        print(f"[vLLM 호출 실패] {e}", flush=True)
+        return "fallback"     # 로컬 모델 대신 안전한 기본값으로
+
 # router_prompt = PromptTemplate.from_template(ROUTER_PROMPT)
 # router_chain = router_prompt | route_llm | StrOutputParser()
 
-fallback_chain = FALLBACK_PROMPT | route_llm | StrOutputParser()
+# fallback_chain = FALLBACK_PROMPT | route_llm | StrOutputParser()
 
 class AgentState(TypedDict):
     question : str
@@ -204,13 +212,30 @@ def build_graph():
         if not contexts:
             return {"answer": ("질문과 관련성이 충분한 뉴스를 \n찾지 못했습니다."), "trace": ["generate_node"]}
         context_text = "\n\n".join(contexts)
-        filled = f"참고 뉴스:\n{context_text}\n\n질문: {state['question']}\n답변: "
-        answer = stock_news_llm.invoke(filled)
+        # filled = f"참고 뉴스:\n{context_text}\n\n질문: {state['question']}\n답변: "
+        # answer = stock_news_llm.invoke(filled)
+        answer = stock_news_chain.invoke({"context_text": context_text, "question": state["question"]})
         return {"answer": answer, "trace": ["generate_node"]}
 
+    # 공개 가중치 모델 Qwen을 라우터로 사용할 때
     def fallback_node(state: AgentState) -> dict:
-        answer = route_llm.invoke(state["question"])
-        return {"answer" : answer, "trace" : ["fallback_node"]}
+        tok, model = load_model()
+        prompt_text = f"다음 질문에 3문장 이내로 간단히 답하세요.\n질문: {state['question']}\n답변:"
+        messages = [{"role": "user", "content": prompt_text}]
+        text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        inputs = tok(text, return_tensors="pt")
+
+        with torch.no_grad():
+            out = model.generate(**inputs, max_new_tokens=150, do_sample=True, temperature=0.7,
+                                 pad_token_id=tok.eos_token_id)
+
+        answer = tok.decode(out[0][inputs.input_ids.shape[1]:], skip_special_tokens=True).strip()
+        return {"answer": answer, "trace": ["fallback_node"]}
+
+    # gemini를 라우터로 사용할 때
+    # def fallback_node(state: AgentState) -> dict:
+    #     answer = route_llm.invoke(state["question"])
+    #     return {"answer" : answer, "trace" : ["fallback_node"]}
 
     graph_builder = StateGraph(AgentState)
 

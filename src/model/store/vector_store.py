@@ -64,34 +64,6 @@ def extract_article_body(url: str) -> str:
         print(f"기사 본문 추출 실패: {url} / {e}")
         return ""
 
-# def parse_news_items(items):
-#     documents = []
-#
-#     for item in items:
-#         title = html_to_text(item.get("title", ""))
-#         description = html_to_text(item.get("description", ""))
-#         link = item.get("link", "")
-#         pub_date = item.get("pubDate", "")
-#
-#         text = f"""
-# 제목: {title}
-# 내용: {description}
-# 링크: {link}
-# 작성일: {pub_date}
-# """.strip()
-#
-#         documents.append({
-#             "text": text,
-#             "metadata": {
-#                 "title": title,
-#                 "link": link,
-#                 "pubDate": pub_date,
-#                 "source": "naver_news",
-#             }
-#         })
-#
-#     return documents
-
 def extract_news_body(original_link, naver_link, min_length=100):
     body = extract_article_body(original_link)
 
@@ -246,7 +218,7 @@ class ChromaNewsVectorStore:
 
         return len(documents)
 
-    def build_news_vector_db(self, query, display=3, sort="sim", company = None, aliases = None):
+    def build_news_vector_db(self, query, display=10, sort="sim", company = None, aliases = None):
         # 사용자 질문 저장
         question_id = self.save_question(query)
         result = search_stock_news(query=query, display=display*3, sort=sort)
@@ -307,7 +279,7 @@ class ChromaNewsVectorStore:
         return question_id
 
     # Retrieval 임베딩
-    def search_similar_news(self, question: str, question_id: str, top_k=3, max_distance: float = 1.25):
+    def search_similar_news(self, question: str, question_id: str, top_k=10, max_distance: float = 1.3):
         query_embedding = self.embedder.embed_text(question)
 
         query_args = {
@@ -353,13 +325,6 @@ class ChromaNewsVectorStore:
             "metadatas": [[item[1] for item in filtered]],
             "distances": [[item[2] for item in filtered]],
         }
-
-        # return self.news_collection.query(
-        #     query_embeddings=[query_embedding],
-        #     n_results=max(top_k * 3, top_k),
-        #     where={"question_id": question_id},
-        #     include=["documents", "metadatas", "distances"],
-        # )
 
     def get_chunks_by_question_id(self, question_id):
         return self.news_collection.get(
