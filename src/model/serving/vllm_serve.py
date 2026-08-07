@@ -23,19 +23,19 @@ hf_cache_vol = modal.Volume.from_name("huggingface-cache", create_if_missing=Tru
 
 vllm_cache_vol = modal.Volume.from_name("vllm-cache", create_if_missing=True)
 
-FAST_BOOT = False
+FAST_BOOT = True
 
 app = modal.App("eric-chatagnet-router")
 
 N_GPU = 1
 MINUTES = 60  # seconds
-VLLM_PORT = 8000
+VLLM_PORT = 8001
 ROUTING_REGION = "ap-south"
 
 
 @app.server(
     image=vllm_image,
-    gpu=f"L4:{N_GPU}",
+    gpu=f"T4:{N_GPU}",
     scaledown_window=15 * MINUTES,  # how long should we stay up with no requests?
     startup_timeout=10 * MINUTES,  # how long should we wait for container start?
     volumes={
