@@ -15,7 +15,7 @@ from typing_extensions import TypedDict, Annotated
 from typing import Literal, Any
 
 from model.store.vector_store import ChromaNewsVectorStore
-from model.rag.baseline import build_llm, prompt, KoreanGPTLLM
+from model.rag.baseline import build_llm, prompt, KoreanGPTLLM, stock_news_chain
 from model.graph.query_rewrite import rewrite_stock_query
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
