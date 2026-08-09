@@ -16,9 +16,10 @@ SentencePiece 토크나이저 → Decoder-only Transformer 사전학습 → 도�
 | 질문 재작성 | 상장사 별칭 사전 · 의도 추출 · 시간 표현 정규화로 검색어 자동 생성 |
 | 파이프라인 | LCEL 체인 · LangGraph StateGraph (조건부 분기 3경로) |
 | 자동 라우팅 | LLM이 질문 유형 분류(smalltalk / stock_rag / fallback) → 경로 자동 선택 |
-| **자동 평가** | 라우팅 정확도 · 답변 근거성(groundedness) · 반복률 · 형식 준수를 스크립트로 정량 측정 |
-| **성능 최적화** | 본문 추출 병렬화 · 종목별 뉴스 캐싱으로 응답 지연 개선 |
-| UI | **카카오톡 스타일** 채팅 인터페이스 (Vanilla JS) — 카카오톡 채널 이식을 염두에 둔 설계 |
+| 자동 평가 | 생성 품질(반복률·근거성·형식)은 규칙 기반, 검색 품질은 LLM-as-judge로 이원화하여 정량 측정 |
+| 비교 실험 | 자체 모델과 대형 모델(Gemini)의 생성 품질을 동일 컨텍스트로 정량 비교 |
+| 성능 최적화 | 본문 추출 병렬화 · 종목별 뉴스 캐싱으로 응답 지연 개선 |
+| UI | 카카오톡 스타일 채팅 인터페이스 (Vanilla JS) — 카카오톡 채널 이식을 염두에 둔 설계 |
 | 서빙 | FastAPI + nginx 리버스 프록시, 웹/모델 서버 물리 분리 |
 | 라우터 서빙 | vLLM 외부 서버 연동 (`VLLM_BASE_URL`), 미설정 시 로컬 모델 폴백 |
 | 배포 | GitHub Actions 4-job 파이프라인 → Docker Hub → EC2 2대 자동 반영 |
@@ -30,15 +31,15 @@ SentencePiece 토크나이저 → Decoder-only Transformer 사전학습 → 도�
 
 ```mermaid
 flowchart TB
-    subgraph UI["채팅 화면 (카카오톡 UI 컨벤션)"]
+    subgraph UI["채팅 화면 - 카카오톡 UI 컨벤션"]
         direction TB
-        H["상단 헤더<br/>─────────────<br/>챗봇 · 참여자 수"]
-        B["대화 영역<br/>─────────────<br/>날짜 구분선<br/>봇: 흰 말풍선 + 프로필 (좌)<br/>나: 노란 말풍선 (우)<br/>말풍선 옆 전송 시각<br/>응답 대기 시 입력 중 표시"]
-        I["입력 영역<br/>─────────────<br/>텍스트 입력 · 전송 버튼<br/>Enter 전송 / Shift+Enter 줄바꿈"]
+        H["상단 헤더 / 챗봇, 참여자 수"]
+        B["대화 영역 / 날짜 구분선, 말풍선, 전송 시각, 입력 중 표시"]
+        I["입력 영역 / 텍스트 입력, 전송 버튼, Enter 전송"]
         H --- B --- I
     end
 
-    B -.->|POST /agent/chat| API[FastAPI]
+    B -.->|POST agent chat| API[FastAPI]
     API -.->|answer| B
 
     style UI fill:#b2c7d9,stroke:#7a94ab,stroke-width:2px,color:#111111
@@ -114,7 +115,7 @@ flowchart LR
 | Stage 2 | 스몰톡 파인튜닝 | `KoreanGPT_smalltalk.pt` | 단일 모델로 잡담과 뉴스 요약을 모두 처리하면 응답 성격이 섞인다. 도메인별 체크포인트를 분리해 각 경로에서 전용 모델을 로드                                                    |
 | Stage 3 | 뉴스 요약 파인튜닝 | `KoreanGPT_news.pt` | 참고 뉴스를 받아 요약하는 형식(`참고 뉴스: … 질문: … 답변: …`)을 학습                                                                             |
 | Stage 4 | 임베딩 전용 사용 | `KoreanGPT.pt` | 외부 임베딩 모델 없이 RAG 전 과정을 자체 모델로 구성하는 것이 목표였다. Stage 1 체크포인트의 hidden state를 평균해 문서 벡터로 사용                                    |
-| Stage 5 | RAG 추가 파인튜닝 | `KoreanGPT_news_v2.pt` | **실험 결과**: 학습 데이터 3,084건 중 28%를 "참고 뉴스에 해당 정보가 없습니다" 케이스로 구성해 근거 없는 생성을 억제했다. 42M 규모에서 긴 컨텍스트를 읽고 요약하는 능력의 한계라는 문제가 남아있다. |
+| Stage 5 | RAG 추가 파인튜닝 | `KoreanGPT_news_v2.pt` | 학습 데이터 3,084건 중 28%를 "참고 뉴스에 해당 정보가 없습니다" 케이스로 구성해, 근거 없는 생성을 억제하는 방향으로 접근했다. 아래 비교 실험 결과 이 방향성 자체는 유효했음을 확인했고, 42M 규모라는 파라미터 한계가 최종 품질의 병목이라는 점도 함께 규명했다 |
 
 **최적화**: PyTorch 내장 최적화 어텐션(causal mask 자동 처리) · 답변 토큰만 손실 계산(프롬프트 `-100` 마스킹) · 낮은 학습률(1e-5)로 기존 지식 보존 · 코사인 스케줄러 + 워밍업
 
@@ -354,10 +355,12 @@ with ThreadPoolExecutor(max_workers=5) as executor:
 
 ```python
 _cfg = use_config()
-_cfg.set("DEFAULT", "DOWNLOAD_TIMEOUT", "5")
+_cfg.set("DEFAULT", "DOWNLOAD_TIMEOUT", "10")
 ```
 
-`max_workers`를 과도하게 높이면 상대 서버에 부담을 주거나 차단될 수 있어 5로 제한했다.
+`max_workers`를 과도하게 높이면 상대 서버에 부담을 주거나 차단될 수 있어 10으로 제한했다.
+
+이렇게 동시 요청을 보내 응답 시간이 `99.840219초`에서 `2.939691초`로 대폭 감소했다.
 
 ### 개선 2 — 종목별 뉴스 캐싱
 
@@ -382,46 +385,60 @@ _cfg.set("DEFAULT", "DOWNLOAD_TIMEOUT", "5")
 
 ### 결과
 
-| 구간 | 개선 전 | 개선 후 |
-|---|---|---|
+| 구간 | 개선 전 | 개선 후  |
+|---|---|-----------------|
 | 본문 추출 | 순차 10건 | 병렬 5-way + 타임아웃 |
-| 반복 질문 | 매번 재수집 | 캐시 히트 시 생략 |
-| 전체 응답 | 99.8초 | *(측정값 기입)* |
+| 반복 질문 | 매번 재수집 | 캐시 히트 시 생략      |
+| 전체 응답 | 99.8초 | 2.93초  |
 
 <br>
 
 ## 자동 평가 파이프라인
 
-RAG 시스템은 출력이 매번 달라 기존 단위 테스트로 검증할 수 없다. 프롬프트나 파라미터를 바꿨을 때 **좋아졌는지 나빠졌는지 판단할 기준**이 필요해 평가 스크립트를 별도로 구성했다.
+RAG 시스템은 출력이 매번 달라 기존 단위 테스트로 검증할 수 없다. 프롬프트나 파라미터를 바꿨을 때 좋아졌는지 나빠졌는지 판단할 기준이 필요해 평가 스크립트를 별도로 구성했다.
 
 ```mermaid
 flowchart LR
-    TS[(평가셋<br/>라벨링된 질문)] --> RUN[배치 실행]
-    RUN --> API[/agent/chat/]
-    API --> R1[route 수집]
-    API --> R2[answer 수집]
-    API --> R3[contexts 수집]
+    TS[(질문셋)] --> RUN[배치 실행]
+    RUN --> SEARCH[뉴스 수집 인덱싱]
+    SEARCH --> RET[벡터 검색]
 
-    R1 --> M1[라우팅 정확도<br/>Confusion Matrix]
-    R2 --> M2[반복률 · 형식 준수]
-    R2 & R3 --> M3[근거성<br/>Groundedness]
+    RET --> JUDGE[Gemini 검색 품질 평가]
+    RET --> GEN[답변 생성]
+    GEN --> RULE[규칙 기반 생성 품질 평가]
 
-    M1 & M2 & M3 --> REP[리포트 출력]
+    JUDGE --> REP[리포트 CSV]
+    RULE --> REP
 
-    style M3 fill:#ffe8e8,stroke:#d9534f,stroke-width:2px,color:#111111
-    style REP fill:#e8f8e8,stroke:#5cb85c,stroke-width:2px,color:#111111
+    style JUDGE fill:#fff4e6,stroke:#f5a623,stroke-width:2px,color:#111111
+    style RULE fill:#e8f8e8,stroke:#5cb85c,stroke-width:2px,color:#111111
+    style REP fill:#ffe8e8,stroke:#d9534f,stroke-width:2px,color:#111111
 ```
+
+
+**두 축으로 나눠 평가한 이유**: 검색 품질("이 문서가 질문에 적합한가")은 의미적 판단이 필요해 LLM-as-judge(Gemini)가 적합하고, 생성 품질("반복·근거성·형식이 정상인가")은 재현 가능한 결정적 지표가 더 중요해 규칙 기반으로 분리했다. 후자는 API 비용·한도와 무관하게 언제든 동일한 기준으로 회귀 검증을 돌릴 수 있다.
 
 ### 평가 지표
 
 | 지표 | 측정 방법 | 왜 필요한가 |
 |---|---|---|
-| **라우팅 정확도** | 라벨링된 질문셋의 기대 경로와 실제 `route` 비교, 혼동 행렬 산출 | 잘못된 경로로 가면 이후 파이프라인이 모두 무의미하다. 오분류 패턴을 보면 프롬프트를 어디서 보강할지 알 수 있다 |
-| **근거성 (Groundedness)** | 답변에 등장한 핵심 어휘가 `contexts`에 존재하는 비율 | 환각을 정량화하는 핵심 지표. 검색된 뉴스에 없는 내용을 지어내면 이 값이 떨어진다 |
-| **반복률** | 답변 내 고유 토큰 비율 (`len(set) / len`) | 소규모 모델의 대표적 실패 모드인 반복 루프를 자동 탐지 |
-| **형식 준수** | 백틱·마크다운 잔재, 최소·최대 길이, 문장 종결 여부 | 라우터 출력에 백틱이 섞여 분기가 깨진 경험에서 도입 |
-| **폴백률** | 전체 질문 중 "관련 뉴스 없음"으로 응답한 비율 | 너무 높으면 임계값이 과하게 엄격하다는 신호. 검색 성능의 간접 지표 |
-| **응답 시간** | 요청별 소요 시간의 p50 / p95 | 평균만 보면 느린 케이스가 가려진다 |
+| 검색 품질 | Gemini가 질문–컨텍스트 적합성을 5점 척도로 채점 (keyword_search, relevance, context_usefulness 등) | 검색이 실패하면 이후 파이프라인이 무의미하다 |
+| 반복률 | 답변 내 고유 토큰 비율 (`len(set) / len`) | 소규모 모델의 대표적 실패 모드인 반복 루프를 자동 탐지 |
+| 근거성 (Groundedness) | 답변에 등장한 핵심 어휘가 `contexts`에 존재하는 비율 | 환각을 정량화하는 핵심 지표 |
+
+### 자체 모델 · 대형 모델 비교 실험
+
+Stage 5 파인튜닝 이후에도 남아 있던 생성 품질 문제의 원인을 분리하기 위해, 동일한 검색 결과(컨텍스트)를 기준으로 자체 모델(KoreanGPT_news_v2, 42M)과 대형 모델(Gemini 3.6 Flash)의 답변을 나란히 평가했다.
+
+| 지표 | KoreanGPT (42M) | Gemini 3.6 Flash |
+|---|---|---|
+| 어휘 다양성 (repetition_ratio) | 0.564 ~ 0.929 | 0.902 ~ 0.983 |
+| 근거성 (groundedness) | 0.000 ~ 0.054 | 0.447 ~ 0.568 |
+| 생성 통과율 | 0 / 5 | 5 / 5 |
+
+**해석**: 두 모델에게 완전히 동일한 뉴스 컨텍스트를 주었다는 점이 핵심이다. 검색 품질 변수를 통제한 상태에서도 근거성이 10배 이상 벌어졌다는 것은, Stage 5에서 설계한 "근거 기반 응답" 학습 방향 자체는 유효했으나 42M 파라미터로는 500자 규모의 긴 컨텍스트를 읽고 압축·요약하는 능력이 구조적으로 부족하다는 뜻이다. 실제로 학습 데이터(정제된 150자 내외 컨텍스트)와 서빙 시 컨텍스트(원문 500자 청크)의 길이·형태 차이가 이 격차를 키운 것으로 판단하며, 컨텍스트 정제 강화와 모델 스케일업을 다음 개선 지점으로 특정했다.
+
+이 실험은 직접 만든 모델의 한계를 감으로 판단하지 않고 수치로 규명했다는 근거이며, 라우터에 vLLM으로 공개 가중치 모델을 서빙하는 구조를 이미 갖춘 만큼 생성 단계도 동일한 방식으로 확장할 수 있는 여지를 남겨두었다.
 
 ### 평가셋 구성
 
@@ -429,18 +446,10 @@ flowchart LR
 |---|---|
 | 종목 명시 질문 | 정상 경로의 기본 성능 |
 | 별칭·줄임말 질문 (`삼전`, `하닉`) | 질문 재작성 모듈 검증 |
-| 존재하지 않는 종목 | 근거 없는 생성을 하지 않고 폴백하는지 |
-| 주식 무관 질문 | 라우팅 오분류 탐지 |
-| 인사·잡담 | 스몰톡 경로 검증 |
-
-### 설계 원칙
-
-**외부 LLM에 의존하지 않는다** — LLM-as-judge 방식은 채점 자체가 비결정적이고 API 비용·한도에 묶인다. 규칙 기반 지표는 재현 가능하고, 언제든 같은 기준으로 회귀 검증을 돌릴 수 있다.
-
-**개선의 나침반으로 쓴다** — 지표가 없으면 "좋아진 것 같다"는 감으로 판단하게 된다. 프롬프트 수정·파라미터 조정·모델 교체 시 **동일한 평가셋으로 전후를 비교**해 변경의 효과를 수치로 확인한다.
+| 시장 전체 질문 (종목 미포함) | 검색 확장성 검증 |
 
 ```bash
-uv run python src/model/rag/evaluate_rag.py --dataset src/model/data/eval/testset.json
+uv run python src/model/rag/evaluate_rag.py
 ```
 
 <br>
@@ -520,7 +529,7 @@ flowchart LR
     style GHA fill:#f0f0f5,stroke:#6c757d,stroke-width:2px,color:#111111
 ```
 
-**모델 배포를 분리한 이유**: 초기에는 모델 가중치를 로컬에서 이미지에 직접 복사했는데, `.gitignore`와 `.dockerignore` 떄문에 CI 환경에서 빌드를 실패했었다. 그래서 Hugging Face에 모델을 업로드하고 Dockerfile을 통해 자동으로 다운로드하게 만들었다.
+**모델 배포를 분리한 이유**: 초기에는 모델 가중치를 로컬에서 이미지에 직접 복사했는데, `.gitignore`와 `.dockerignore`가 서로 다른 시점에 작동한다는 걸 놓쳐 CI 환경에서만 빌드가 실패했다. Hugging Face에 모델을 업로드하고 Dockerfile에서 빌드 시 자동으로 내려받는 구조로 바꿔 이 문제를 근본적으로 해소했다.
 
 | 자산 | 위치 | 이유 |
 |---|---|---|
@@ -548,14 +557,16 @@ flowchart LR
 # .env
 NAVER_CLIENT_ID=...
 NAVER_CLIENT_SECRET=...
+GOOGLE_API_KEY=...                # 검색 품질 평가(LLM-judge)용
 
-# 라우터 서빙 — 설정 시 vLLM 사용, 미설정 시 로컬 모델 폴백
+# 라우터 서빙 - 설정 시 vLLM 사용, 미설정 시 로컬 모델 폴백
 VLLM_BASE_URL=http://localhost:8001/v1
 VLLM_MODEL=Qwen/Qwen2.5-0.5B-Instruct
 
 # 캐시
 NEWS_CACHE_TTL=300
 ```
+
 ## 로컬
 
 ### 실행
@@ -590,7 +601,7 @@ uv run python main.py
 
 ```bash
 # vLLM 서버 기동
-vllm serve Qwen/Qwen2.5-0.5B-Instruct --port 8001
+vllm serve Qwen/Qwen2.5-1.5B-Instruct --port 8001
 
 # 챗봇 실행 시 환경변수 지정
 VLLM_BASE_URL=http://localhost:8001/v1 \
@@ -603,7 +614,7 @@ uv run python main.py
 ### 평가 실행
 
 ```bash
-uv run python src/model/rag/evaluate_rag.py --dataset src/model/data/testset.json
+uv run python src/model/rag/evaluate_rag.py
 ```
 
 ### Docker 실행
@@ -755,7 +766,7 @@ explicit = true
 
 **분석**: `repetition_penalty` 미적용 상태. 소규모 모델은 반복 루프에 특히 취약하다
 
-**해결**: `temperature` 0.3 / `top_k` 20 / `repetition_penalty` 1.15 적용. 페널티 적용 범위를 생성 구간 전체로 확장. 이후 평가 파이프라인의 **반복률 지표**로 회귀를 자동 감지하도록 했다
+**해결**: `temperature` 0.3 / `top_k` 10 / `repetition_penalty` 1.3 적용. 페널티 적용 범위를 생성 구간 전체로 확장. 이후 평가 파이프라인의 **반복률 지표**로 회귀를 자동 감지하도록 했다
 
 </details>
 
