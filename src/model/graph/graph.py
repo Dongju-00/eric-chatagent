@@ -66,7 +66,7 @@ stock_rag:
 
 fallback:
 - smalltalk과 stock_rag에 해당하지 않는 질문
-- 예: 파이썬 리스트 사용법 알려줘, 서울 날씨 알려줘
+- 예: 파이썬 리스트 사용법 알려줘, 서울 날씨 알려줘, 선형대수 설명해줘
 
 반드시 다음 중 하나만 출력하세요.
 smalltalk
@@ -219,19 +219,42 @@ def build_graph():
 
     # 공개 가중치 모델 Qwen을 라우터로 사용할 때
     def fallback_node(state: AgentState) -> dict:
-        tok, model = load_model()
-        prompt_text = f"다음 질문에 3문장 이내로 간단히 답하세요.\n질문: {state['question']}\n답변:"
-        messages = [{"role": "user", "content": prompt_text}]
-        text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-        inputs = tok(text, return_tensors="pt")
+        question = state["question"]
 
-        with torch.no_grad():
-            out = model.generate(**inputs, max_new_tokens=150, do_sample=True, temperature=0.7,
-                                 pad_token_id=tok.eos_token_id)
+        if VLLM_BASE_URL:
+            try:
+                resp = httpx.post(
+                    f"{VLLM_BASE_URL}/chat/completions",
+                    headers={"Authorization": f"Bearer {VLLM_API_KEY}"},
+                    json={"model": MODEL_ID,
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": "당신은 한국 주식 정보를 안내하는 챗봇입니다. "
+                                           "사용자가 주식과 무관한 질문을 했습니다. "
+                                           "3문장 이내로 간단히 답하세요.",
+                            },
+                            {"role": "user", "content": question},
+                        ],
+                        "max_tokens": 200,
+                        "temperature": 0.7,
+                    },
+                    timeout=30,
+                )
+                resp.raise_for_status()
+                answer = resp.json()["choices"][0]["message"]["content"].strip()
+                print(f"[fallback vLLM 응답] {answer[:50]!r}", flush=True)
+                return {"answer": answer, "trace": ["fallback_node"]}
 
-        answer = tok.decode(out[0][inputs.input_ids.shape[1]:], skip_special_tokens=True).strip()
-        return {"answer": answer, "trace": ["fallback_node"]}
+            except Exception as e:
+                print(f"[fallback vLLM 실패] {e}", flush=True)
+                # 아래로 흘러서 기본 응답 반환
 
+        # vLLM 미설정이거나 호출 실패 시 안전한 기본 응답
+        return {
+            "answer": "주식 관련 질문에 답변드릴 수 있습니다. 종목명과 함께 질문해 주세요.",
+            "trace": ["fallback_node"],
+        }
     # gemini를 라우터로 사용할 때
     # def fallback_node(state: AgentState) -> dict:
     #     answer = route_llm.invoke(state["question"])
