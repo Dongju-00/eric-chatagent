@@ -1,13 +1,10 @@
 import json
 import re
-from pathlib import Path
 from typing import Any
 
+from model.paths import DATA_DIR
 
-# query_rewrite.py가 src/model/graph 안에 있는 경우
-MODEL_DIR = Path(__file__).resolve().parents[1]
-
-CONFIG_PATH = MODEL_DIR / "data" / "stock" / "stock_query_config.json"
+CONFIG_PATH = DATA_DIR / "stock" / "stock_query_config.json"
 
 with CONFIG_PATH.open("r", encoding="utf-8") as f:
     stock_config = json.load(f)
@@ -44,6 +41,24 @@ def normalize_text(text: str) -> str:
 
     return text
 
+def _alias_in_text(alias: str, lowered_text: str) -> bool:
+    """별칭이 텍스트에 나타나는지 검사한다.
+
+    영문/숫자만으로 된 짧은 별칭은 단어경계를 요구한다. 사전이 30종에서
+    299종으로 늘면서 ``GS``·``LS``·``NC``·``CU``·``ISC`` 같은 별칭이 들어왔고,
+    단순 부분문자열 검사로는 "earnin**gs**" 가 GS로, "ri**sk**" 가 SK로
+    잡힌다(실측). 잘못된 종목으로 필터링하는 것은 종목을 못 찾는 것보다
+    나쁠 수 있으므로 경계를 요구한다.
+
+    한글 별칭은 교착어라 경계가 명확하지 않으므로(``삼전은`` 처럼 조사가
+    붙는다) 부분문자열 검사를 그대로 쓴다.
+    """
+    if alias.isascii():
+        return re.search(rf"(?<![0-9a-z]){re.escape(alias)}(?![0-9a-z])",
+                         lowered_text) is not None
+    return alias in lowered_text
+
+
 def extract_company(question: str) -> dict[str, Any]:
     """
     질문에서 구체적인 기업을 찾는다.
@@ -61,7 +76,7 @@ def extract_company(question: str) -> dict[str, Any]:
 
     # 구체적인 기업명을 먼저 검사
     for alias in SORTED_ALIASES:
-        if alias in lowered:
+        if _alias_in_text(alias, lowered):
             company = ALIAS_TO_COMPANY[alias]
 
             return {

@@ -3,10 +3,7 @@ import torch.nn.functional as F
 
 from model.train.model import KoreanGPT, block_size, device
 from model.train.sp_tokenizer import load_sp
-
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parents[1]
+from model.paths import CHECKPOINT_DIR, SP_PREFIX
 
 class KoreanGPTEmbedder:
     def __init__(
@@ -15,10 +12,10 @@ class KoreanGPTEmbedder:
         sp_prefix=None,
     ):
         if sp_prefix is None:
-            sp_prefix = BASE_DIR / "data" / "sp_korean"
+            sp_prefix = SP_PREFIX
 
         if model_path is None:
-            model_path = BASE_DIR / "checkpoints" / "KoreanGPT.pt"
+            model_path = CHECKPOINT_DIR / "KoreanGPT.pt"
 
         self.sp = load_sp(sp_prefix)
 

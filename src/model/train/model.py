@@ -2,8 +2,8 @@
 Decoder-only GPT
 Encoder-Decoder가 아니라, 토큰 시퀀스 하나를 받아서 "다음 토큰이 뭘까"를 계속
 예측하는 구조입니다. 질문/답변 구분 없이 그냥 긴 텍스트를 이어쓰는 법을 배우고,
-generator.py / app.py에서 "질문: ...\n답변: " 까지 입력으로 주고 그 뒤를 생성시키는
-방식으로 씁니다.
+baseline.py의 KoreanGPTLLM에서 "질문: ...\n답변: " 까지 입력으로 주고 그 뒤를
+생성시키는 방식으로 씁니다.
 """
 import torch
 import torch.nn as nn

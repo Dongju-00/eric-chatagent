@@ -2,11 +2,11 @@ import csv
 import random
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR = PROJECT_ROOT / "data"
+from model.paths import DATA_DIR
 
-def load_korean_chatbot_data(root_dir: str = "model") -> str:
-    path = Path(root_dir) / "data" / "processed" / "pretrain.txt"
+def load_korean_chatbot_data(root_dir: str = None) -> str:
+    base = Path(root_dir) / "data" if root_dir else DATA_DIR
+    path = base / "processed" / "pretrain.txt"
 
     if not path.exists():
         raise FileNotFoundError(
@@ -40,15 +40,3 @@ def load_qa_pairs(root_dir: str = None, split: str = "train", prefix: str = "qa"
                 pairs.append((question, answer))
 
     return pairs
-
-
-def load_chatbot_qa_data(root_dir: str = None   , split: str = "train", shuffle: bool = True, seed: int = 42) -> str:
-    pairs = load_qa_pairs(root_dir=root_dir, split=split)
-
-    if shuffle:
-        random.Random(seed).shuffle(pairs)
-
-    return "".join(
-        f"질문: {question}\n답변: {answer}\n\n"
-        for question, answer in pairs
-    )

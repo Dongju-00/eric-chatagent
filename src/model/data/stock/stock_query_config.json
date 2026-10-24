@@ -1,8 +1,14 @@
 {
   "metadata": {
-    "generated_at": "2026-08-03T14:05:00+09:00",
+    "generated_at": "2026-10-23T00:00:00+09:00",
     "description": "eric-chatagent 주식 뉴스 질의 재작성용 통합 설정",
-    "version": "1.0.0"
+    "version": "1.1.0",
+    "company_count": 299,
+    "market_breakdown": {
+      "KOSPI": 207,
+      "KOSDAQ": 92
+    },
+    "ticker_source": "KRX KIND 상장법인목록(corpList.do, 시장별 조회) + 네이버 금융 시가총액 순위 API 교차검증"
   },
   "companies": [
     {
@@ -785,6 +791,6322 @@
         "수주",
         "건설"
       ]
+    },
+    {
+      "rank": 31,
+      "canonical_name": "SK이노베이션",
+      "ticker": "096770",
+      "market": "KOSPI",
+      "group": "SK",
+      "sector": [
+        "정유",
+        "화학",
+        "2차전지"
+      ],
+      "aliases": [
+        "SK이노베이션",
+        "096770",
+        "SK이노",
+        "에스케이이노베이션",
+        "SK Innovation"
+      ],
+      "business_keywords": [
+        "정제마진",
+        "유가",
+        "배터리",
+        "SK온",
+        "윤활유",
+        "합병",
+        "적자"
+      ]
+    },
+    {
+      "rank": 32,
+      "canonical_name": "메리츠금융지주",
+      "ticker": "138040",
+      "market": "KOSPI",
+      "group": "메리츠금융그룹",
+      "sector": [
+        "금융",
+        "지주",
+        "보험"
+      ],
+      "aliases": [
+        "메리츠금융지주",
+        "138040",
+        "메리츠금융",
+        "Meritz Financial"
+      ],
+      "business_keywords": [
+        "주주환원",
+        "자사주",
+        "배당",
+        "보험손익",
+        "증권",
+        "배당성향"
+      ]
+    },
+    {
+      "rank": 33,
+      "canonical_name": "HMM",
+      "ticker": "011200",
+      "market": "KOSPI",
+      "group": "HMM",
+      "sector": [
+        "해운",
+        "물류"
+      ],
+      "aliases": [
+        "HMM",
+        "011200",
+        "에이치엠엠",
+        "현대상선"
+      ],
+      "business_keywords": [
+        "컨테이너",
+        "SCFI",
+        "운임",
+        "벌크",
+        "얼라이언스",
+        "현금성 자산",
+        "매각"
+      ]
+    },
+    {
+      "rank": 34,
+      "canonical_name": "KT&G",
+      "ticker": "033780",
+      "market": "KOSPI",
+      "group": "KT&G",
+      "sector": [
+        "담배",
+        "식품"
+      ],
+      "aliases": [
+        "KT&G",
+        "033780",
+        "케이티앤지",
+        "KT앤지",
+        "KT and G"
+      ],
+      "business_keywords": [
+        "담배",
+        "궐련형 전자담배",
+        "릴",
+        "해외 담배",
+        "홍삼",
+        "배당",
+        "주주환원"
+      ]
+    },
+    {
+      "rank": 35,
+      "canonical_name": "한국전력",
+      "ticker": "015760",
+      "market": "KOSPI",
+      "group": "한국전력",
+      "sector": [
+        "전력",
+        "유틸리티"
+      ],
+      "aliases": [
+        "한국전력",
+        "015760",
+        "한국전력공사",
+        "한전",
+        "KEPCO"
+      ],
+      "business_keywords": [
+        "전기요금",
+        "연료비",
+        "원전",
+        "적자",
+        "부채",
+        "SMP",
+        "요금 인상"
+      ]
+    },
+    {
+      "rank": 36,
+      "canonical_name": "한미반도체",
+      "ticker": "042700",
+      "market": "KOSPI",
+      "group": "한미반도체",
+      "sector": [
+        "반도체장비"
+      ],
+      "aliases": [
+        "한미반도체",
+        "042700",
+        "Hanmi Semiconductor"
+      ],
+      "business_keywords": [
+        "TC본더",
+        "HBM",
+        "본딩 장비",
+        "후공정",
+        "수주",
+        "듀얼 TC본더"
+      ]
+    },
+    {
+      "rank": 37,
+      "canonical_name": "고려아연",
+      "ticker": "010130",
+      "market": "KOSPI",
+      "group": "고려아연",
+      "sector": [
+        "비철금속",
+        "소재"
+      ],
+      "aliases": [
+        "고려아연",
+        "010130",
+        "Korea Zinc"
+      ],
+      "business_keywords": [
+        "아연",
+        "연",
+        "은",
+        "경영권 분쟁",
+        "영풍",
+        "자사주",
+        "니켈"
+      ]
+    },
+    {
+      "rank": 38,
+      "canonical_name": "삼성에스디에스",
+      "ticker": "018260",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "IT서비스",
+        "물류"
+      ],
+      "aliases": [
+        "삼성에스디에스",
+        "018260",
+        "삼성SDS",
+        "Samsung SDS"
+      ],
+      "business_keywords": [
+        "IT서비스",
+        "클라우드",
+        "물류BPO",
+        "생성형 AI",
+        "패브릭스",
+        "디지털 전환"
+      ]
+    },
+    {
+      "rank": 39,
+      "canonical_name": "LG화학",
+      "ticker": "051910",
+      "market": "KOSPI",
+      "group": "LG",
+      "sector": [
+        "화학",
+        "2차전지소재"
+      ],
+      "aliases": [
+        "LG화학",
+        "051910",
+        "엘지화학",
+        "LG Chem"
+      ],
+      "business_keywords": [
+        "석유화학",
+        "양극재",
+        "첨단소재",
+        "생명과학",
+        "스프레드",
+        "적자"
+      ]
+    },
+    {
+      "rank": 40,
+      "canonical_name": "SK텔레콤",
+      "ticker": "017670",
+      "market": "KOSPI",
+      "group": "SK",
+      "sector": [
+        "통신"
+      ],
+      "aliases": [
+        "SK텔레콤",
+        "017670",
+        "SKT",
+        "에스케이텔레콤",
+        "SK Telecom"
+      ],
+      "business_keywords": [
+        "5G",
+        "무선 ARPU",
+        "AI",
+        "에이닷",
+        "데이터센터",
+        "배당",
+        "해킹"
+      ]
+    },
+    {
+      "rank": 41,
+      "canonical_name": "기업은행",
+      "ticker": "024110",
+      "market": "KOSPI",
+      "group": "IBK",
+      "sector": [
+        "금융",
+        "은행"
+      ],
+      "aliases": [
+        "기업은행",
+        "024110",
+        "IBK기업은행",
+        "중소기업은행",
+        "IBK"
+      ],
+      "business_keywords": [
+        "NIM",
+        "중소기업 대출",
+        "대손충당금",
+        "배당",
+        "연체율"
+      ]
+    },
+    {
+      "rank": 42,
+      "canonical_name": "LG",
+      "ticker": "003550",
+      "market": "KOSPI",
+      "group": "LG",
+      "sector": [
+        "지주"
+      ],
+      "aliases": [
+        "LG",
+        "003550",
+        "엘지",
+        "주식회사LG",
+        "LG Corp"
+      ],
+      "business_keywords": [
+        "지주사",
+        "배당",
+        "자사주",
+        "주주환원",
+        "계열사 실적"
+      ]
+    },
+    {
+      "rank": 43,
+      "canonical_name": "S-Oil",
+      "ticker": "010950",
+      "market": "KOSPI",
+      "group": "에쓰오일",
+      "sector": [
+        "정유",
+        "화학"
+      ],
+      "aliases": [
+        "S-Oil",
+        "010950",
+        "에쓰오일",
+        "S-OIL",
+        "에스오일"
+      ],
+      "business_keywords": [
+        "정제마진",
+        "유가",
+        "샤힌 프로젝트",
+        "윤활기유",
+        "배당"
+      ]
+    },
+    {
+      "rank": 44,
+      "canonical_name": "삼성중공업",
+      "ticker": "010140",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "조선"
+      ],
+      "aliases": [
+        "삼성중공업",
+        "010140",
+        "삼성중",
+        "Samsung Heavy Industries"
+      ],
+      "business_keywords": [
+        "LNG선",
+        "수주",
+        "수주잔고",
+        "FLNG",
+        "해양플랜트",
+        "후판 가격"
+      ]
+    },
+    {
+      "rank": 45,
+      "canonical_name": "포스코퓨처엠",
+      "ticker": "003670",
+      "market": "KOSPI",
+      "group": "포스코",
+      "sector": [
+        "2차전지소재"
+      ],
+      "aliases": [
+        "포스코퓨처엠",
+        "003670",
+        "포스코케미칼",
+        "POSCO Future M"
+      ],
+      "business_keywords": [
+        "양극재",
+        "음극재",
+        "하이니켈",
+        "전구체",
+        "수주",
+        "가동률",
+        "리튬"
+      ]
+    },
+    {
+      "rank": 46,
+      "canonical_name": "두산",
+      "ticker": "000150",
+      "market": "KOSPI",
+      "group": "두산",
+      "sector": [
+        "지주",
+        "전자부품"
+      ],
+      "aliases": [
+        "두산",
+        "000150",
+        "주식회사두산",
+        "Doosan"
+      ],
+      "business_keywords": [
+        "동박적층판",
+        "CCL",
+        "전자BG",
+        "지주사",
+        "로보틱스",
+        "밥캣"
+      ]
+    },
+    {
+      "rank": 47,
+      "canonical_name": "카카오",
+      "ticker": "035720",
+      "market": "KOSPI",
+      "group": "카카오",
+      "sector": [
+        "인터넷",
+        "플랫폼",
+        "AI"
+      ],
+      "aliases": [
+        "카카오",
+        "035720",
+        "카카오톡",
+        "Kakao",
+        "카카오주식",
+        "다음카카오"
+      ],
+      "business_keywords": [
+        "카카오톡",
+        "톡비즈",
+        "광고",
+        "커머스",
+        "콘텐츠",
+        "AI",
+        "카나나",
+        "모빌리티",
+        "사법 리스크"
+      ]
+    },
+    {
+      "rank": 48,
+      "canonical_name": "미래에셋증권",
+      "ticker": "006800",
+      "market": "KOSPI",
+      "group": "미래에셋",
+      "sector": [
+        "금융",
+        "증권"
+      ],
+      "aliases": [
+        "미래에셋증권",
+        "006800",
+        "미래에셋대우",
+        "Mirae Asset Securities"
+      ],
+      "business_keywords": [
+        "브로커리지",
+        "IB",
+        "운용손익",
+        "해외주식",
+        "자사주",
+        "배당"
+      ]
+    },
+    {
+      "rank": 49,
+      "canonical_name": "현대글로비스",
+      "ticker": "086280",
+      "market": "KOSPI",
+      "group": "현대자동차그룹",
+      "sector": [
+        "물류",
+        "해운"
+      ],
+      "aliases": [
+        "현대글로비스",
+        "086280",
+        "글로비스",
+        "Hyundai Glovis"
+      ],
+      "business_keywords": [
+        "자동차운반선",
+        "PCTC",
+        "물류",
+        "CKD",
+        "해운 운임",
+        "현대차그룹"
+      ]
+    },
+    {
+      "rank": 50,
+      "canonical_name": "한화시스템",
+      "ticker": "272210",
+      "market": "KOSPI",
+      "group": "한화",
+      "sector": [
+        "방산",
+        "IT"
+      ],
+      "aliases": [
+        "한화시스템",
+        "272210",
+        "Hanwha Systems"
+      ],
+      "business_keywords": [
+        "방산 전자",
+        "레이더",
+        "위성",
+        "수주",
+        "UAM",
+        "ICT"
+      ]
+    },
+    {
+      "rank": 51,
+      "canonical_name": "DB손해보험",
+      "ticker": "005830",
+      "market": "KOSPI",
+      "group": "DB",
+      "sector": [
+        "보험",
+        "손해보험"
+      ],
+      "aliases": [
+        "DB손해보험",
+        "005830",
+        "디비손해보험",
+        "DB손보",
+        "동부화재"
+      ],
+      "business_keywords": [
+        "보험손익",
+        "자동차보험",
+        "장기보험",
+        "CSM",
+        "손해율",
+        "배당"
+      ]
+    },
+    {
+      "rank": 52,
+      "canonical_name": "KT",
+      "ticker": "030200",
+      "market": "KOSPI",
+      "group": "KT",
+      "sector": [
+        "통신"
+      ],
+      "aliases": [
+        "KT",
+        "030200",
+        "케이티",
+        "KT Corp"
+      ],
+      "business_keywords": [
+        "5G",
+        "무선 ARPU",
+        "AI",
+        "클라우드",
+        "데이터센터",
+        "배당",
+        "부동산"
+      ]
+    },
+    {
+      "rank": 53,
+      "canonical_name": "삼성E&A",
+      "ticker": "028050",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "건설",
+        "플랜트"
+      ],
+      "aliases": [
+        "삼성E&A",
+        "028050",
+        "삼성엔지니어링",
+        "Samsung E&A"
+      ],
+      "business_keywords": [
+        "플랜트",
+        "수주",
+        "화공",
+        "비화공",
+        "수소",
+        "중동 수주"
+      ]
+    },
+    {
+      "rank": 54,
+      "canonical_name": "HD현대",
+      "ticker": "267250",
+      "market": "KOSPI",
+      "group": "HD현대",
+      "sector": [
+        "지주"
+      ],
+      "aliases": [
+        "HD현대",
+        "267250",
+        "현대중공업지주",
+        "에이치디현대",
+        "HD Hyundai"
+      ],
+      "business_keywords": [
+        "지주사",
+        "배당",
+        "조선",
+        "정유",
+        "건설기계",
+        "주주환원"
+      ]
+    },
+    {
+      "rank": 55,
+      "canonical_name": "에이피알",
+      "ticker": "278470",
+      "market": "KOSPI",
+      "group": "에이피알",
+      "sector": [
+        "화장품",
+        "뷰티디바이스"
+      ],
+      "aliases": [
+        "에이피알",
+        "278470",
+        "APR"
+      ],
+      "business_keywords": [
+        "메디큐브",
+        "뷰티 디바이스",
+        "에이지알",
+        "수출",
+        "미국 매출",
+        "화장품"
+      ]
+    },
+    {
+      "rank": 56,
+      "canonical_name": "LIG디펜스앤에어로스페이스",
+      "ticker": "079550",
+      "market": "KOSPI",
+      "group": "LIG",
+      "sector": [
+        "방산"
+      ],
+      "aliases": [
+        "LIG디펜스앤에어로스페이스",
+        "079550",
+        "LIG넥스원",
+        "LIG디펜스",
+        "엘아이지넥스원"
+      ],
+      "business_keywords": [
+        "유도무기",
+        "천궁",
+        "수출",
+        "수주잔고",
+        "중동 수주",
+        "방산"
+      ]
+    },
+    {
+      "rank": 57,
+      "canonical_name": "현대건설",
+      "ticker": "000720",
+      "market": "KOSPI",
+      "group": "현대자동차그룹",
+      "sector": [
+        "건설"
+      ],
+      "aliases": [
+        "현대건설",
+        "000720",
+        "현건",
+        "Hyundai E&C"
+      ],
+      "business_keywords": [
+        "수주",
+        "원가율",
+        "주택",
+        "분양",
+        "원전",
+        "해외 수주"
+      ]
+    },
+    {
+      "rank": 58,
+      "canonical_name": "한국항공우주",
+      "ticker": "047810",
+      "market": "KOSPI",
+      "group": "한국항공우주",
+      "sector": [
+        "방산",
+        "항공우주"
+      ],
+      "aliases": [
+        "한국항공우주",
+        "047810",
+        "KAI",
+        "한국항공우주산업",
+        "Korea Aerospace Industries"
+      ],
+      "business_keywords": [
+        "FA-50",
+        "수출",
+        "수주",
+        "KF-21",
+        "폴란드",
+        "기체부품",
+        "우주"
+      ]
+    },
+    {
+      "rank": 59,
+      "canonical_name": "카카오뱅크",
+      "ticker": "323410",
+      "market": "KOSPI",
+      "group": "카카오",
+      "sector": [
+        "금융",
+        "인터넷은행"
+      ],
+      "aliases": [
+        "카카오뱅크",
+        "323410",
+        "카뱅",
+        "KakaoBank"
+      ],
+      "business_keywords": [
+        "인터넷은행",
+        "여신",
+        "수신",
+        "NIM",
+        "플랫폼 수익",
+        "중저신용자 대출",
+        "연체율"
+      ]
+    },
+    {
+      "rank": 60,
+      "canonical_name": "대한항공",
+      "ticker": "003490",
+      "market": "KOSPI",
+      "group": "한진",
+      "sector": [
+        "항공"
+      ],
+      "aliases": [
+        "대한항공",
+        "003490",
+        "KAL",
+        "Korean Air"
+      ],
+      "business_keywords": [
+        "여객",
+        "화물",
+        "아시아나 통합",
+        "유가",
+        "환율",
+        "마일리지",
+        "운임"
+      ]
+    },
+    {
+      "rank": 61,
+      "canonical_name": "삼양식품",
+      "ticker": "003230",
+      "market": "KOSPI",
+      "group": "삼양",
+      "sector": [
+        "식품"
+      ],
+      "aliases": [
+        "삼양식품",
+        "003230",
+        "Samyang Foods"
+      ],
+      "business_keywords": [
+        "불닭볶음면",
+        "불닭",
+        "수출",
+        "해외 매출",
+        "밀양 공장",
+        "라면",
+        "환율"
+      ]
+    },
+    {
+      "rank": 62,
+      "canonical_name": "포스코인터내셔널",
+      "ticker": "047050",
+      "market": "KOSPI",
+      "group": "포스코",
+      "sector": [
+        "상사",
+        "에너지"
+      ],
+      "aliases": [
+        "포스코인터내셔널",
+        "047050",
+        "포스코대우",
+        "POSCO International"
+      ],
+      "business_keywords": [
+        "가스전",
+        "미얀마 가스전",
+        "트레이딩",
+        "구동모터코아",
+        "식량",
+        "친환경"
+      ]
+    },
+    {
+      "rank": 63,
+      "canonical_name": "현대로템",
+      "ticker": "064350",
+      "market": "KOSPI",
+      "group": "현대자동차그룹",
+      "sector": [
+        "방산",
+        "철도"
+      ],
+      "aliases": [
+        "현대로템",
+        "064350",
+        "로템",
+        "Hyundai Rotem"
+      ],
+      "business_keywords": [
+        "K2 전차",
+        "수출",
+        "철도 수주",
+        "폴란드",
+        "방산",
+        "수주잔고"
+      ]
+    },
+    {
+      "rank": 64,
+      "canonical_name": "LG이노텍",
+      "ticker": "011070",
+      "market": "KOSPI",
+      "group": "LG",
+      "sector": [
+        "전자부품"
+      ],
+      "aliases": [
+        "LG이노텍",
+        "011070",
+        "엘지이노텍",
+        "LG Innotek"
+      ],
+      "business_keywords": [
+        "카메라모듈",
+        "애플",
+        "아이폰",
+        "광학솔루션",
+        "기판소재",
+        "FC-BGA",
+        "전장"
+      ]
+    },
+    {
+      "rank": 65,
+      "canonical_name": "HD현대마린솔루션",
+      "ticker": "443060",
+      "market": "KOSPI",
+      "group": "HD현대",
+      "sector": [
+        "조선",
+        "서비스"
+      ],
+      "aliases": [
+        "HD현대마린솔루션",
+        "443060",
+        "현대글로벌서비스",
+        "HD Hyundai Marine Solution"
+      ],
+      "business_keywords": [
+        "선박 애프터마켓",
+        "친환경 개조",
+        "레트로핏",
+        "수주",
+        "선박 관리",
+        "배당"
+      ]
+    },
+    {
+      "rank": 66,
+      "canonical_name": "현대오토에버",
+      "ticker": "307950",
+      "market": "KOSPI",
+      "group": "현대자동차그룹",
+      "sector": [
+        "IT서비스",
+        "소프트웨어"
+      ],
+      "aliases": [
+        "현대오토에버",
+        "307950",
+        "오토에버",
+        "Hyundai AutoEver"
+      ],
+      "business_keywords": [
+        "차량 소프트웨어",
+        "SDV",
+        "내비게이션",
+        "IT서비스",
+        "스마트팩토리"
+      ]
+    },
+    {
+      "rank": 67,
+      "canonical_name": "NH투자증권",
+      "ticker": "005940",
+      "market": "KOSPI",
+      "group": "NH농협",
+      "sector": [
+        "금융",
+        "증권"
+      ],
+      "aliases": [
+        "NH투자증권",
+        "005940",
+        "엔에이치투자증권",
+        "우리투자증권",
+        "NH증권"
+      ],
+      "business_keywords": [
+        "브로커리지",
+        "IB",
+        "운용손익",
+        "배당",
+        "자사주"
+      ]
+    },
+    {
+      "rank": 68,
+      "canonical_name": "크래프톤",
+      "ticker": "259960",
+      "market": "KOSPI",
+      "group": "크래프톤",
+      "sector": [
+        "게임"
+      ],
+      "aliases": [
+        "크래프톤",
+        "259960",
+        "KRAFTON"
+      ],
+      "business_keywords": [
+        "배틀그라운드",
+        "PUBG",
+        "인도",
+        "BGMI",
+        "트래픽",
+        "신작"
+      ]
+    },
+    {
+      "rank": 69,
+      "canonical_name": "한국금융지주",
+      "ticker": "071050",
+      "market": "KOSPI",
+      "group": "한국투자금융그룹",
+      "sector": [
+        "금융",
+        "지주",
+        "증권"
+      ],
+      "aliases": [
+        "한국금융지주",
+        "071050",
+        "한국투자금융지주",
+        "한투지주"
+      ],
+      "business_keywords": [
+        "한국투자증권",
+        "IB",
+        "브로커리지",
+        "배당",
+        "자사주"
+      ]
+    },
+    {
+      "rank": 70,
+      "canonical_name": "한진칼",
+      "ticker": "180640",
+      "market": "KOSPI",
+      "group": "한진",
+      "sector": [
+        "지주",
+        "항공"
+      ],
+      "aliases": [
+        "한진칼",
+        "180640",
+        "Hanjin KAL"
+      ],
+      "business_keywords": [
+        "지주사",
+        "대한항공",
+        "경영권",
+        "지분",
+        "배당"
+      ]
+    },
+    {
+      "rank": 71,
+      "canonical_name": "GS",
+      "ticker": "078930",
+      "market": "KOSPI",
+      "group": "GS",
+      "sector": [
+        "지주"
+      ],
+      "aliases": [
+        "GS",
+        "078930",
+        "지에스",
+        "GS홀딩스",
+        "GS Holdings"
+      ],
+      "business_keywords": [
+        "지주사",
+        "GS칼텍스",
+        "정제마진",
+        "배당",
+        "주주환원"
+      ]
+    },
+    {
+      "rank": 72,
+      "canonical_name": "한국타이어앤테크놀로지",
+      "ticker": "161390",
+      "market": "KOSPI",
+      "group": "한국앤컴퍼니",
+      "sector": [
+        "자동차부품",
+        "타이어"
+      ],
+      "aliases": [
+        "한국타이어앤테크놀로지",
+        "161390",
+        "한국타이어",
+        "한타",
+        "Hankook Tire"
+      ],
+      "business_keywords": [
+        "타이어",
+        "교체용 타이어",
+        "고인치",
+        "전기차 타이어",
+        "원재료",
+        "미국 공장"
+      ]
+    },
+    {
+      "rank": 73,
+      "canonical_name": "하이브",
+      "ticker": "352820",
+      "market": "KOSPI",
+      "group": "하이브",
+      "sector": [
+        "엔터테인먼트"
+      ],
+      "aliases": [
+        "하이브",
+        "352820",
+        "HYBE",
+        "빅히트",
+        "빅히트엔터테인먼트"
+      ],
+      "business_keywords": [
+        "BTS",
+        "방탄소년단",
+        "앨범",
+        "위버스",
+        "월드투어",
+        "아티스트",
+        "신인 그룹"
+      ]
+    },
+    {
+      "rank": 74,
+      "canonical_name": "아모레퍼시픽",
+      "ticker": "090430",
+      "market": "KOSPI",
+      "group": "아모레퍼시픽",
+      "sector": [
+        "화장품"
+      ],
+      "aliases": [
+        "아모레퍼시픽",
+        "090430",
+        "아모레",
+        "Amorepacific"
+      ],
+      "business_keywords": [
+        "설화수",
+        "라네즈",
+        "중국 매출",
+        "면세",
+        "미국 매출",
+        "코스알엑스",
+        "화장품"
+      ]
+    },
+    {
+      "rank": 75,
+      "canonical_name": "코웨이",
+      "ticker": "021240",
+      "market": "KOSPI",
+      "group": "코웨이",
+      "sector": [
+        "생활가전",
+        "렌탈"
+      ],
+      "aliases": [
+        "코웨이",
+        "021240",
+        "Coway",
+        "웅진코웨이"
+      ],
+      "business_keywords": [
+        "정수기",
+        "렌탈",
+        "계정 수",
+        "비렉스",
+        "말레이시아",
+        "매트리스"
+      ]
+    },
+    {
+      "rank": 76,
+      "canonical_name": "LG씨엔에스",
+      "ticker": "064400",
+      "market": "KOSPI",
+      "group": "LG",
+      "sector": [
+        "IT서비스"
+      ],
+      "aliases": [
+        "LG씨엔에스",
+        "064400",
+        "LG CNS",
+        "엘지씨엔에스"
+      ],
+      "business_keywords": [
+        "클라우드",
+        "생성형 AI",
+        "스마트팩토리",
+        "DX",
+        "공공 IT",
+        "수주"
+      ]
+    },
+    {
+      "rank": 77,
+      "canonical_name": "삼성증권",
+      "ticker": "016360",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "금융",
+        "증권"
+      ],
+      "aliases": [
+        "삼성증권",
+        "016360",
+        "Samsung Securities"
+      ],
+      "business_keywords": [
+        "브로커리지",
+        "자산관리",
+        "IB",
+        "해외주식",
+        "배당"
+      ]
+    },
+    {
+      "rank": 78,
+      "canonical_name": "가온전선",
+      "ticker": "000500",
+      "market": "KOSPI",
+      "group": "LS",
+      "sector": [
+        "전선"
+      ],
+      "aliases": [
+        "가온전선",
+        "000500",
+        "Gaon Cable"
+      ],
+      "business_keywords": [
+        "전력선",
+        "통신케이블",
+        "전력망",
+        "수주",
+        "구리 가격"
+      ]
+    },
+    {
+      "rank": 79,
+      "canonical_name": "LS",
+      "ticker": "006260",
+      "market": "KOSPI",
+      "group": "LS",
+      "sector": [
+        "지주",
+        "전선"
+      ],
+      "aliases": [
+        "LS",
+        "006260",
+        "엘에스",
+        "LS Corp",
+        "LS그룹"
+      ],
+      "business_keywords": [
+        "지주사",
+        "전선",
+        "LS전선",
+        "전력망",
+        "배당",
+        "해저케이블"
+      ]
+    },
+    {
+      "rank": 80,
+      "canonical_name": "한화솔루션",
+      "ticker": "009830",
+      "market": "KOSPI",
+      "group": "한화",
+      "sector": [
+        "화학",
+        "태양광"
+      ],
+      "aliases": [
+        "한화솔루션",
+        "009830",
+        "한화케미칼",
+        "Hanwha Solutions"
+      ],
+      "business_keywords": [
+        "태양광",
+        "큐셀",
+        "IRA",
+        "AMPC",
+        "석유화학",
+        "모듈 가격",
+        "적자"
+      ]
+    },
+    {
+      "rank": 81,
+      "canonical_name": "이수페타시스",
+      "ticker": "007660",
+      "market": "KOSPI",
+      "group": "이수",
+      "sector": [
+        "전자부품",
+        "PCB"
+      ],
+      "aliases": [
+        "이수페타시스",
+        "007660",
+        "Isu Petasys"
+      ],
+      "business_keywords": [
+        "MLB",
+        "인쇄회로기판",
+        "AI 가속기",
+        "네트워크 장비",
+        "증설",
+        "수주"
+      ]
+    },
+    {
+      "rank": 82,
+      "canonical_name": "유한양행",
+      "ticker": "000100",
+      "market": "KOSPI",
+      "group": "유한양행",
+      "sector": [
+        "제약"
+      ],
+      "aliases": [
+        "유한양행",
+        "000100",
+        "Yuhan"
+      ],
+      "business_keywords": [
+        "렉라자",
+        "레이저티닙",
+        "얀센",
+        "마일스톤",
+        "로열티",
+        "신약",
+        "FDA"
+      ]
+    },
+    {
+      "rank": 83,
+      "canonical_name": "대덕전자",
+      "ticker": "353200",
+      "market": "KOSPI",
+      "group": "대덕",
+      "sector": [
+        "전자부품",
+        "PCB"
+      ],
+      "aliases": [
+        "대덕전자",
+        "353200",
+        "Daeduck Electronics"
+      ],
+      "business_keywords": [
+        "패키지기판",
+        "FC-BGA",
+        "반도체기판",
+        "메모리 모듈",
+        "수주"
+      ]
+    },
+    {
+      "rank": 84,
+      "canonical_name": "LG유플러스",
+      "ticker": "032640",
+      "market": "KOSPI",
+      "group": "LG",
+      "sector": [
+        "통신"
+      ],
+      "aliases": [
+        "LG유플러스",
+        "032640",
+        "엘지유플러스",
+        "LGU+",
+        "LG Uplus"
+      ],
+      "business_keywords": [
+        "5G",
+        "무선 ARPU",
+        "IPTV",
+        "AI",
+        "데이터센터",
+        "배당"
+      ]
+    },
+    {
+      "rank": 85,
+      "canonical_name": "SK바이오팜",
+      "ticker": "326030",
+      "market": "KOSPI",
+      "group": "SK",
+      "sector": [
+        "바이오",
+        "제약"
+      ],
+      "aliases": [
+        "SK바이오팜",
+        "326030",
+        "에스케이바이오팜",
+        "SK Biopharmaceuticals"
+      ],
+      "business_keywords": [
+        "엑스코프리",
+        "세노바메이트",
+        "미국 매출",
+        "뇌전증",
+        "흑자",
+        "신약"
+      ]
+    },
+    {
+      "rank": 86,
+      "canonical_name": "대우건설",
+      "ticker": "047040",
+      "market": "KOSPI",
+      "group": "대우건설",
+      "sector": [
+        "건설"
+      ],
+      "aliases": [
+        "대우건설",
+        "047040",
+        "Daewoo E&C"
+      ],
+      "business_keywords": [
+        "수주",
+        "원가율",
+        "주택",
+        "분양",
+        "해외 수주",
+        "나이지리아"
+      ]
+    },
+    {
+      "rank": 87,
+      "canonical_name": "키움증권",
+      "ticker": "039490",
+      "market": "KOSPI",
+      "group": "다우키움",
+      "sector": [
+        "금융",
+        "증권"
+      ],
+      "aliases": [
+        "키움증권",
+        "039490",
+        "Kiwoom Securities"
+      ],
+      "business_keywords": [
+        "브로커리지",
+        "리테일 점유율",
+        "해외주식",
+        "운용손익",
+        "배당"
+      ]
+    },
+    {
+      "rank": 88,
+      "canonical_name": "산일전기",
+      "ticker": "062040",
+      "market": "KOSPI",
+      "group": "산일전기",
+      "sector": [
+        "전력기기"
+      ],
+      "aliases": [
+        "산일전기",
+        "062040",
+        "Sanil Electric"
+      ],
+      "business_keywords": [
+        "변압기",
+        "수출",
+        "북미 전력망",
+        "데이터센터",
+        "수주"
+      ]
+    },
+    {
+      "rank": 89,
+      "canonical_name": "한화",
+      "ticker": "000880",
+      "market": "KOSPI",
+      "group": "한화",
+      "sector": [
+        "지주",
+        "방산",
+        "화학"
+      ],
+      "aliases": [
+        "한화",
+        "000880",
+        "한화그룹",
+        "주식회사한화",
+        "Hanwha Corp"
+      ],
+      "business_keywords": [
+        "지주사",
+        "화약",
+        "방산",
+        "모멘텀",
+        "건설",
+        "지분 가치",
+        "승계"
+      ]
+    },
+    {
+      "rank": 90,
+      "canonical_name": "삼성카드",
+      "ticker": "029780",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "금융",
+        "카드"
+      ],
+      "aliases": [
+        "삼성카드",
+        "029780",
+        "Samsung Card"
+      ],
+      "business_keywords": [
+        "카드 취급액",
+        "연체율",
+        "조달 비용",
+        "배당",
+        "가맹점 수수료"
+      ]
+    },
+    {
+      "rank": 91,
+      "canonical_name": "JB금융지주",
+      "ticker": "175330",
+      "market": "KOSPI",
+      "group": "JB금융그룹",
+      "sector": [
+        "금융",
+        "은행"
+      ],
+      "aliases": [
+        "JB금융지주",
+        "175330",
+        "제이비금융지주",
+        "JB금융",
+        "전북은행"
+      ],
+      "business_keywords": [
+        "NIM",
+        "대손충당금",
+        "ROE",
+        "배당",
+        "주주환원",
+        "광주은행"
+      ]
+    },
+    {
+      "rank": 92,
+      "canonical_name": "두산밥캣",
+      "ticker": "241560",
+      "market": "KOSPI",
+      "group": "두산",
+      "sector": [
+        "건설기계"
+      ],
+      "aliases": [
+        "두산밥캣",
+        "241560",
+        "밥캣",
+        "Doosan Bobcat"
+      ],
+      "business_keywords": [
+        "소형 건설장비",
+        "북미 매출",
+        "딜러 재고",
+        "관세",
+        "배당"
+      ]
+    },
+    {
+      "rank": 93,
+      "canonical_name": "한미약품",
+      "ticker": "128940",
+      "market": "KOSPI",
+      "group": "한미",
+      "sector": [
+        "제약"
+      ],
+      "aliases": [
+        "한미약품",
+        "128940",
+        "Hanmi Pharm"
+      ],
+      "business_keywords": [
+        "신약",
+        "비만 치료제",
+        "롤론티스",
+        "기술수출",
+        "경영권 분쟁",
+        "수출"
+      ]
+    },
+    {
+      "rank": 94,
+      "canonical_name": "카카오페이",
+      "ticker": "377300",
+      "market": "KOSPI",
+      "group": "카카오",
+      "sector": [
+        "핀테크"
+      ],
+      "aliases": [
+        "카카오페이",
+        "377300",
+        "KakaoPay"
+      ],
+      "business_keywords": [
+        "간편결제",
+        "거래액",
+        "TPV",
+        "증권",
+        "보험",
+        "해외결제",
+        "수수료"
+      ]
+    },
+    {
+      "rank": 95,
+      "canonical_name": "NC",
+      "ticker": "036570",
+      "market": "KOSPI",
+      "group": "엔씨",
+      "sector": [
+        "게임"
+      ],
+      "aliases": [
+        "NC",
+        "036570",
+        "엔씨소프트",
+        "NCSOFT",
+        "NC소프트"
+      ],
+      "business_keywords": [
+        "리니지",
+        "아이온2",
+        "신작",
+        "트래픽",
+        "모바일 게임",
+        "구조조정"
+      ]
+    },
+    {
+      "rank": 96,
+      "canonical_name": "오리온",
+      "ticker": "271560",
+      "market": "KOSPI",
+      "group": "오리온",
+      "sector": [
+        "식품"
+      ],
+      "aliases": [
+        "오리온",
+        "271560",
+        "Orion"
+      ],
+      "business_keywords": [
+        "제과",
+        "중국 매출",
+        "베트남",
+        "러시아",
+        "원가",
+        "스낵"
+      ]
+    },
+    {
+      "rank": 97,
+      "canonical_name": "HD건설기계",
+      "ticker": "267270",
+      "market": "KOSPI",
+      "group": "HD현대",
+      "sector": [
+        "건설기계"
+      ],
+      "aliases": [
+        "HD건설기계",
+        "267270",
+        "HD현대건설기계",
+        "현대건설기계"
+      ],
+      "business_keywords": [
+        "굴착기",
+        "중국 시장",
+        "인도",
+        "신흥국",
+        "수주",
+        "건설기계"
+      ]
+    },
+    {
+      "rank": 98,
+      "canonical_name": "DB하이텍",
+      "ticker": "000990",
+      "market": "KOSPI",
+      "group": "DB",
+      "sector": [
+        "반도체",
+        "파운드리"
+      ],
+      "aliases": [
+        "DB하이텍",
+        "000990",
+        "디비하이텍",
+        "동부하이텍",
+        "DB HiTek"
+      ],
+      "business_keywords": [
+        "파운드리",
+        "8인치",
+        "아날로그 반도체",
+        "가동률",
+        "전력반도체"
+      ]
+    },
+    {
+      "rank": 99,
+      "canonical_name": "BNK금융지주",
+      "ticker": "138930",
+      "market": "KOSPI",
+      "group": "BNK금융그룹",
+      "sector": [
+        "금융",
+        "은행"
+      ],
+      "aliases": [
+        "BNK금융지주",
+        "138930",
+        "비엔케이금융지주",
+        "BNK금융",
+        "부산은행"
+      ],
+      "business_keywords": [
+        "NIM",
+        "대손충당금",
+        "배당",
+        "주주환원",
+        "경남은행"
+      ]
+    },
+    {
+      "rank": 100,
+      "canonical_name": "대한전선",
+      "ticker": "001440",
+      "market": "KOSPI",
+      "group": "호반",
+      "sector": [
+        "전선"
+      ],
+      "aliases": [
+        "대한전선",
+        "001440",
+        "Taihan Cable"
+      ],
+      "business_keywords": [
+        "초고압 케이블",
+        "해저케이블",
+        "북미 수주",
+        "전력망",
+        "구리 가격"
+      ]
+    },
+    {
+      "rank": 101,
+      "canonical_name": "SKC",
+      "ticker": "011790",
+      "market": "KOSPI",
+      "group": "SK",
+      "sector": [
+        "화학",
+        "소재"
+      ],
+      "aliases": [
+        "SKC",
+        "011790",
+        "에스케이씨"
+      ],
+      "business_keywords": [
+        "동박",
+        "글라스기판",
+        "반도체 소재",
+        "화학",
+        "적자",
+        "증설"
+      ]
+    },
+    {
+      "rank": 102,
+      "canonical_name": "LG생활건강",
+      "ticker": "051900",
+      "market": "KOSPI",
+      "group": "LG",
+      "sector": [
+        "화장품",
+        "생활용품"
+      ],
+      "aliases": [
+        "LG생활건강",
+        "051900",
+        "엘지생활건강",
+        "LG H&H",
+        "엘지생건"
+      ],
+      "business_keywords": [
+        "후",
+        "화장품",
+        "중국 매출",
+        "면세",
+        "생활용품",
+        "음료"
+      ]
+    },
+    {
+      "rank": 103,
+      "canonical_name": "한온시스템",
+      "ticker": "018880",
+      "market": "KOSPI",
+      "group": "한국앤컴퍼니",
+      "sector": [
+        "자동차부품"
+      ],
+      "aliases": [
+        "한온시스템",
+        "018880",
+        "Hanon Systems"
+      ],
+      "business_keywords": [
+        "열관리",
+        "전동화",
+        "컴프레서",
+        "수주",
+        "유상증자"
+      ]
+    },
+    {
+      "rank": 104,
+      "canonical_name": "에스원",
+      "ticker": "012750",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "보안서비스"
+      ],
+      "aliases": [
+        "에스원",
+        "012750",
+        "S-1 Corporation"
+      ],
+      "business_keywords": [
+        "물리보안",
+        "계정 수",
+        "건물관리",
+        "배당",
+        "보안"
+      ]
+    },
+    {
+      "rank": 105,
+      "canonical_name": "두산로보틱스",
+      "ticker": "454910",
+      "market": "KOSPI",
+      "group": "두산",
+      "sector": [
+        "로봇"
+      ],
+      "aliases": [
+        "두산로보틱스",
+        "454910",
+        "Doosan Robotics"
+      ],
+      "business_keywords": [
+        "협동로봇",
+        "코봇",
+        "북미 판매",
+        "솔루션",
+        "적자",
+        "로봇"
+      ]
+    },
+    {
+      "rank": 106,
+      "canonical_name": "OCI홀딩스",
+      "ticker": "010060",
+      "market": "KOSPI",
+      "group": "OCI",
+      "sector": [
+        "화학",
+        "태양광",
+        "지주"
+      ],
+      "aliases": [
+        "OCI홀딩스",
+        "010060",
+        "OCI",
+        "오씨아이홀딩스"
+      ],
+      "business_keywords": [
+        "폴리실리콘",
+        "태양광",
+        "말레이시아",
+        "반도체용 폴리실리콘",
+        "지주사"
+      ]
+    },
+    {
+      "rank": 107,
+      "canonical_name": "현대해상",
+      "ticker": "001450",
+      "market": "KOSPI",
+      "group": "현대해상",
+      "sector": [
+        "보험",
+        "손해보험"
+      ],
+      "aliases": [
+        "현대해상",
+        "001450",
+        "현대해상화재보험",
+        "Hyundai Marine & Fire"
+      ],
+      "business_keywords": [
+        "보험손익",
+        "자동차보험",
+        "장기보험",
+        "CSM",
+        "손해율",
+        "배당"
+      ]
+    },
+    {
+      "rank": 108,
+      "canonical_name": "현대제철",
+      "ticker": "004020",
+      "market": "KOSPI",
+      "group": "현대자동차그룹",
+      "sector": [
+        "철강"
+      ],
+      "aliases": [
+        "현대제철",
+        "004020",
+        "Hyundai Steel"
+      ],
+      "business_keywords": [
+        "철근",
+        "열연",
+        "후판",
+        "중국 철강",
+        "반덤핑",
+        "미국 공장",
+        "적자"
+      ]
+    },
+    {
+      "rank": 109,
+      "canonical_name": "LG디스플레이",
+      "ticker": "034220",
+      "market": "KOSPI",
+      "group": "LG",
+      "sector": [
+        "디스플레이"
+      ],
+      "aliases": [
+        "LG디스플레이",
+        "034220",
+        "엘지디스플레이",
+        "LGD",
+        "LG Display"
+      ],
+      "business_keywords": [
+        "OLED",
+        "애플",
+        "아이폰 패널",
+        "LCD",
+        "흑자 전환",
+        "패널 가격"
+      ]
+    },
+    {
+      "rank": 110,
+      "canonical_name": "한전기술",
+      "ticker": "052690",
+      "market": "KOSPI",
+      "group": "한국전력",
+      "sector": [
+        "원전",
+        "엔지니어링"
+      ],
+      "aliases": [
+        "한전기술",
+        "052690",
+        "한국전력기술",
+        "KEPCO E&C"
+      ],
+      "business_keywords": [
+        "원전 설계",
+        "SMR",
+        "체코 원전",
+        "수주",
+        "원자력"
+      ]
+    },
+    {
+      "rank": 111,
+      "canonical_name": "엘앤에프",
+      "ticker": "066970",
+      "market": "KOSPI",
+      "group": "엘앤에프",
+      "sector": [
+        "2차전지소재"
+      ],
+      "aliases": [
+        "엘앤에프",
+        "066970",
+        "L&F",
+        "엘엔에프"
+      ],
+      "business_keywords": [
+        "양극재",
+        "하이니켈",
+        "테슬라",
+        "적자",
+        "리튬 가격",
+        "가동률"
+      ]
+    },
+    {
+      "rank": 112,
+      "canonical_name": "한화생명",
+      "ticker": "088350",
+      "market": "KOSPI",
+      "group": "한화",
+      "sector": [
+        "보험",
+        "생명보험"
+      ],
+      "aliases": [
+        "한화생명",
+        "088350",
+        "Hanwha Life"
+      ],
+      "business_keywords": [
+        "CSM",
+        "보험손익",
+        "투자손익",
+        "지급여력",
+        "배당"
+      ]
+    },
+    {
+      "rank": 113,
+      "canonical_name": "CJ",
+      "ticker": "001040",
+      "market": "KOSPI",
+      "group": "CJ",
+      "sector": [
+        "지주"
+      ],
+      "aliases": [
+        "CJ",
+        "001040",
+        "씨제이",
+        "CJ주식회사",
+        "CJ Corp"
+      ],
+      "business_keywords": [
+        "지주사",
+        "배당",
+        "자회사",
+        "주주환원",
+        "지분 가치"
+      ]
+    },
+    {
+      "rank": 114,
+      "canonical_name": "한국가스공사",
+      "ticker": "036460",
+      "market": "KOSPI",
+      "group": "한국가스공사",
+      "sector": [
+        "유틸리티",
+        "가스"
+      ],
+      "aliases": [
+        "한국가스공사",
+        "036460",
+        "가스공사",
+        "KOGAS"
+      ],
+      "business_keywords": [
+        "미수금",
+        "요금 인상",
+        "LNG 도입",
+        "모잠비크",
+        "배당",
+        "유가"
+      ]
+    },
+    {
+      "rank": 115,
+      "canonical_name": "팬오션",
+      "ticker": "028670",
+      "market": "KOSPI",
+      "group": "하림",
+      "sector": [
+        "해운"
+      ],
+      "aliases": [
+        "팬오션",
+        "028670",
+        "Pan Ocean"
+      ],
+      "business_keywords": [
+        "BDI",
+        "벌크 운임",
+        "건화물선",
+        "곡물",
+        "LNG선",
+        "유상증자"
+      ]
+    },
+    {
+      "rank": 116,
+      "canonical_name": "KCC",
+      "ticker": "002380",
+      "market": "KOSPI",
+      "group": "KCC",
+      "sector": [
+        "화학",
+        "건자재"
+      ],
+      "aliases": [
+        "KCC",
+        "002380",
+        "케이씨씨"
+      ],
+      "business_keywords": [
+        "실리콘",
+        "도료",
+        "건자재",
+        "모멘티브",
+        "판유리",
+        "원가"
+      ]
+    },
+    {
+      "rank": 117,
+      "canonical_name": "영원무역",
+      "ticker": "111770",
+      "market": "KOSPI",
+      "group": "영원무역",
+      "sector": [
+        "의류",
+        "OEM"
+      ],
+      "aliases": [
+        "영원무역",
+        "111770",
+        "Youngone"
+      ],
+      "business_keywords": [
+        "OEM",
+        "노스페이스",
+        "수주",
+        "스캇",
+        "방글라데시",
+        "아웃도어"
+      ]
+    },
+    {
+      "rank": 118,
+      "canonical_name": "코스맥스",
+      "ticker": "192820",
+      "market": "KOSPI",
+      "group": "코스맥스",
+      "sector": [
+        "화장품ODM"
+      ],
+      "aliases": [
+        "코스맥스",
+        "192820",
+        "COSMAX"
+      ],
+      "business_keywords": [
+        "ODM",
+        "화장품 제조",
+        "중국",
+        "인디 브랜드",
+        "수출",
+        "가동률"
+      ]
+    },
+    {
+      "rank": 119,
+      "canonical_name": "강원랜드",
+      "ticker": "035250",
+      "market": "KOSPI",
+      "group": "강원랜드",
+      "sector": [
+        "카지노",
+        "레저"
+      ],
+      "aliases": [
+        "강원랜드",
+        "035250",
+        "Kangwon Land"
+      ],
+      "business_keywords": [
+        "카지노",
+        "드랍액",
+        "방문객",
+        "입장료",
+        "배당",
+        "규제"
+      ]
+    },
+    {
+      "rank": 120,
+      "canonical_name": "서울보증보험",
+      "ticker": "031210",
+      "market": "KOSPI",
+      "group": "서울보증보험",
+      "sector": [
+        "보험"
+      ],
+      "aliases": [
+        "서울보증보험",
+        "031210",
+        "SGI서울보증",
+        "서울보증"
+      ],
+      "business_keywords": [
+        "보증보험",
+        "손해율",
+        "배당",
+        "전세보증",
+        "상장"
+      ]
+    },
+    {
+      "rank": 121,
+      "canonical_name": "포스코DX",
+      "ticker": "022100",
+      "market": "KOSPI",
+      "group": "포스코",
+      "sector": [
+        "IT서비스",
+        "자동화"
+      ],
+      "aliases": [
+        "포스코DX",
+        "022100",
+        "포스코ICT",
+        "POSCO DX"
+      ],
+      "business_keywords": [
+        "스마트팩토리",
+        "자동화",
+        "로봇",
+        "이차전지 설비",
+        "수주"
+      ]
+    },
+    {
+      "rank": 122,
+      "canonical_name": "한국콜마",
+      "ticker": "161890",
+      "market": "KOSPI",
+      "group": "한국콜마",
+      "sector": [
+        "화장품ODM"
+      ],
+      "aliases": [
+        "한국콜마",
+        "161890",
+        "Kolmar Korea"
+      ],
+      "business_keywords": [
+        "ODM",
+        "선케어",
+        "수출",
+        "미국 공장",
+        "인디 브랜드",
+        "가동률"
+      ]
+    },
+    {
+      "rank": 123,
+      "canonical_name": "넷마블",
+      "ticker": "251270",
+      "market": "KOSPI",
+      "group": "넷마블",
+      "sector": [
+        "게임"
+      ],
+      "aliases": [
+        "넷마블",
+        "251270",
+        "Netmarble"
+      ],
+      "business_keywords": [
+        "모바일 게임",
+        "신작",
+        "트래픽",
+        "하이브 지분",
+        "흑자 전환"
+      ]
+    },
+    {
+      "rank": 124,
+      "canonical_name": "한미사이언스",
+      "ticker": "008930",
+      "market": "KOSPI",
+      "group": "한미",
+      "sector": [
+        "지주",
+        "제약"
+      ],
+      "aliases": [
+        "한미사이언스",
+        "008930",
+        "한미약품그룹"
+      ],
+      "business_keywords": [
+        "지주사",
+        "경영권 분쟁",
+        "배당",
+        "지분",
+        "제약"
+      ]
+    },
+    {
+      "rank": 125,
+      "canonical_name": "동서",
+      "ticker": "026960",
+      "market": "KOSPI",
+      "group": "동서",
+      "sector": [
+        "식품"
+      ],
+      "aliases": [
+        "동서",
+        "026960",
+        "Dongsuh"
+      ],
+      "business_keywords": [
+        "커피",
+        "맥심",
+        "동서식품",
+        "배당",
+        "지분법 이익"
+      ]
+    },
+    {
+      "rank": 126,
+      "canonical_name": "일진전기",
+      "ticker": "103590",
+      "market": "KOSPI",
+      "group": "일진",
+      "sector": [
+        "전선",
+        "전력기기"
+      ],
+      "aliases": [
+        "일진전기",
+        "103590",
+        "Iljin Electric"
+      ],
+      "business_keywords": [
+        "초고압 케이블",
+        "변압기",
+        "북미 수주",
+        "전력망",
+        "수주잔고"
+      ]
+    },
+    {
+      "rank": 127,
+      "canonical_name": "금호석유화학",
+      "ticker": "011780",
+      "market": "KOSPI",
+      "group": "금호",
+      "sector": [
+        "화학"
+      ],
+      "aliases": [
+        "금호석유화학",
+        "011780",
+        "금호석화",
+        "Kumho Petrochemical"
+      ],
+      "business_keywords": [
+        "합성고무",
+        "NB라텍스",
+        "스프레드",
+        "페놀",
+        "배당",
+        "자사주"
+      ]
+    },
+    {
+      "rank": 128,
+      "canonical_name": "한화엔진",
+      "ticker": "082740",
+      "market": "KOSPI",
+      "group": "한화",
+      "sector": [
+        "조선기자재"
+      ],
+      "aliases": [
+        "한화엔진",
+        "082740",
+        "HSD엔진",
+        "Hanwha Engine"
+      ],
+      "business_keywords": [
+        "선박 엔진",
+        "수주",
+        "이중연료 엔진",
+        "조선 기자재",
+        "수주잔고"
+      ]
+    },
+    {
+      "rank": 129,
+      "canonical_name": "CJ제일제당",
+      "ticker": "097950",
+      "market": "KOSPI",
+      "group": "CJ",
+      "sector": [
+        "식품",
+        "바이오"
+      ],
+      "aliases": [
+        "CJ제일제당",
+        "097950",
+        "제일제당",
+        "CJ CheilJedang"
+      ],
+      "business_keywords": [
+        "바이오",
+        "라이신",
+        "식품",
+        "비비고",
+        "가공식품",
+        "해외 매출",
+        "곡물가"
+      ]
+    },
+    {
+      "rank": 130,
+      "canonical_name": "SK바이오사이언스",
+      "ticker": "302440",
+      "market": "KOSPI",
+      "group": "SK",
+      "sector": [
+        "바이오",
+        "백신"
+      ],
+      "aliases": [
+        "SK바이오사이언스",
+        "302440",
+        "에스케이바이오사이언스",
+        "SK Bioscience"
+      ],
+      "business_keywords": [
+        "백신",
+        "폐렴구균",
+        "CMO",
+        "사노피",
+        "적자",
+        "임상"
+      ]
+    },
+    {
+      "rank": 131,
+      "canonical_name": "롯데에너지머티리얼즈",
+      "ticker": "020150",
+      "market": "KOSPI",
+      "group": "롯데",
+      "sector": [
+        "2차전지소재"
+      ],
+      "aliases": [
+        "롯데에너지머티리얼즈",
+        "020150",
+        "일진머티리얼즈",
+        "Lotte Energy Materials"
+      ],
+      "business_keywords": [
+        "동박",
+        "전지박",
+        "증설",
+        "말레이시아",
+        "적자",
+        "전기차 수요"
+      ]
+    },
+    {
+      "rank": 132,
+      "canonical_name": "현대엘리베이터",
+      "ticker": "017800",
+      "market": "KOSPI",
+      "group": "현대엘리베이터",
+      "sector": [
+        "기계",
+        "엘리베이터"
+      ],
+      "aliases": [
+        "현대엘리베이터",
+        "017800",
+        "Hyundai Elevator"
+      ],
+      "business_keywords": [
+        "엘리베이터",
+        "승강기",
+        "유지보수",
+        "수주",
+        "중국",
+        "배당"
+      ]
+    },
+    {
+      "rank": 133,
+      "canonical_name": "GS건설",
+      "ticker": "006360",
+      "market": "KOSPI",
+      "group": "GS",
+      "sector": [
+        "건설"
+      ],
+      "aliases": [
+        "GS건설",
+        "006360",
+        "지에스건설",
+        "GS E&C",
+        "자이"
+      ],
+      "business_keywords": [
+        "자이",
+        "수주",
+        "원가율",
+        "주택",
+        "분양",
+        "해외 플랜트"
+      ]
+    },
+    {
+      "rank": 134,
+      "canonical_name": "iM금융지주",
+      "ticker": "139130",
+      "market": "KOSPI",
+      "group": "iM금융그룹",
+      "sector": [
+        "금융",
+        "은행"
+      ],
+      "aliases": [
+        "iM금융지주",
+        "139130",
+        "DGB금융지주",
+        "아이엠금융지주",
+        "iM금융",
+        "대구은행"
+      ],
+      "business_keywords": [
+        "NIM",
+        "대손충당금",
+        "배당",
+        "iM뱅크",
+        "시중은행 전환"
+      ]
+    },
+    {
+      "rank": 135,
+      "canonical_name": "코리안리",
+      "ticker": "003690",
+      "market": "KOSPI",
+      "group": "코리안리",
+      "sector": [
+        "보험",
+        "재보험"
+      ],
+      "aliases": [
+        "코리안리",
+        "003690",
+        "Korean Re",
+        "대한재보험"
+      ],
+      "business_keywords": [
+        "재보험",
+        "보험손익",
+        "손해율",
+        "배당",
+        "해외 수재"
+      ]
+    },
+    {
+      "rank": 136,
+      "canonical_name": "농심",
+      "ticker": "004370",
+      "market": "KOSPI",
+      "group": "농심",
+      "sector": [
+        "식품"
+      ],
+      "aliases": [
+        "농심",
+        "004370",
+        "Nongshim"
+      ],
+      "business_keywords": [
+        "신라면",
+        "라면",
+        "미국 공장",
+        "수출",
+        "원가",
+        "해외 매출"
+      ]
+    },
+    {
+      "rank": 137,
+      "canonical_name": "F&F",
+      "ticker": "383220",
+      "market": "KOSPI",
+      "group": "F&F",
+      "sector": [
+        "패션"
+      ],
+      "aliases": [
+        "F&F",
+        "383220",
+        "에프앤에프"
+      ],
+      "business_keywords": [
+        "MLB",
+        "디스커버리",
+        "중국 매출",
+        "면세",
+        "패션",
+        "로열티"
+      ]
+    },
+    {
+      "rank": 138,
+      "canonical_name": "신세계",
+      "ticker": "004170",
+      "market": "KOSPI",
+      "group": "신세계",
+      "sector": [
+        "유통",
+        "백화점"
+      ],
+      "aliases": [
+        "신세계",
+        "004170",
+        "Shinsegae"
+      ],
+      "business_keywords": [
+        "백화점",
+        "면세점",
+        "명품",
+        "소비 심리",
+        "배당",
+        "센트럴시티"
+      ]
+    },
+    {
+      "rank": 139,
+      "canonical_name": "SK가스",
+      "ticker": "018670",
+      "market": "KOSPI",
+      "group": "SK",
+      "sector": [
+        "가스",
+        "에너지"
+      ],
+      "aliases": [
+        "SK가스",
+        "018670",
+        "에스케이가스",
+        "SK Gas"
+      ],
+      "business_keywords": [
+        "LPG",
+        "울산 GPS",
+        "LNG",
+        "발전",
+        "트레이딩",
+        "배당"
+      ]
+    },
+    {
+      "rank": 140,
+      "canonical_name": "DN오토모티브",
+      "ticker": "007340",
+      "market": "KOSPI",
+      "group": "DN",
+      "sector": [
+        "자동차부품",
+        "배터리"
+      ],
+      "aliases": [
+        "DN오토모티브",
+        "007340",
+        "디엔오토모티브",
+        "동아타이어"
+      ],
+      "business_keywords": [
+        "방진 부품",
+        "자동차 배터리",
+        "DN솔루션즈",
+        "수주",
+        "공작기계"
+      ]
+    },
+    {
+      "rank": 141,
+      "canonical_name": "롯데쇼핑",
+      "ticker": "023530",
+      "market": "KOSPI",
+      "group": "롯데",
+      "sector": [
+        "유통"
+      ],
+      "aliases": [
+        "롯데쇼핑",
+        "023530",
+        "Lotte Shopping"
+      ],
+      "business_keywords": [
+        "백화점",
+        "마트",
+        "롯데온",
+        "이커머스",
+        "해외 사업",
+        "배당"
+      ]
+    },
+    {
+      "rank": 142,
+      "canonical_name": "DL이앤씨",
+      "ticker": "375500",
+      "market": "KOSPI",
+      "group": "DL",
+      "sector": [
+        "건설"
+      ],
+      "aliases": [
+        "DL이앤씨",
+        "375500",
+        "대림산업",
+        "디엘이앤씨",
+        "DL E&C"
+      ],
+      "business_keywords": [
+        "수주",
+        "원가율",
+        "주택",
+        "분양",
+        "플랜트",
+        "안전 사고"
+      ]
+    },
+    {
+      "rank": 143,
+      "canonical_name": "에스엘",
+      "ticker": "005850",
+      "market": "KOSPI",
+      "group": "에스엘",
+      "sector": [
+        "자동차부품"
+      ],
+      "aliases": [
+        "에스엘",
+        "005850",
+        "SL Corporation"
+      ],
+      "business_keywords": [
+        "램프",
+        "전동화 부품",
+        "현대차그룹",
+        "수주",
+        "해외 법인"
+      ]
+    },
+    {
+      "rank": 144,
+      "canonical_name": "한솔케미칼",
+      "ticker": "014680",
+      "market": "KOSPI",
+      "group": "한솔",
+      "sector": [
+        "소재",
+        "화학"
+      ],
+      "aliases": [
+        "한솔케미칼",
+        "014680",
+        "Hansol Chemical"
+      ],
+      "business_keywords": [
+        "과산화수소",
+        "프리커서",
+        "QD 소재",
+        "반도체 소재",
+        "배터리 바인더"
+      ]
+    },
+    {
+      "rank": 145,
+      "canonical_name": "BGF리테일",
+      "ticker": "282330",
+      "market": "KOSPI",
+      "group": "BGF",
+      "sector": [
+        "유통",
+        "편의점"
+      ],
+      "aliases": [
+        "BGF리테일",
+        "282330",
+        "비지에프리테일",
+        "CU"
+      ],
+      "business_keywords": [
+        "편의점",
+        "점포 수",
+        "기존점 성장률",
+        "소비",
+        "배당"
+      ]
+    },
+    {
+      "rank": 146,
+      "canonical_name": "미래에셋생명",
+      "ticker": "085620",
+      "market": "KOSPI",
+      "group": "미래에셋",
+      "sector": [
+        "보험",
+        "생명보험"
+      ],
+      "aliases": [
+        "미래에셋생명",
+        "085620",
+        "Mirae Asset Life"
+      ],
+      "business_keywords": [
+        "CSM",
+        "변액보험",
+        "보험손익",
+        "지급여력",
+        "배당"
+      ]
+    },
+    {
+      "rank": 147,
+      "canonical_name": "제일기획",
+      "ticker": "030000",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "광고"
+      ],
+      "aliases": [
+        "제일기획",
+        "030000",
+        "Cheil Worldwide"
+      ],
+      "business_keywords": [
+        "광고",
+        "디지털 광고",
+        "삼성전자 물량",
+        "해외 매출",
+        "배당"
+      ]
+    },
+    {
+      "rank": 148,
+      "canonical_name": "한국앤컴퍼니",
+      "ticker": "000240",
+      "market": "KOSPI",
+      "group": "한국앤컴퍼니",
+      "sector": [
+        "지주"
+      ],
+      "aliases": [
+        "한국앤컴퍼니",
+        "000240",
+        "한국타이어월드와이드"
+      ],
+      "business_keywords": [
+        "지주사",
+        "한국타이어",
+        "경영권 분쟁",
+        "배당",
+        "한온시스템"
+      ]
+    },
+    {
+      "rank": 149,
+      "canonical_name": "롯데지주",
+      "ticker": "004990",
+      "market": "KOSPI",
+      "group": "롯데",
+      "sector": [
+        "지주"
+      ],
+      "aliases": [
+        "롯데지주",
+        "004990",
+        "Lotte Corp"
+      ],
+      "business_keywords": [
+        "지주사",
+        "배당",
+        "자회사",
+        "신용등급",
+        "지분 가치"
+      ]
+    },
+    {
+      "rank": 150,
+      "canonical_name": "이수스페셜티케미컬",
+      "ticker": "457190",
+      "market": "KOSPI",
+      "group": "이수",
+      "sector": [
+        "화학",
+        "2차전지소재"
+      ],
+      "aliases": [
+        "이수스페셜티케미컬",
+        "457190",
+        "이수스페셜티"
+      ],
+      "business_keywords": [
+        "황화리튬",
+        "전고체 배터리",
+        "정밀화학",
+        "적자",
+        "증설"
+      ]
+    },
+    {
+      "rank": 151,
+      "canonical_name": "에코프로머티",
+      "ticker": "450080",
+      "market": "KOSPI",
+      "group": "에코프로",
+      "sector": [
+        "2차전지소재"
+      ],
+      "aliases": [
+        "에코프로머티",
+        "450080",
+        "에코프로머티리얼즈"
+      ],
+      "business_keywords": [
+        "전구체",
+        "하이니켈",
+        "니켈",
+        "가동률",
+        "수주",
+        "적자"
+      ]
+    },
+    {
+      "rank": 152,
+      "canonical_name": "한올바이오파마",
+      "ticker": "009420",
+      "market": "KOSPI",
+      "group": "대웅",
+      "sector": [
+        "제약",
+        "바이오"
+      ],
+      "aliases": [
+        "한올바이오파마",
+        "009420",
+        "HanAll Biopharma"
+      ],
+      "business_keywords": [
+        "바토클리맙",
+        "기술수출",
+        "이뮤노반트",
+        "임상",
+        "자가면역"
+      ]
+    },
+    {
+      "rank": 153,
+      "canonical_name": "영원무역홀딩스",
+      "ticker": "009970",
+      "market": "KOSPI",
+      "group": "영원무역",
+      "sector": [
+        "지주",
+        "의류"
+      ],
+      "aliases": [
+        "영원무역홀딩스",
+        "009970",
+        "Youngone Holdings"
+      ],
+      "business_keywords": [
+        "지주사",
+        "영원무역",
+        "스캇",
+        "배당",
+        "OEM"
+      ]
+    },
+    {
+      "rank": 154,
+      "canonical_name": "케이뱅크",
+      "ticker": "279570",
+      "market": "KOSPI",
+      "group": "KT",
+      "sector": [
+        "금융",
+        "인터넷은행"
+      ],
+      "aliases": [
+        "케이뱅크",
+        "279570",
+        "K뱅크",
+        "KBank"
+      ],
+      "business_keywords": [
+        "인터넷은행",
+        "여신",
+        "수신",
+        "NIM",
+        "업비트",
+        "상장"
+      ]
+    },
+    {
+      "rank": 155,
+      "canonical_name": "롯데케미칼",
+      "ticker": "011170",
+      "market": "KOSPI",
+      "group": "롯데",
+      "sector": [
+        "화학"
+      ],
+      "aliases": [
+        "롯데케미칼",
+        "011170",
+        "Lotte Chemical"
+      ],
+      "business_keywords": [
+        "석유화학",
+        "스프레드",
+        "에틸렌",
+        "적자",
+        "재무구조",
+        "회사채"
+      ]
+    },
+    {
+      "rank": 156,
+      "canonical_name": "두산퓨얼셀",
+      "ticker": "336260",
+      "market": "KOSPI",
+      "group": "두산",
+      "sector": [
+        "연료전지",
+        "수소"
+      ],
+      "aliases": [
+        "두산퓨얼셀",
+        "336260",
+        "Doosan Fuel Cell"
+      ],
+      "business_keywords": [
+        "연료전지",
+        "수소",
+        "CHPS",
+        "수주",
+        "SOFC",
+        "발전"
+      ]
+    },
+    {
+      "rank": 157,
+      "canonical_name": "현대지에프홀딩스",
+      "ticker": "005440",
+      "market": "KOSPI",
+      "group": "현대백화점",
+      "sector": [
+        "지주"
+      ],
+      "aliases": [
+        "현대지에프홀딩스",
+        "005440",
+        "현대GF홀딩스"
+      ],
+      "business_keywords": [
+        "지주사",
+        "배당",
+        "식품",
+        "유통",
+        "지분 가치"
+      ]
+    },
+    {
+      "rank": 158,
+      "canonical_name": "신영증권",
+      "ticker": "001720",
+      "market": "KOSPI",
+      "group": "신영",
+      "sector": [
+        "금융",
+        "증권"
+      ],
+      "aliases": [
+        "신영증권",
+        "001720",
+        "Shinyoung Securities"
+      ],
+      "business_keywords": [
+        "증권",
+        "자산관리",
+        "배당",
+        "운용손익"
+      ]
+    },
+    {
+      "rank": 159,
+      "canonical_name": "미스토홀딩스",
+      "ticker": "081660",
+      "market": "KOSPI",
+      "group": "미스토",
+      "sector": [
+        "패션",
+        "지주"
+      ],
+      "aliases": [
+        "미스토홀딩스",
+        "081660",
+        "휠라홀딩스",
+        "FILA"
+      ],
+      "business_keywords": [
+        "휠라",
+        "아쿠쉬네트",
+        "타이틀리스트",
+        "골프",
+        "로열티",
+        "리브랜딩"
+      ]
+    },
+    {
+      "rank": 160,
+      "canonical_name": "효성",
+      "ticker": "004800",
+      "market": "KOSPI",
+      "group": "효성",
+      "sector": [
+        "지주"
+      ],
+      "aliases": [
+        "효성",
+        "004800",
+        "주식회사효성",
+        "Hyosung Corp"
+      ],
+      "business_keywords": [
+        "지주사",
+        "효성티앤씨",
+        "배당",
+        "자회사",
+        "분할"
+      ]
+    },
+    {
+      "rank": 161,
+      "canonical_name": "한화비전",
+      "ticker": "489790",
+      "market": "KOSPI",
+      "group": "한화",
+      "sector": [
+        "방산",
+        "보안장비"
+      ],
+      "aliases": [
+        "한화비전",
+        "489790",
+        "Hanwha Vision"
+      ],
+      "business_keywords": [
+        "영상보안",
+        "CCTV",
+        "북미 매출",
+        "방산",
+        "분할"
+      ]
+    },
+    {
+      "rank": 162,
+      "canonical_name": "이마트",
+      "ticker": "139480",
+      "market": "KOSPI",
+      "group": "신세계",
+      "sector": [
+        "유통"
+      ],
+      "aliases": [
+        "이마트",
+        "139480",
+        "emart",
+        "E마트"
+      ],
+      "business_keywords": [
+        "대형마트",
+        "기존점 성장률",
+        "할인점",
+        "스타필드",
+        "트레이더스",
+        "쓱닷컴"
+      ]
+    },
+    {
+      "rank": 163,
+      "canonical_name": "달바글로벌",
+      "ticker": "483650",
+      "market": "KOSPI",
+      "group": "달바글로벌",
+      "sector": [
+        "화장품"
+      ],
+      "aliases": [
+        "달바글로벌",
+        "483650",
+        "dalba",
+        "달바"
+      ],
+      "business_keywords": [
+        "미스트 세럼",
+        "수출",
+        "일본",
+        "미국",
+        "화장품",
+        "인디 브랜드"
+      ]
+    },
+    {
+      "rank": 164,
+      "canonical_name": "아모레퍼시픽홀딩스",
+      "ticker": "002790",
+      "market": "KOSPI",
+      "group": "아모레퍼시픽",
+      "sector": [
+        "지주",
+        "화장품"
+      ],
+      "aliases": [
+        "아모레퍼시픽홀딩스",
+        "002790",
+        "아모레홀딩스",
+        "Amorepacific Group"
+      ],
+      "business_keywords": [
+        "지주사",
+        "배당",
+        "화장품",
+        "지분 가치"
+      ]
+    },
+    {
+      "rank": 165,
+      "canonical_name": "케이씨텍",
+      "ticker": "281820",
+      "market": "KOSPI",
+      "group": "케이씨",
+      "sector": [
+        "반도체장비",
+        "반도체소재"
+      ],
+      "aliases": [
+        "케이씨텍",
+        "281820",
+        "KCTech"
+      ],
+      "business_keywords": [
+        "CMP 장비",
+        "슬러리",
+        "세정 장비",
+        "반도체 장비",
+        "수주"
+      ]
+    },
+    {
+      "rank": 166,
+      "canonical_name": "한전KPS",
+      "ticker": "051600",
+      "market": "KOSPI",
+      "group": "한국전력",
+      "sector": [
+        "발전정비"
+      ],
+      "aliases": [
+        "한전KPS",
+        "051600",
+        "KPS",
+        "한전케이피에스"
+      ],
+      "business_keywords": [
+        "발전 정비",
+        "원전 정비",
+        "수주",
+        "배당",
+        "해외 사업"
+      ]
+    },
+    {
+      "rank": 167,
+      "canonical_name": "씨에스윈드",
+      "ticker": "112610",
+      "market": "KOSPI",
+      "group": "씨에스윈드",
+      "sector": [
+        "풍력"
+      ],
+      "aliases": [
+        "씨에스윈드",
+        "112610",
+        "CS Wind"
+      ],
+      "business_keywords": [
+        "풍력타워",
+        "해상풍력",
+        "AMPC",
+        "미국 공장",
+        "수주",
+        "베스타스"
+      ]
+    },
+    {
+      "rank": 168,
+      "canonical_name": "롯데렌탈",
+      "ticker": "089860",
+      "market": "KOSPI",
+      "group": "롯데",
+      "sector": [
+        "렌탈"
+      ],
+      "aliases": [
+        "롯데렌탈",
+        "089860",
+        "Lotte Rental"
+      ],
+      "business_keywords": [
+        "렌터카",
+        "그린카",
+        "중고차",
+        "매각",
+        "배당"
+      ]
+    },
+    {
+      "rank": 169,
+      "canonical_name": "시프트업",
+      "ticker": "462870",
+      "market": "KOSPI",
+      "group": "시프트업",
+      "sector": [
+        "게임"
+      ],
+      "aliases": [
+        "시프트업",
+        "462870",
+        "SHIFT UP"
+      ],
+      "business_keywords": [
+        "니케",
+        "스텔라블레이드",
+        "신작",
+        "트래픽",
+        "게임"
+      ]
+    },
+    {
+      "rank": 170,
+      "canonical_name": "GS리테일",
+      "ticker": "007070",
+      "market": "KOSPI",
+      "group": "GS",
+      "sector": [
+        "유통",
+        "편의점"
+      ],
+      "aliases": [
+        "GS리테일",
+        "007070",
+        "지에스리테일",
+        "GS25"
+      ],
+      "business_keywords": [
+        "편의점",
+        "점포 수",
+        "기존점 성장률",
+        "수퍼마켓",
+        "홈쇼핑"
+      ]
+    },
+    {
+      "rank": 171,
+      "canonical_name": "LS에코에너지",
+      "ticker": "229640",
+      "market": "KOSPI",
+      "group": "LS",
+      "sector": [
+        "전선"
+      ],
+      "aliases": [
+        "LS에코에너지",
+        "229640",
+        "LS전선아시아"
+      ],
+      "business_keywords": [
+        "베트남",
+        "전선",
+        "해저케이블",
+        "희토류",
+        "수주",
+        "전력망"
+      ]
+    },
+    {
+      "rank": 172,
+      "canonical_name": "HL만도",
+      "ticker": "204320",
+      "market": "KOSPI",
+      "group": "HL",
+      "sector": [
+        "자동차부품"
+      ],
+      "aliases": [
+        "HL만도",
+        "204320",
+        "만도",
+        "HL Mando"
+      ],
+      "business_keywords": [
+        "제동장치",
+        "조향",
+        "전동화",
+        "자율주행",
+        "수주",
+        "현대차그룹"
+      ]
+    },
+    {
+      "rank": 173,
+      "canonical_name": "NHN",
+      "ticker": "181710",
+      "market": "KOSPI",
+      "group": "NHN",
+      "sector": [
+        "인터넷",
+        "게임"
+      ],
+      "aliases": [
+        "NHN",
+        "181710",
+        "엔에이치엔"
+      ],
+      "business_keywords": [
+        "결제",
+        "게임",
+        "클라우드",
+        "커머스",
+        "두레이",
+        "적자"
+      ]
+    },
+    {
+      "rank": 174,
+      "canonical_name": "LX인터내셔널",
+      "ticker": "001120",
+      "market": "KOSPI",
+      "group": "LX",
+      "sector": [
+        "상사"
+      ],
+      "aliases": [
+        "LX인터내셔널",
+        "001120",
+        "LG상사",
+        "LX International"
+      ],
+      "business_keywords": [
+        "트레이딩",
+        "니켈",
+        "팜",
+        "석탄",
+        "물류",
+        "자원 개발"
+      ]
+    },
+    {
+      "rank": 175,
+      "canonical_name": "풍산",
+      "ticker": "103140",
+      "market": "KOSPI",
+      "group": "풍산",
+      "sector": [
+        "비철금속",
+        "방산"
+      ],
+      "aliases": [
+        "풍산",
+        "103140",
+        "Poongsan"
+      ],
+      "business_keywords": [
+        "동 가격",
+        "신동",
+        "방산",
+        "탄약",
+        "수출",
+        "전기동"
+      ]
+    },
+    {
+      "rank": 176,
+      "canonical_name": "코리아써키트",
+      "ticker": "007810",
+      "market": "KOSPI",
+      "group": "영풍",
+      "sector": [
+        "전자부품",
+        "PCB"
+      ],
+      "aliases": [
+        "코리아써키트",
+        "007810",
+        "Korea Circuit"
+      ],
+      "business_keywords": [
+        "PCB",
+        "반도체 기판",
+        "FC-BGA",
+        "수주",
+        "가동률"
+      ]
+    },
+    {
+      "rank": 177,
+      "canonical_name": "현대백화점",
+      "ticker": "069960",
+      "market": "KOSPI",
+      "group": "현대백화점",
+      "sector": [
+        "유통",
+        "백화점"
+      ],
+      "aliases": [
+        "현대백화점",
+        "069960",
+        "Hyundai Department Store"
+      ],
+      "business_keywords": [
+        "백화점",
+        "면세점",
+        "더현대",
+        "소비",
+        "배당"
+      ]
+    },
+    {
+      "rank": 178,
+      "canonical_name": "녹십자",
+      "ticker": "006280",
+      "market": "KOSPI",
+      "group": "녹십자",
+      "sector": [
+        "제약",
+        "바이오"
+      ],
+      "aliases": [
+        "녹십자",
+        "006280",
+        "GC녹십자",
+        "Green Cross"
+      ],
+      "business_keywords": [
+        "알리글로",
+        "혈액제제",
+        "백신",
+        "FDA",
+        "수출",
+        "독감"
+      ]
+    },
+    {
+      "rank": 179,
+      "canonical_name": "동원산업",
+      "ticker": "006040",
+      "market": "KOSPI",
+      "group": "동원",
+      "sector": [
+        "식품",
+        "수산",
+        "지주"
+      ],
+      "aliases": [
+        "동원산업",
+        "006040",
+        "Dongwon Industries"
+      ],
+      "business_keywords": [
+        "참치",
+        "어획량",
+        "참치 가격",
+        "동원F&B",
+        "물류",
+        "지주사"
+      ]
+    },
+    {
+      "rank": 180,
+      "canonical_name": "금호타이어",
+      "ticker": "073240",
+      "market": "KOSPI",
+      "group": "금호타이어",
+      "sector": [
+        "타이어"
+      ],
+      "aliases": [
+        "금호타이어",
+        "073240",
+        "Kumho Tire"
+      ],
+      "business_keywords": [
+        "타이어",
+        "교체용 타이어",
+        "고인치",
+        "미국 공장",
+        "관세",
+        "원재료"
+      ]
+    },
+    {
+      "rank": 181,
+      "canonical_name": "CJ대한통운",
+      "ticker": "000120",
+      "market": "KOSPI",
+      "group": "CJ",
+      "sector": [
+        "물류"
+      ],
+      "aliases": [
+        "CJ대한통운",
+        "000120",
+        "대한통운",
+        "CJ Logistics"
+      ],
+      "business_keywords": [
+        "택배",
+        "물동량",
+        "계약물류",
+        "국제특송",
+        "쿠팡",
+        "주 7일 배송"
+      ]
+    },
+    {
+      "rank": 182,
+      "canonical_name": "IPARK현대산업개발",
+      "ticker": "294870",
+      "market": "KOSPI",
+      "group": "HDC",
+      "sector": [
+        "건설"
+      ],
+      "aliases": [
+        "IPARK현대산업개발",
+        "294870",
+        "HDC현대산업개발",
+        "현대산업개발",
+        "아이파크"
+      ],
+      "business_keywords": [
+        "아이파크",
+        "수주",
+        "원가율",
+        "주택",
+        "분양"
+      ]
+    },
+    {
+      "rank": 183,
+      "canonical_name": "아시아나항공",
+      "ticker": "020560",
+      "market": "KOSPI",
+      "group": "대한항공",
+      "sector": [
+        "항공"
+      ],
+      "aliases": [
+        "아시아나항공",
+        "020560",
+        "Asiana Airlines"
+      ],
+      "business_keywords": [
+        "여객",
+        "화물",
+        "통합",
+        "유가",
+        "환율",
+        "운임"
+      ]
+    },
+    {
+      "rank": 184,
+      "canonical_name": "호텔신라",
+      "ticker": "008770",
+      "market": "KOSPI",
+      "group": "삼성",
+      "sector": [
+        "면세점",
+        "호텔"
+      ],
+      "aliases": [
+        "호텔신라",
+        "008770",
+        "Hotel Shilla",
+        "신라호텔"
+      ],
+      "business_keywords": [
+        "면세점",
+        "따이궁",
+        "중국인 관광객",
+        "호텔",
+        "인천공항 임대료"
+      ]
+    },
+    {
+      "rank": 185,
+      "canonical_name": "다우기술",
+      "ticker": "023590",
+      "market": "KOSPI",
+      "group": "다우키움",
+      "sector": [
+        "IT",
+        "지주"
+      ],
+      "aliases": [
+        "다우기술",
+        "023590",
+        "Daou Tech"
+      ],
+      "business_keywords": [
+        "키움증권",
+        "IT서비스",
+        "지분법 이익",
+        "배당",
+        "사람인"
+      ]
+    },
+    {
+      "rank": 186,
+      "canonical_name": "대한조선",
+      "ticker": "439260",
+      "market": "KOSPI",
+      "group": "대한조선",
+      "sector": [
+        "조선"
+      ],
+      "aliases": [
+        "대한조선",
+        "439260",
+        "Daehan Shipbuilding"
+      ],
+      "business_keywords": [
+        "탱커",
+        "수주",
+        "수주잔고",
+        "선가",
+        "상장"
+      ]
+    },
+    {
+      "rank": 187,
+      "canonical_name": "오리온홀딩스",
+      "ticker": "001800",
+      "market": "KOSPI",
+      "group": "오리온",
+      "sector": [
+        "지주",
+        "식품"
+      ],
+      "aliases": [
+        "오리온홀딩스",
+        "001800",
+        "Orion Holdings"
+      ],
+      "business_keywords": [
+        "지주사",
+        "오리온",
+        "배당",
+        "제과"
+      ]
+    },
+    {
+      "rank": 188,
+      "canonical_name": "SK이터닉스",
+      "ticker": "475150",
+      "market": "KOSPI",
+      "group": "SK",
+      "sector": [
+        "신재생에너지"
+      ],
+      "aliases": [
+        "SK이터닉스",
+        "475150",
+        "에스케이이터닉스"
+      ],
+      "business_keywords": [
+        "태양광",
+        "풍력",
+        "ESS",
+        "신재생에너지",
+        "발전",
+        "수주"
+      ]
+    },
+    {
+      "rank": 189,
+      "canonical_name": "현대위아",
+      "ticker": "011210",
+      "market": "KOSPI",
+      "group": "현대자동차그룹",
+      "sector": [
+        "자동차부품",
+        "기계"
+      ],
+      "aliases": [
+        "현대위아",
+        "011210",
+        "Hyundai Wia"
+      ],
+      "business_keywords": [
+        "등속조인트",
+        "공작기계",
+        "열관리",
+        "수주",
+        "현대차그룹"
+      ]
+    },
+    {
+      "rank": 190,
+      "canonical_name": "SK아이이테크놀로지",
+      "ticker": "361610",
+      "market": "KOSPI",
+      "group": "SK",
+      "sector": [
+        "2차전지소재"
+      ],
+      "aliases": [
+        "SK아이이테크놀로지",
+        "361610",
+        "SKIET",
+        "에스케이아이이테크놀로지"
+      ],
+      "business_keywords": [
+        "분리막",
+        "LiBS",
+        "적자",
+        "가동률",
+        "폴란드",
+        "매각"
+      ]
+    },
+    {
+      "rank": 191,
+      "canonical_name": "코스모신소재",
+      "ticker": "005070",
+      "market": "KOSPI",
+      "group": "코스모",
+      "sector": [
+        "2차전지소재"
+      ],
+      "aliases": [
+        "코스모신소재",
+        "005070",
+        "Cosmo AM&T"
+      ],
+      "business_keywords": [
+        "양극재",
+        "하이니켈",
+        "MLCC 이형필름",
+        "증설",
+        "수주"
+      ]
+    },
+    {
+      "rank": 192,
+      "canonical_name": "오뚜기",
+      "ticker": "007310",
+      "market": "KOSPI",
+      "group": "오뚜기",
+      "sector": [
+        "식품"
+      ],
+      "aliases": [
+        "오뚜기",
+        "007310",
+        "Ottogi"
+      ],
+      "business_keywords": [
+        "라면",
+        "진라면",
+        "소스",
+        "즉석밥",
+        "수출",
+        "원가"
+      ]
+    },
+    {
+      "rank": 193,
+      "canonical_name": "HDC",
+      "ticker": "012630",
+      "market": "KOSPI",
+      "group": "HDC",
+      "sector": [
+        "지주"
+      ],
+      "aliases": [
+        "HDC",
+        "012630",
+        "에이치디씨",
+        "HDC Holdings"
+      ],
+      "business_keywords": [
+        "지주사",
+        "배당",
+        "아이파크",
+        "지분 가치"
+      ]
+    },
+    {
+      "rank": 194,
+      "canonical_name": "코오롱인더",
+      "ticker": "120110",
+      "market": "KOSPI",
+      "group": "코오롱",
+      "sector": [
+        "화학",
+        "소재"
+      ],
+      "aliases": [
+        "코오롱인더",
+        "120110",
+        "코오롱인더스트리",
+        "Kolon Industries"
+      ],
+      "business_keywords": [
+        "아라미드",
+        "타이어코드",
+        "필름",
+        "패션",
+        "수소 소재"
+      ]
+    },
+    {
+      "rank": 195,
+      "canonical_name": "한일시멘트",
+      "ticker": "300720",
+      "market": "KOSPI",
+      "group": "한일",
+      "sector": [
+        "시멘트"
+      ],
+      "aliases": [
+        "한일시멘트",
+        "300720",
+        "Hanil Cement"
+      ],
+      "business_keywords": [
+        "시멘트",
+        "레미콘",
+        "출하량",
+        "유연탄",
+        "건설 경기",
+        "배당"
+      ]
+    },
+    {
+      "rank": 196,
+      "canonical_name": "HD현대마린엔진",
+      "ticker": "071970",
+      "market": "KOSPI",
+      "group": "HD현대",
+      "sector": [
+        "조선기자재"
+      ],
+      "aliases": [
+        "HD현대마린엔진",
+        "071970",
+        "STX중공업",
+        "에이치디현대마린엔진"
+      ],
+      "business_keywords": [
+        "선박 엔진",
+        "수주",
+        "조선 기자재",
+        "엔진 부품"
+      ]
+    },
+    {
+      "rank": 197,
+      "canonical_name": "대웅제약",
+      "ticker": "069620",
+      "market": "KOSPI",
+      "group": "대웅",
+      "sector": [
+        "제약"
+      ],
+      "aliases": [
+        "대웅제약",
+        "069620",
+        "Daewoong Pharmaceutical"
+      ],
+      "business_keywords": [
+        "나보타",
+        "보툴리눔 톡신",
+        "펙수클루",
+        "엔블로",
+        "수출",
+        "소송"
+      ]
+    },
+    {
+      "rank": 198,
+      "canonical_name": "HD현대에너지솔루션",
+      "ticker": "322000",
+      "market": "KOSPI",
+      "group": "HD현대",
+      "sector": [
+        "태양광"
+      ],
+      "aliases": [
+        "HD현대에너지솔루션",
+        "322000",
+        "현대에너지솔루션"
+      ],
+      "business_keywords": [
+        "태양광 모듈",
+        "셀",
+        "ESS",
+        "수출",
+        "적자"
+      ]
+    },
+    {
+      "rank": 199,
+      "canonical_name": "세아베스틸지주",
+      "ticker": "001430",
+      "market": "KOSPI",
+      "group": "세아",
+      "sector": [
+        "철강",
+        "지주"
+      ],
+      "aliases": [
+        "세아베스틸지주",
+        "001430",
+        "세아베스틸"
+      ],
+      "business_keywords": [
+        "특수강",
+        "자동차용 강재",
+        "지주사",
+        "원가",
+        "철스크랩"
+      ]
+    },
+    {
+      "rank": 200,
+      "canonical_name": "SK네트웍스",
+      "ticker": "001740",
+      "market": "KOSPI",
+      "group": "SK",
+      "sector": [
+        "상사",
+        "렌탈"
+      ],
+      "aliases": [
+        "SK네트웍스",
+        "001740",
+        "에스케이네트웍스",
+        "SK Networks"
+      ],
+      "business_keywords": [
+        "AI 컴퍼니",
+        "민팃",
+        "워커힐",
+        "정보통신 유통",
+        "사업 재편"
+      ]
+    },
+    {
+      "rank": 201,
+      "canonical_name": "롯데웰푸드",
+      "ticker": "280360",
+      "market": "KOSPI",
+      "group": "롯데",
+      "sector": [
+        "식품"
+      ],
+      "aliases": [
+        "롯데웰푸드",
+        "280360",
+        "롯데제과",
+        "Lotte Wellfood"
+      ],
+      "business_keywords": [
+        "제과",
+        "빙과",
+        "인도",
+        "원가",
+        "코코아 가격",
+        "수출"
+      ]
+    },
+    {
+      "rank": 202,
+      "canonical_name": "더블유게임즈",
+      "ticker": "192080",
+      "market": "KOSPI",
+      "group": "더블유게임즈",
+      "sector": [
+        "게임"
+      ],
+      "aliases": [
+        "더블유게임즈",
+        "192080",
+        "DoubleU Games"
+      ],
+      "business_keywords": [
+        "소셜카지노",
+        "더블다운",
+        "모바일게임",
+        "자사주",
+        "배당"
+      ]
+    },
+    {
+      "rank": 203,
+      "canonical_name": "HJ중공업",
+      "ticker": "097230",
+      "market": "KOSPI",
+      "group": "HJ중공업",
+      "sector": [
+        "조선",
+        "건설"
+      ],
+      "aliases": [
+        "HJ중공업",
+        "097230",
+        "한진중공업"
+      ],
+      "business_keywords": [
+        "조선",
+        "특수선",
+        "건설",
+        "수주",
+        "영도조선소"
+      ]
+    },
+    {
+      "rank": 204,
+      "canonical_name": "후성",
+      "ticker": "093370",
+      "market": "KOSPI",
+      "group": "후성",
+      "sector": [
+        "화학"
+      ],
+      "aliases": [
+        "후성",
+        "093370",
+        "Foosung"
+      ],
+      "business_keywords": [
+        "불화가스",
+        "전해질 첨가제",
+        "LiPF6",
+        "냉매",
+        "반도체 특수가스"
+      ]
+    },
+    {
+      "rank": 205,
+      "canonical_name": "삼화콘덴서",
+      "ticker": "001820",
+      "market": "KOSPI",
+      "group": "삼화",
+      "sector": [
+        "전자부품"
+      ],
+      "aliases": [
+        "삼화콘덴서",
+        "001820",
+        "삼화콘덴서공업",
+        "Samwha Capacitor"
+      ],
+      "business_keywords": [
+        "MLCC",
+        "콘덴서",
+        "전장",
+        "전기차",
+        "DCLC"
+      ]
+    },
+    {
+      "rank": 206,
+      "canonical_name": "하이트진로",
+      "ticker": "000080",
+      "market": "KOSPI",
+      "group": "하이트진로",
+      "sector": [
+        "주류"
+      ],
+      "aliases": [
+        "하이트진로",
+        "000080",
+        "Hite Jinro"
+      ],
+      "business_keywords": [
+        "소주",
+        "맥주",
+        "참이슬",
+        "테라",
+        "켈리",
+        "수출",
+        "주세"
+      ]
+    },
+    {
+      "rank": 207,
+      "canonical_name": "효성티앤씨",
+      "ticker": "298020",
+      "market": "KOSPI",
+      "group": "효성",
+      "sector": [
+        "화학섬유"
+      ],
+      "aliases": [
+        "효성티앤씨",
+        "298020",
+        "효성T&C",
+        "Hyosung TNC"
+      ],
+      "business_keywords": [
+        "스판덱스",
+        "나일론",
+        "폴리에스터",
+        "스프레드",
+        "중국",
+        "베트남"
+      ]
+    },
+    {
+      "rank": 208,
+      "canonical_name": "알테오젠",
+      "ticker": "196170",
+      "market": "KOSDAQ",
+      "group": "알테오젠",
+      "sector": [
+        "바이오",
+        "제약"
+      ],
+      "aliases": [
+        "알테오젠",
+        "196170",
+        "Alteogen"
+      ],
+      "business_keywords": [
+        "테르가제",
+        "ALT-B4",
+        "히알루로니다제",
+        "기술수출",
+        "키트루다 SC",
+        "마일스톤"
+      ]
+    },
+    {
+      "rank": 209,
+      "canonical_name": "에코프로",
+      "ticker": "086520",
+      "market": "KOSDAQ",
+      "group": "에코프로",
+      "sector": [
+        "2차전지소재",
+        "지주"
+      ],
+      "aliases": [
+        "에코프로",
+        "086520",
+        "Ecopro"
+      ],
+      "business_keywords": [
+        "지주사",
+        "양극재",
+        "전구체",
+        "리튬",
+        "니켈",
+        "자회사"
+      ]
+    },
+    {
+      "rank": 210,
+      "canonical_name": "에코프로비엠",
+      "ticker": "247540",
+      "market": "KOSDAQ",
+      "group": "에코프로",
+      "sector": [
+        "2차전지소재"
+      ],
+      "aliases": [
+        "에코프로비엠",
+        "247540",
+        "에코프로BM",
+        "Ecopro BM"
+      ],
+      "business_keywords": [
+        "양극재",
+        "하이니켈",
+        "NCA",
+        "가동률",
+        "리튬 가격",
+        "수주"
+      ]
+    },
+    {
+      "rank": 211,
+      "canonical_name": "주성엔지니어링",
+      "ticker": "036930",
+      "market": "KOSDAQ",
+      "group": "주성엔지니어링",
+      "sector": [
+        "반도체장비"
+      ],
+      "aliases": [
+        "주성엔지니어링",
+        "036930",
+        "Jusung Engineering"
+      ],
+      "business_keywords": [
+        "ALD",
+        "반도체 장비",
+        "디스플레이 장비",
+        "수주",
+        "태양광 장비"
+      ]
+    },
+    {
+      "rank": 212,
+      "canonical_name": "레인보우로보틱스",
+      "ticker": "277810",
+      "market": "KOSDAQ",
+      "group": "삼성",
+      "sector": [
+        "로봇"
+      ],
+      "aliases": [
+        "레인보우로보틱스",
+        "277810",
+        "Rainbow Robotics"
+      ],
+      "business_keywords": [
+        "협동로봇",
+        "휴머노이드",
+        "삼성전자",
+        "이족보행",
+        "자회사 편입"
+      ]
+    },
+    {
+      "rank": 213,
+      "canonical_name": "HLB",
+      "ticker": "028300",
+      "market": "KOSDAQ",
+      "group": "HLB",
+      "sector": [
+        "바이오"
+      ],
+      "aliases": [
+        "HLB",
+        "028300",
+        "에이치엘비"
+      ],
+      "business_keywords": [
+        "리보세라닙",
+        "FDA",
+        "간암 신약",
+        "임상",
+        "재심사",
+        "허가"
+      ]
+    },
+    {
+      "rank": 214,
+      "canonical_name": "이오테크닉스",
+      "ticker": "039030",
+      "market": "KOSDAQ",
+      "group": "이오테크닉스",
+      "sector": [
+        "반도체장비"
+      ],
+      "aliases": [
+        "이오테크닉스",
+        "039030",
+        "EO Technics"
+      ],
+      "business_keywords": [
+        "레이저 장비",
+        "어닐링",
+        "마킹",
+        "HBM",
+        "그루빙",
+        "수주"
+      ]
+    },
+    {
+      "rank": 215,
+      "canonical_name": "리노공업",
+      "ticker": "058470",
+      "market": "KOSDAQ",
+      "group": "리노공업",
+      "sector": [
+        "반도체부품"
+      ],
+      "aliases": [
+        "리노공업",
+        "058470",
+        "LEENO Industrial"
+      ],
+      "business_keywords": [
+        "리노핀",
+        "테스트 소켓",
+        "프로브",
+        "비메모리",
+        "배당",
+        "수출"
+      ]
+    },
+    {
+      "rank": 216,
+      "canonical_name": "삼천당제약",
+      "ticker": "000250",
+      "market": "KOSDAQ",
+      "group": "삼천당제약",
+      "sector": [
+        "제약"
+      ],
+      "aliases": [
+        "삼천당제약",
+        "000250",
+        "Samchundang Pharm"
+      ],
+      "business_keywords": [
+        "아일리아 시밀러",
+        "경구용 세마글루타이드",
+        "기술수출",
+        "임상",
+        "유럽 판매"
+      ]
+    },
+    {
+      "rank": 217,
+      "canonical_name": "원익IPS",
+      "ticker": "240810",
+      "market": "KOSDAQ",
+      "group": "원익",
+      "sector": [
+        "반도체장비"
+      ],
+      "aliases": [
+        "원익IPS",
+        "240810",
+        "원익아이피에스",
+        "Wonik IPS"
+      ],
+      "business_keywords": [
+        "반도체 장비",
+        "증착",
+        "디스플레이 장비",
+        "수주",
+        "삼성전자"
+      ]
+    },
+    {
+      "rank": 218,
+      "canonical_name": "심텍",
+      "ticker": "222800",
+      "market": "KOSDAQ",
+      "group": "심텍",
+      "sector": [
+        "반도체기판"
+      ],
+      "aliases": [
+        "심텍",
+        "222800",
+        "Simmtech"
+      ],
+      "business_keywords": [
+        "메모리 모듈 기판",
+        "FC-CSP",
+        "MSAP",
+        "가동률",
+        "DDR5",
+        "적자"
+      ]
+    },
+    {
+      "rank": 219,
+      "canonical_name": "HPSP",
+      "ticker": "403870",
+      "market": "KOSDAQ",
+      "group": "HPSP",
+      "sector": [
+        "반도체장비"
+      ],
+      "aliases": [
+        "HPSP",
+        "403870",
+        "에이치피에스피"
+      ],
+      "business_keywords": [
+        "고압 수소 어닐링",
+        "장비",
+        "특허 소송",
+        "수출",
+        "매각"
+      ]
+    },
+    {
+      "rank": 220,
+      "canonical_name": "피에스케이홀딩스",
+      "ticker": "031980",
+      "market": "KOSDAQ",
+      "group": "피에스케이",
+      "sector": [
+        "반도체장비",
+        "지주"
+      ],
+      "aliases": [
+        "피에스케이홀딩스",
+        "031980",
+        "PSK홀딩스"
+      ],
+      "business_keywords": [
+        "디스컴",
+        "HBM",
+        "리플로우",
+        "후공정 장비",
+        "지주사"
+      ]
+    },
+    {
+      "rank": 221,
+      "canonical_name": "피에스케이",
+      "ticker": "319660",
+      "market": "KOSDAQ",
+      "group": "피에스케이",
+      "sector": [
+        "반도체장비"
+      ],
+      "aliases": [
+        "피에스케이",
+        "319660",
+        "PSK Inc"
+      ],
+      "business_keywords": [
+        "드라이 스트립",
+        "베벨 에치",
+        "하드마스크",
+        "수주",
+        "반도체 장비"
+      ]
+    },
+    {
+      "rank": 222,
+      "canonical_name": "로보티즈",
+      "ticker": "108490",
+      "market": "KOSDAQ",
+      "group": "로보티즈",
+      "sector": [
+        "로봇"
+      ],
+      "aliases": [
+        "로보티즈",
+        "108490",
+        "ROBOTIS"
+      ],
+      "business_keywords": [
+        "액추에이터",
+        "자율주행 로봇",
+        "휴머노이드",
+        "로봇 부품",
+        "LG전자"
+      ]
+    },
+    {
+      "rank": 223,
+      "canonical_name": "ISC",
+      "ticker": "095340",
+      "market": "KOSDAQ",
+      "group": "SKC",
+      "sector": [
+        "반도체부품"
+      ],
+      "aliases": [
+        "ISC",
+        "095340",
+        "아이에스씨"
+      ],
+      "business_keywords": [
+        "테스트 소켓",
+        "러버 소켓",
+        "번인 소켓",
+        "수출",
+        "HBM"
+      ]
+    },
+    {
+      "rank": 224,
+      "canonical_name": "티에스이",
+      "ticker": "131290",
+      "market": "KOSDAQ",
+      "group": "티에스이",
+      "sector": [
+        "반도체부품"
+      ],
+      "aliases": [
+        "티에스이",
+        "131290",
+        "TSE Co"
+      ],
+      "business_keywords": [
+        "프로브카드",
+        "테스트 소켓",
+        "인터페이스 보드",
+        "HBM",
+        "수주"
+      ]
+    },
+    {
+      "rank": 225,
+      "canonical_name": "에이비엘바이오",
+      "ticker": "298380",
+      "market": "KOSDAQ",
+      "group": "에이비엘바이오",
+      "sector": [
+        "바이오"
+      ],
+      "aliases": [
+        "에이비엘바이오",
+        "298380",
+        "ABL Bio"
+      ],
+      "business_keywords": [
+        "그랩바디",
+        "이중항체",
+        "GSK",
+        "기술수출",
+        "임상",
+        "뇌혈관장벽"
+      ]
+    },
+    {
+      "rank": 226,
+      "canonical_name": "리가켐바이오",
+      "ticker": "141080",
+      "market": "KOSDAQ",
+      "group": "오리온",
+      "sector": [
+        "바이오"
+      ],
+      "aliases": [
+        "리가켐바이오",
+        "141080",
+        "레고켐바이오",
+        "LigaChem Biosciences"
+      ],
+      "business_keywords": [
+        "ADC",
+        "기술수출",
+        "임상",
+        "마일스톤",
+        "항암"
+      ]
+    },
+    {
+      "rank": 227,
+      "canonical_name": "보로노이",
+      "ticker": "310210",
+      "market": "KOSDAQ",
+      "group": "보로노이",
+      "sector": [
+        "바이오"
+      ],
+      "aliases": [
+        "보로노이",
+        "310210",
+        "Voronoi"
+      ],
+      "business_keywords": [
+        "표적 항암",
+        "기술수출",
+        "임상",
+        "비소세포폐암",
+        "마일스톤"
+      ]
+    },
+    {
+      "rank": 228,
+      "canonical_name": "유진테크",
+      "ticker": "084370",
+      "market": "KOSDAQ",
+      "group": "유진테크",
+      "sector": [
+        "반도체장비"
+      ],
+      "aliases": [
+        "유진테크",
+        "084370",
+        "Eugene Technology"
+      ],
+      "business_keywords": [
+        "LPCVD",
+        "증착 장비",
+        "반도체 장비",
+        "수주",
+        "삼성전자"
+      ]
+    },
+    {
+      "rank": 229,
+      "canonical_name": "파마리서치",
+      "ticker": "214450",
+      "market": "KOSDAQ",
+      "group": "파마리서치",
+      "sector": [
+        "의료미용",
+        "제약"
+      ],
+      "aliases": [
+        "파마리서치",
+        "214450",
+        "Pharma Research"
+      ],
+      "business_keywords": [
+        "리쥬란",
+        "스킨부스터",
+        "콘쥬란",
+        "수출",
+        "의료기기",
+        "보툴리눔"
+      ]
+    },
+    {
+      "rank": 230,
+      "canonical_name": "펩트론",
+      "ticker": "087010",
+      "market": "KOSDAQ",
+      "group": "펩트론",
+      "sector": [
+        "바이오"
+      ],
+      "aliases": [
+        "펩트론",
+        "087010",
+        "Peptron"
+      ],
+      "business_keywords": [
+        "스마트데포",
+        "서방형",
+        "일라이릴리",
+        "비만 치료제",
+        "기술수출"
+      ]
+    },
+    {
+      "rank": 231,
+      "canonical_name": "하나마이크론",
+      "ticker": "067310",
+      "market": "KOSDAQ",
+      "group": "하나마이크론",
+      "sector": [
+        "반도체후공정"
+      ],
+      "aliases": [
+        "하나마이크론",
+        "067310",
+        "Hana Micron"
+      ],
+      "business_keywords": [
+        "OSAT",
+        "패키징",
+        "테스트",
+        "베트남",
+        "브라질",
+        "HBM"
+      ]
+    },
+    {
+      "rank": 232,
+      "canonical_name": "파두",
+      "ticker": "440110",
+      "market": "KOSDAQ",
+      "group": "파두",
+      "sector": [
+        "반도체"
+      ],
+      "aliases": [
+        "파두",
+        "440110",
+        "FADU"
+      ],
+      "business_keywords": [
+        "SSD 컨트롤러",
+        "데이터센터",
+        "eSSD",
+        "적자",
+        "수주"
+      ]
+    },
+    {
+      "rank": 233,
+      "canonical_name": "티씨케이",
+      "ticker": "064760",
+      "market": "KOSDAQ",
+      "group": "티씨케이",
+      "sector": [
+        "반도체소재"
+      ],
+      "aliases": [
+        "티씨케이",
+        "064760",
+        "TCK Co"
+      ],
+      "business_keywords": [
+        "SiC 링",
+        "실리콘카바이드",
+        "에치 소재",
+        "가동률",
+        "배당"
+      ]
+    },
+    {
+      "rank": 234,
+      "canonical_name": "올릭스",
+      "ticker": "226950",
+      "market": "KOSDAQ",
+      "group": "올릭스",
+      "sector": [
+        "바이오"
+      ],
+      "aliases": [
+        "올릭스",
+        "226950",
+        "OliX Pharmaceuticals"
+      ],
+      "business_keywords": [
+        "RNAi",
+        "siRNA",
+        "기술수출",
+        "임상",
+        "비만",
+        "탈모"
+      ]
+    },
+    {
+      "rank": 235,
+      "canonical_name": "솔브레인",
+      "ticker": "357780",
+      "market": "KOSDAQ",
+      "group": "솔브레인",
+      "sector": [
+        "반도체소재"
+      ],
+      "aliases": [
+        "솔브레인",
+        "357780",
+        "Soulbrain"
+      ],
+      "business_keywords": [
+        "식각액",
+        "전해액",
+        "반도체 소재",
+        "2차전지 소재",
+        "가동률"
+      ]
+    },
+    {
+      "rank": 236,
+      "canonical_name": "휴젤",
+      "ticker": "145020",
+      "market": "KOSDAQ",
+      "group": "휴젤",
+      "sector": [
+        "의료미용"
+      ],
+      "aliases": [
+        "휴젤",
+        "145020",
+        "Hugel"
+      ],
+      "business_keywords": [
+        "보툴렉스",
+        "보툴리눔 톡신",
+        "필러",
+        "FDA",
+        "수출",
+        "중국"
+      ]
+    },
+    {
+      "rank": 237,
+      "canonical_name": "제주반도체",
+      "ticker": "080220",
+      "market": "KOSDAQ",
+      "group": "제주반도체",
+      "sector": [
+        "반도체"
+      ],
+      "aliases": [
+        "제주반도체",
+        "080220",
+        "Jeju Semiconductor"
+      ],
+      "business_keywords": [
+        "저전력 메모리",
+        "LPDDR",
+        "니치 메모리",
+        "통신용 반도체",
+        "수출"
+      ]
+    },
+    {
+      "rank": 238,
+      "canonical_name": "펄어비스",
+      "ticker": "263750",
+      "market": "KOSDAQ",
+      "group": "펄어비스",
+      "sector": [
+        "게임"
+      ],
+      "aliases": [
+        "펄어비스",
+        "263750",
+        "Pearl Abyss"
+      ],
+      "business_keywords": [
+        "검은사막",
+        "붉은사막",
+        "신작",
+        "트래픽",
+        "적자"
+      ]
+    },
+    {
+      "rank": 239,
+      "canonical_name": "서진시스템",
+      "ticker": "178320",
+      "market": "KOSDAQ",
+      "group": "서진시스템",
+      "sector": [
+        "전자부품",
+        "ESS"
+      ],
+      "aliases": [
+        "서진시스템",
+        "178320",
+        "Seojin System"
+      ],
+      "business_keywords": [
+        "ESS 함체",
+        "통신 장비",
+        "베트남",
+        "수주",
+        "전기차 부품"
+      ]
+    },
+    {
+      "rank": 240,
+      "canonical_name": "실리콘투",
+      "ticker": "257720",
+      "market": "KOSDAQ",
+      "group": "실리콘투",
+      "sector": [
+        "화장품유통"
+      ],
+      "aliases": [
+        "실리콘투",
+        "257720",
+        "Silicon2"
+      ],
+      "business_keywords": [
+        "스타일코리안",
+        "K뷰티 수출",
+        "미국 매출",
+        "역직구",
+        "물류"
+      ]
+    },
+    {
+      "rank": 241,
+      "canonical_name": "동진쎄미켐",
+      "ticker": "005290",
+      "market": "KOSDAQ",
+      "group": "동진쎄미켐",
+      "sector": [
+        "반도체소재"
+      ],
+      "aliases": [
+        "동진쎄미켐",
+        "005290",
+        "Dongjin Semichem"
+      ],
+      "business_keywords": [
+        "포토레지스트",
+        "EUV PR",
+        "발포제",
+        "반도체 소재",
+        "국산화"
+      ]
+    },
+    {
+      "rank": 242,
+      "canonical_name": "고영",
+      "ticker": "098460",
+      "market": "KOSDAQ",
+      "group": "고영",
+      "sector": [
+        "검사장비"
+      ],
+      "aliases": [
+        "고영",
+        "098460",
+        "Koh Young Technology"
+      ],
+      "business_keywords": [
+        "3D 검사 장비",
+        "SPI",
+        "AOI",
+        "의료 로봇",
+        "수주"
+      ]
+    },
+    {
+      "rank": 243,
+      "canonical_name": "두산테스나",
+      "ticker": "131970",
+      "market": "KOSDAQ",
+      "group": "두산",
+      "sector": [
+        "반도체테스트"
+      ],
+      "aliases": [
+        "두산테스나",
+        "131970",
+        "테스나",
+        "Doosan Tesna"
+      ],
+      "business_keywords": [
+        "웨이퍼 테스트",
+        "OSAT",
+        "비메모리",
+        "가동률",
+        "CIS"
+      ]
+    },
+    {
+      "rank": 244,
+      "canonical_name": "케어젠",
+      "ticker": "214370",
+      "market": "KOSDAQ",
+      "group": "케어젠",
+      "sector": [
+        "바이오",
+        "건강기능식품"
+      ],
+      "aliases": [
+        "케어젠",
+        "214370",
+        "Caregen"
+      ],
+      "business_keywords": [
+        "펩타이드",
+        "건강기능식품",
+        "수출",
+        "혈당",
+        "임상"
+      ]
+    },
+    {
+      "rank": 245,
+      "canonical_name": "에스엠",
+      "ticker": "041510",
+      "market": "KOSDAQ",
+      "group": "카카오",
+      "sector": [
+        "엔터테인먼트"
+      ],
+      "aliases": [
+        "에스엠",
+        "041510",
+        "SM엔터테인먼트",
+        "SM Entertainment",
+        "에스엠엔터"
+      ],
+      "business_keywords": [
+        "아이돌",
+        "앨범",
+        "콘서트",
+        "신인 그룹",
+        "일본",
+        "플랫폼"
+      ]
+    },
+    {
+      "rank": 246,
+      "canonical_name": "디앤디파마텍",
+      "ticker": "347850",
+      "market": "KOSDAQ",
+      "group": "디앤디파마텍",
+      "sector": [
+        "바이오"
+      ],
+      "aliases": [
+        "디앤디파마텍",
+        "347850",
+        "D&D Pharmatech"
+      ],
+      "business_keywords": [
+        "경구용 비만 치료제",
+        "GLP-1",
+        "기술수출",
+        "임상",
+        "멧세라"
+      ]
+    },
+    {
+      "rank": 247,
+      "canonical_name": "에스티팜",
+      "ticker": "237690",
+      "market": "KOSDAQ",
+      "group": "동아쏘시오",
+      "sector": [
+        "바이오",
+        "CDMO"
+      ],
+      "aliases": [
+        "에스티팜",
+        "237690",
+        "ST Pharm"
+      ],
+      "business_keywords": [
+        "올리고뉴클레오타이드",
+        "CDMO",
+        "원료의약품",
+        "수주",
+        "mRNA"
+      ]
+    },
+    {
+      "rank": 248,
+      "canonical_name": "클래시스",
+      "ticker": "214150",
+      "market": "KOSDAQ",
+      "group": "클래시스",
+      "sector": [
+        "의료미용기기"
+      ],
+      "aliases": [
+        "클래시스",
+        "214150",
+        "Classys"
+      ],
+      "business_keywords": [
+        "슈링크",
+        "볼뉴머",
+        "HIFU",
+        "수출",
+        "소모품",
+        "장비"
+      ]
+    },
+    {
+      "rank": 249,
+      "canonical_name": "원익홀딩스",
+      "ticker": "030530",
+      "market": "KOSDAQ",
+      "group": "원익",
+      "sector": [
+        "반도체장비",
+        "지주"
+      ],
+      "aliases": [
+        "원익홀딩스",
+        "030530",
+        "Wonik Holdings"
+      ],
+      "business_keywords": [
+        "가스 장비",
+        "지주사",
+        "반도체 장비",
+        "자회사"
+      ]
+    },
+    {
+      "rank": 250,
+      "canonical_name": "파크시스템스",
+      "ticker": "140860",
+      "market": "KOSDAQ",
+      "group": "파크시스템스",
+      "sector": [
+        "계측장비"
+      ],
+      "aliases": [
+        "파크시스템스",
+        "140860",
+        "Park Systems"
+      ],
+      "business_keywords": [
+        "원자현미경",
+        "AFM",
+        "반도체 계측",
+        "수주",
+        "수출"
+      ]
+    },
+    {
+      "rank": 251,
+      "canonical_name": "셀트리온제약",
+      "ticker": "068760",
+      "market": "KOSDAQ",
+      "group": "셀트리온그룹",
+      "sector": [
+        "제약"
+      ],
+      "aliases": [
+        "셀트리온제약",
+        "068760",
+        "Celltrion Pharm"
+      ],
+      "business_keywords": [
+        "램시마",
+        "유플라이마",
+        "케미컬 의약품",
+        "고덱스",
+        "합병"
+      ]
+    },
+    {
+      "rank": 252,
+      "canonical_name": "엘앤씨바이오",
+      "ticker": "290650",
+      "market": "KOSDAQ",
+      "group": "엘앤씨바이오",
+      "sector": [
+        "바이오",
+        "의료기기"
+      ],
+      "aliases": [
+        "엘앤씨바이오",
+        "290650",
+        "L&C Bio"
+      ],
+      "business_keywords": [
+        "메가덤",
+        "인체조직",
+        "중국",
+        "메가카티",
+        "수출"
+      ]
+    },
+    {
+      "rank": 253,
+      "canonical_name": "씨젠",
+      "ticker": "096530",
+      "market": "KOSDAQ",
+      "group": "씨젠",
+      "sector": [
+        "진단"
+      ],
+      "aliases": [
+        "씨젠",
+        "096530",
+        "Seegene"
+      ],
+      "business_keywords": [
+        "분자진단",
+        "PCR",
+        "호흡기 진단",
+        "수출",
+        "적자"
+      ]
+    },
+    {
+      "rank": 254,
+      "canonical_name": "LS마린솔루션",
+      "ticker": "060370",
+      "market": "KOSDAQ",
+      "group": "LS",
+      "sector": [
+        "해저케이블"
+      ],
+      "aliases": [
+        "LS마린솔루션",
+        "060370",
+        "KT서브마린"
+      ],
+      "business_keywords": [
+        "해저케이블 시공",
+        "해상풍력",
+        "수주",
+        "LS전선"
+      ]
+    },
+    {
+      "rank": 255,
+      "canonical_name": "대주전자재료",
+      "ticker": "078600",
+      "market": "KOSDAQ",
+      "group": "대주전자재료",
+      "sector": [
+        "전자소재"
+      ],
+      "aliases": [
+        "대주전자재료",
+        "078600",
+        "Daejoo Electronic Materials"
+      ],
+      "business_keywords": [
+        "실리콘 음극재",
+        "도전재",
+        "MLCC 소재",
+        "수주",
+        "증설"
+      ]
+    },
+    {
+      "rank": 256,
+      "canonical_name": "테크윙",
+      "ticker": "089030",
+      "market": "KOSDAQ",
+      "group": "테크윙",
+      "sector": [
+        "반도체장비"
+      ],
+      "aliases": [
+        "테크윙",
+        "089030",
+        "Techwing"
+      ],
+      "business_keywords": [
+        "핸들러",
+        "큐브프로버",
+        "HBM 테스트",
+        "수주",
+        "적자"
+      ]
+    },
+    {
+      "rank": 257,
+      "canonical_name": "오스코텍",
+      "ticker": "039200",
+      "market": "KOSDAQ",
+      "group": "오스코텍",
+      "sector": [
+        "바이오"
+      ],
+      "aliases": [
+        "오스코텍",
+        "039200",
+        "Oscotec"
+      ],
+      "business_keywords": [
+        "레이저티닙",
+        "유한양행",
+        "세비도플레닙",
+        "로열티",
+        "임상"
+      ]
+    },
+    {
+      "rank": 258,
+      "canonical_name": "SFA반도체",
+      "ticker": "036540",
+      "market": "KOSDAQ",
+      "group": "SFA",
+      "sector": [
+        "반도체후공정"
+      ],
+      "aliases": [
+        "SFA반도체",
+        "036540",
+        "에스에프에이반도체",
+        "SFA Semicon"
+      ],
+      "business_keywords": [
+        "OSAT",
+        "패키징",
+        "테스트",
+        "메모리",
+        "필리핀"
+      ]
+    },
+    {
+      "rank": 259,
+      "canonical_name": "비에이치아이",
+      "ticker": "083650",
+      "market": "KOSDAQ",
+      "group": "비에이치아이",
+      "sector": [
+        "발전설비"
+      ],
+      "aliases": [
+        "비에이치아이",
+        "083650",
+        "BHI Co"
+      ],
+      "business_keywords": [
+        "HRSG",
+        "복합화력",
+        "원전 기자재",
+        "수주",
+        "수주잔고"
+      ]
+    },
+    {
+      "rank": 260,
+      "canonical_name": "코오롱티슈진",
+      "ticker": "950160",
+      "market": "KOSDAQ",
+      "group": "코오롱",
+      "sector": [
+        "바이오"
+      ],
+      "aliases": [
+        "코오롱티슈진",
+        "950160",
+        "티슈진",
+        "TissueGene"
+      ],
+      "business_keywords": [
+        "인보사",
+        "TG-C",
+        "임상 3상",
+        "FDA",
+        "골관절염"
+      ]
+    },
+    {
+      "rank": 261,
+      "canonical_name": "JYP Ent.",
+      "ticker": "035900",
+      "market": "KOSDAQ",
+      "group": "JYP",
+      "sector": [
+        "엔터테인먼트"
+      ],
+      "aliases": [
+        "JYP Ent.",
+        "035900",
+        "JYP",
+        "JYP엔터테인먼트",
+        "제이와이피"
+      ],
+      "business_keywords": [
+        "아이돌",
+        "앨범",
+        "콘서트",
+        "스트레이키즈",
+        "트와이스",
+        "일본"
+      ]
+    },
+    {
+      "rank": 262,
+      "canonical_name": "기가비스",
+      "ticker": "420770",
+      "market": "KOSDAQ",
+      "group": "기가비스",
+      "sector": [
+        "검사장비"
+      ],
+      "aliases": [
+        "기가비스",
+        "420770",
+        "Gigavis"
+      ],
+      "business_keywords": [
+        "AOI",
+        "패키지기판 검사",
+        "FC-BGA",
+        "수주",
+        "수출"
+      ]
+    },
+    {
+      "rank": 263,
+      "canonical_name": "하림지주",
+      "ticker": "003380",
+      "market": "KOSDAQ",
+      "group": "하림",
+      "sector": [
+        "지주",
+        "식품"
+      ],
+      "aliases": [
+        "하림지주",
+        "003380",
+        "Harim Holdings"
+      ],
+      "business_keywords": [
+        "지주사",
+        "양계",
+        "사료",
+        "팬오션",
+        "식품"
+      ]
+    },
+    {
+      "rank": 264,
+      "canonical_name": "카카오게임즈",
+      "ticker": "293490",
+      "market": "KOSDAQ",
+      "group": "카카오",
+      "sector": [
+        "게임"
+      ],
+      "aliases": [
+        "카카오게임즈",
+        "293490",
+        "카겜",
+        "Kakao Games"
+      ],
+      "business_keywords": [
+        "오딘",
+        "아키에이지",
+        "신작",
+        "모바일 게임",
+        "적자",
+        "매각"
+      ]
+    },
+    {
+      "rank": 265,
+      "canonical_name": "코미코",
+      "ticker": "183300",
+      "market": "KOSDAQ",
+      "group": "코미코",
+      "sector": [
+        "반도체부품"
+      ],
+      "aliases": [
+        "코미코",
+        "183300",
+        "KoMiCo"
+      ],
+      "business_keywords": [
+        "세라믹 코팅",
+        "부품 세정",
+        "반도체 소모품",
+        "미국 공장",
+        "가동률"
+      ]
+    },
+    {
+      "rank": 266,
+      "canonical_name": "RFHIC",
+      "ticker": "218410",
+      "market": "KOSDAQ",
+      "group": "RFHIC",
+      "sector": [
+        "통신부품",
+        "방산"
+      ],
+      "aliases": [
+        "RFHIC",
+        "218410",
+        "알에프에이치아이씨"
+      ],
+      "business_keywords": [
+        "GaN 트랜지스터",
+        "질화갈륨",
+        "방산",
+        "통신 장비",
+        "수주"
+      ]
+    },
+    {
+      "rank": 267,
+      "canonical_name": "코스메카코리아",
+      "ticker": "241710",
+      "market": "KOSDAQ",
+      "group": "코스메카코리아",
+      "sector": [
+        "화장품ODM"
+      ],
+      "aliases": [
+        "코스메카코리아",
+        "241710",
+        "Cosmecca Korea"
+      ],
+      "business_keywords": [
+        "ODM",
+        "잉글우드랩",
+        "미국",
+        "선케어",
+        "인디 브랜드"
+      ]
+    },
+    {
+      "rank": 268,
+      "canonical_name": "동국제약",
+      "ticker": "086450",
+      "market": "KOSDAQ",
+      "group": "동국제약",
+      "sector": [
+        "제약"
+      ],
+      "aliases": [
+        "동국제약",
+        "086450",
+        "Dongkook Pharmaceutical"
+      ],
+      "business_keywords": [
+        "인사돌",
+        "마데카솔",
+        "센텔리안24",
+        "더마 화장품",
+        "전문의약품"
+      ]
+    },
+    {
+      "rank": 269,
+      "canonical_name": "하나머티리얼즈",
+      "ticker": "166090",
+      "market": "KOSDAQ",
+      "group": "하나마이크론",
+      "sector": [
+        "반도체소재"
+      ],
+      "aliases": [
+        "하나머티리얼즈",
+        "166090",
+        "Hana Materials"
+      ],
+      "business_keywords": [
+        "실리콘 전극",
+        "링",
+        "에치 부품",
+        "가동률",
+        "수출"
+      ]
+    },
+    {
+      "rank": 270,
+      "canonical_name": "HK이노엔",
+      "ticker": "195940",
+      "market": "KOSDAQ",
+      "group": "한국콜마",
+      "sector": [
+        "제약"
+      ],
+      "aliases": [
+        "HK이노엔",
+        "195940",
+        "에이치케이이노엔",
+        "HK inno.N"
+      ],
+      "business_keywords": [
+        "케이캡",
+        "P-CAB",
+        "수출",
+        "중국",
+        "백신 유통",
+        "컨디션"
+      ]
+    },
+    {
+      "rank": 271,
+      "canonical_name": "SFA",
+      "ticker": "056190",
+      "market": "KOSDAQ",
+      "group": "SFA",
+      "sector": [
+        "자동화장비"
+      ],
+      "aliases": [
+        "SFA",
+        "056190",
+        "에스에프에이",
+        "SFA Engineering"
+      ],
+      "business_keywords": [
+        "스마트팩토리",
+        "물류 자동화",
+        "디스플레이 장비",
+        "2차전지 장비",
+        "수주"
+      ]
+    },
+    {
+      "rank": 272,
+      "canonical_name": "CJ ENM",
+      "ticker": "035760",
+      "market": "KOSDAQ",
+      "group": "CJ",
+      "sector": [
+        "미디어",
+        "콘텐츠"
+      ],
+      "aliases": [
+        "CJ ENM",
+        "035760",
+        "씨제이이엔엠",
+        "CJENM",
+        "CJ E&M"
+      ],
+      "business_keywords": [
+        "드라마",
+        "티빙",
+        "광고",
+        "음악",
+        "영화",
+        "피프스시즌"
+      ]
+    },
+    {
+      "rank": 273,
+      "canonical_name": "LS머트리얼즈",
+      "ticker": "417200",
+      "market": "KOSDAQ",
+      "group": "LS",
+      "sector": [
+        "부품",
+        "소재"
+      ],
+      "aliases": [
+        "LS머트리얼즈",
+        "417200",
+        "LS Materials"
+      ],
+      "business_keywords": [
+        "울트라커패시터",
+        "알루미늄 부품",
+        "전기차",
+        "ESS",
+        "수주"
+      ]
+    },
+    {
+      "rank": 274,
+      "canonical_name": "펌텍코리아",
+      "ticker": "251970",
+      "market": "KOSDAQ",
+      "group": "펌텍코리아",
+      "sector": [
+        "화장품용기"
+      ],
+      "aliases": [
+        "펌텍코리아",
+        "251970",
+        "Pum-Tech Korea"
+      ],
+      "business_keywords": [
+        "화장품 용기",
+        "펌프",
+        "수출",
+        "인디 브랜드",
+        "가동률"
+      ]
+    },
+    {
+      "rank": 275,
+      "canonical_name": "안랩",
+      "ticker": "053800",
+      "market": "KOSDAQ",
+      "group": "안랩",
+      "sector": [
+        "보안"
+      ],
+      "aliases": [
+        "안랩",
+        "053800",
+        "AhnLab"
+      ],
+      "business_keywords": [
+        "정보보안",
+        "백신",
+        "클라우드 보안",
+        "수주",
+        "관제"
+      ]
+    },
+    {
+      "rank": 276,
+      "canonical_name": "루닛",
+      "ticker": "328130",
+      "market": "KOSDAQ",
+      "group": "루닛",
+      "sector": [
+        "의료AI"
+      ],
+      "aliases": [
+        "루닛",
+        "328130",
+        "Lunit"
+      ],
+      "business_keywords": [
+        "인사이트",
+        "AI 영상 판독",
+        "스코프",
+        "볼파라",
+        "적자",
+        "FDA"
+      ]
+    },
+    {
+      "rank": 277,
+      "canonical_name": "신성델타테크",
+      "ticker": "065350",
+      "market": "KOSDAQ",
+      "group": "신성",
+      "sector": [
+        "부품",
+        "2차전지"
+      ],
+      "aliases": [
+        "신성델타테크",
+        "065350",
+        "Shinsung Delta Tech"
+      ],
+      "business_keywords": [
+        "세탁기 부품",
+        "2차전지 부품",
+        "초전도체",
+        "자회사",
+        "수주"
+      ]
+    },
+    {
+      "rank": 278,
+      "canonical_name": "에스앤에스텍",
+      "ticker": "101490",
+      "market": "KOSDAQ",
+      "group": "에스앤에스텍",
+      "sector": [
+        "반도체소재"
+      ],
+      "aliases": [
+        "에스앤에스텍",
+        "101490",
+        "S&S Tech"
+      ],
+      "business_keywords": [
+        "블랭크마스크",
+        "EUV 블랭크마스크",
+        "펠리클",
+        "국산화",
+        "증설"
+      ]
+    },
+    {
+      "rank": 279,
+      "canonical_name": "케이엠더블유",
+      "ticker": "032500",
+      "market": "KOSDAQ",
+      "group": "케이엠더블유",
+      "sector": [
+        "통신장비"
+      ],
+      "aliases": [
+        "케이엠더블유",
+        "032500",
+        "KMW Inc"
+      ],
+      "business_keywords": [
+        "기지국 장비",
+        "MMR",
+        "5G",
+        "적자",
+        "수주"
+      ]
+    },
+    {
+      "rank": 280,
+      "canonical_name": "와이지엔터테인먼트",
+      "ticker": "122870",
+      "market": "KOSDAQ",
+      "group": "YG",
+      "sector": [
+        "엔터테인먼트"
+      ],
+      "aliases": [
+        "와이지엔터테인먼트",
+        "122870",
+        "YG엔터테인먼트",
+        "와이지엔터",
+        "YG Entertainment"
+      ],
+      "business_keywords": [
+        "블랙핑크",
+        "베이비몬스터",
+        "앨범",
+        "콘서트",
+        "아이돌"
+      ]
+    },
+    {
+      "rank": 281,
+      "canonical_name": "솔브레인홀딩스",
+      "ticker": "036830",
+      "market": "KOSDAQ",
+      "group": "솔브레인",
+      "sector": [
+        "지주",
+        "소재"
+      ],
+      "aliases": [
+        "솔브레인홀딩스",
+        "036830",
+        "Soulbrain Holdings"
+      ],
+      "business_keywords": [
+        "지주사",
+        "반도체 소재",
+        "배당",
+        "자회사"
+      ]
+    },
+    {
+      "rank": 282,
+      "canonical_name": "스튜디오드래곤",
+      "ticker": "253450",
+      "market": "KOSDAQ",
+      "group": "CJ",
+      "sector": [
+        "콘텐츠"
+      ],
+      "aliases": [
+        "스튜디오드래곤",
+        "253450",
+        "Studio Dragon"
+      ],
+      "business_keywords": [
+        "드라마",
+        "넷플릭스",
+        "티빙",
+        "제작 편수",
+        "IP"
+      ]
+    },
+    {
+      "rank": 283,
+      "canonical_name": "원익QnC",
+      "ticker": "074600",
+      "market": "KOSDAQ",
+      "group": "원익",
+      "sector": [
+        "반도체소재"
+      ],
+      "aliases": [
+        "원익QnC",
+        "074600",
+        "원익큐엔씨",
+        "Wonik QnC"
+      ],
+      "business_keywords": [
+        "쿼츠",
+        "세정",
+        "램프",
+        "모멘티브",
+        "가동률"
+      ]
+    },
+    {
+      "rank": 284,
+      "canonical_name": "나노신소재",
+      "ticker": "121600",
+      "market": "KOSDAQ",
+      "group": "나노신소재",
+      "sector": [
+        "소재"
+      ],
+      "aliases": [
+        "나노신소재",
+        "121600",
+        "Nano Materials"
+      ],
+      "business_keywords": [
+        "CNT 도전재",
+        "타겟",
+        "실리카",
+        "2차전지 소재",
+        "증설"
+      ]
+    },
+    {
+      "rank": 285,
+      "canonical_name": "덕산네오룩스",
+      "ticker": "213420",
+      "market": "KOSDAQ",
+      "group": "덕산",
+      "sector": [
+        "디스플레이소재"
+      ],
+      "aliases": [
+        "덕산네오룩스",
+        "213420",
+        "Duksan Neolux"
+      ],
+      "business_keywords": [
+        "OLED 소재",
+        "HTL",
+        "레드 호스트",
+        "아이폰",
+        "가동률"
+      ]
+    },
+    {
+      "rank": 286,
+      "canonical_name": "넥슨게임즈",
+      "ticker": "225570",
+      "market": "KOSDAQ",
+      "group": "넥슨",
+      "sector": [
+        "게임"
+      ],
+      "aliases": [
+        "넥슨게임즈",
+        "225570",
+        "Nexon Games"
+      ],
+      "business_keywords": [
+        "블루아카이브",
+        "퍼스트 디센던트",
+        "신작",
+        "트래픽",
+        "넥슨"
+      ]
+    },
+    {
+      "rank": 287,
+      "canonical_name": "인텔리안테크",
+      "ticker": "189300",
+      "market": "KOSDAQ",
+      "group": "인텔리안테크",
+      "sector": [
+        "위성통신"
+      ],
+      "aliases": [
+        "인텔리안테크",
+        "189300",
+        "인텔리안테크놀로지스",
+        "Intellian Technologies"
+      ],
+      "business_keywords": [
+        "위성 안테나",
+        "저궤도 위성",
+        "원웹",
+        "수주",
+        "평판 안테나"
+      ]
+    },
+    {
+      "rank": 288,
+      "canonical_name": "메디톡스",
+      "ticker": "086900",
+      "market": "KOSDAQ",
+      "group": "메디톡스",
+      "sector": [
+        "바이오",
+        "의료미용"
+      ],
+      "aliases": [
+        "메디톡스",
+        "086900",
+        "Medytox"
+      ],
+      "business_keywords": [
+        "메디톡신",
+        "보툴리눔 톡신",
+        "소송",
+        "수출",
+        "뉴럭스"
+      ]
+    },
+    {
+      "rank": 289,
+      "canonical_name": "서울반도체",
+      "ticker": "046890",
+      "market": "KOSDAQ",
+      "group": "서울반도체",
+      "sector": [
+        "LED"
+      ],
+      "aliases": [
+        "서울반도체",
+        "046890",
+        "Seoul Semiconductor"
+      ],
+      "business_keywords": [
+        "LED",
+        "와이캅",
+        "마이크로 LED",
+        "특허 소송",
+        "자동차 조명"
+      ]
+    },
+    {
+      "rank": 290,
+      "canonical_name": "디어유",
+      "ticker": "376300",
+      "market": "KOSDAQ",
+      "group": "카카오",
+      "sector": [
+        "플랫폼"
+      ],
+      "aliases": [
+        "디어유",
+        "376300",
+        "DearU"
+      ],
+      "business_keywords": [
+        "버블",
+        "구독자",
+        "아티스트",
+        "일본",
+        "플랫폼"
+      ]
+    },
+    {
+      "rank": 291,
+      "canonical_name": "위메이드",
+      "ticker": "112040",
+      "market": "KOSDAQ",
+      "group": "위메이드",
+      "sector": [
+        "게임"
+      ],
+      "aliases": [
+        "위메이드",
+        "112040",
+        "Wemade"
+      ],
+      "business_keywords": [
+        "미르",
+        "위믹스",
+        "블록체인",
+        "나이트크로우",
+        "적자"
+      ]
+    },
+    {
+      "rank": 292,
+      "canonical_name": "SOOP",
+      "ticker": "067160",
+      "market": "KOSDAQ",
+      "group": "SOOP",
+      "sector": [
+        "플랫폼"
+      ],
+      "aliases": [
+        "SOOP",
+        "067160",
+        "아프리카TV"
+      ],
+      "business_keywords": [
+        "스트리밍",
+        "별풍선",
+        "광고",
+        "트래픽",
+        "글로벌 플랫폼"
+      ]
+    },
+    {
+      "rank": 293,
+      "canonical_name": "메가스터디교육",
+      "ticker": "215200",
+      "market": "KOSDAQ",
+      "group": "메가스터디",
+      "sector": [
+        "교육"
+      ],
+      "aliases": [
+        "메가스터디교육",
+        "215200",
+        "Megastudyedu"
+      ],
+      "business_keywords": [
+        "고등 인강",
+        "재수학원",
+        "의대 정원",
+        "수강생",
+        "배당"
+      ]
+    },
+    {
+      "rank": 294,
+      "canonical_name": "에코프로에이치엔",
+      "ticker": "383310",
+      "market": "KOSDAQ",
+      "group": "에코프로",
+      "sector": [
+        "환경"
+      ],
+      "aliases": [
+        "에코프로에이치엔",
+        "383310",
+        "에코프로HN"
+      ],
+      "business_keywords": [
+        "대기오염 방지",
+        "온실가스 감축",
+        "환경 설비",
+        "수주"
+      ]
+    },
+    {
+      "rank": 295,
+      "canonical_name": "아이센스",
+      "ticker": "099190",
+      "market": "KOSDAQ",
+      "group": "아이센스",
+      "sector": [
+        "진단",
+        "의료기기"
+      ],
+      "aliases": [
+        "아이센스",
+        "099190",
+        "i-SENS"
+      ],
+      "business_keywords": [
+        "혈당 측정",
+        "CGM",
+        "케어센스",
+        "수출",
+        "연속혈당"
+      ]
+    },
+    {
+      "rank": 296,
+      "canonical_name": "인바디",
+      "ticker": "041830",
+      "market": "KOSDAQ",
+      "group": "인바디",
+      "sector": [
+        "의료기기"
+      ],
+      "aliases": [
+        "인바디",
+        "041830",
+        "InBody"
+      ],
+      "business_keywords": [
+        "체성분 분석",
+        "수출",
+        "미국",
+        "배당",
+        "가정용"
+      ]
+    },
+    {
+      "rank": 297,
+      "canonical_name": "쎄트렉아이",
+      "ticker": "099320",
+      "market": "KOSDAQ",
+      "group": "한화",
+      "sector": [
+        "우주항공"
+      ],
+      "aliases": [
+        "쎄트렉아이",
+        "099320",
+        "Satrec Initiative"
+      ],
+      "business_keywords": [
+        "위성",
+        "지구관측",
+        "한화에어로스페이스",
+        "수주",
+        "우주"
+      ]
+    },
+    {
+      "rank": 298,
+      "canonical_name": "한국기업평가",
+      "ticker": "034950",
+      "market": "KOSDAQ",
+      "group": "한국기업평가",
+      "sector": [
+        "금융서비스"
+      ],
+      "aliases": [
+        "한국기업평가",
+        "034950",
+        "한기평",
+        "Korea Ratings"
+      ],
+      "business_keywords": [
+        "신용평가",
+        "회사채",
+        "배당",
+        "신용등급"
+      ]
+    },
+    {
+      "rank": 299,
+      "canonical_name": "제룡전기",
+      "ticker": "033100",
+      "market": "KOSDAQ",
+      "group": "제룡전기",
+      "sector": [
+        "전력기기"
+      ],
+      "aliases": [
+        "제룡전기",
+        "033100",
+        "Jeryong Electric"
+      ],
+      "business_keywords": [
+        "변압기",
+        "미국 수출",
+        "전력망",
+        "수주",
+        "배당"
+      ]
     }
   ],
   "ambiguous_companies": {
@@ -795,81 +7117,554 @@
       "삼성생명",
       "삼성물산",
       "삼성SDI",
-      "삼성화재"
+      "삼성화재",
+      "삼성에스디에스",
+      "삼성중공업",
+      "삼성E&A",
+      "삼성증권",
+      "삼성카드",
+      "에스원",
+      "제일기획",
+      "호텔신라",
+      "레인보우로보틱스"
     ],
     "SK": [
       "SK하이닉스",
       "SK스퀘어",
-      "SK"
+      "SK",
+      "SK이노베이션",
+      "SK텔레콤",
+      "SK바이오팜",
+      "SKC",
+      "SK바이오사이언스",
+      "SK가스",
+      "SK이터닉스",
+      "SK아이이테크놀로지",
+      "SK네트웍스"
     ],
     "에스케이": [
       "SK하이닉스",
       "SK스퀘어",
-      "SK"
+      "SK",
+      "SK이노베이션",
+      "SK텔레콤",
+      "SK바이오팜",
+      "SKC",
+      "SK바이오사이언스",
+      "SK가스",
+      "SK이터닉스",
+      "SK아이이테크놀로지",
+      "SK네트웍스"
     ],
     "LG": [
       "LG에너지솔루션",
-      "LG전자"
+      "LG전자",
+      "LG화학",
+      "LG",
+      "LG이노텍",
+      "LG씨엔에스",
+      "LG유플러스",
+      "LG생활건강",
+      "LG디스플레이"
     ],
     "엘지": [
       "LG에너지솔루션",
-      "LG전자"
+      "LG전자",
+      "LG화학",
+      "LG",
+      "LG이노텍",
+      "LG씨엔에스",
+      "LG유플러스",
+      "LG생활건강",
+      "LG디스플레이"
     ],
     "현대": [
       "현대자동차",
+      "기아",
       "현대모비스",
+      "현대글로비스",
+      "현대건설",
+      "현대로템",
+      "현대오토에버",
+      "현대제철",
+      "현대위아",
       "HD현대중공업",
       "HD한국조선해양",
-      "HD현대일렉트릭"
+      "HD현대일렉트릭",
+      "HD현대",
+      "HD현대마린솔루션",
+      "HD건설기계",
+      "HD현대마린엔진",
+      "HD현대에너지솔루션",
+      "현대지에프홀딩스",
+      "현대백화점",
+      "현대해상",
+      "현대엘리베이터"
     ],
     "현대차그룹": [
       "현대자동차",
       "기아",
-      "현대모비스"
+      "현대모비스",
+      "현대글로비스",
+      "현대건설",
+      "현대로템",
+      "현대오토에버",
+      "현대제철",
+      "현대위아"
     ],
     "HD현대": [
       "HD현대중공업",
       "HD한국조선해양",
-      "HD현대일렉트릭"
+      "HD현대일렉트릭",
+      "HD현대",
+      "HD현대마린솔루션",
+      "HD건설기계",
+      "HD현대마린엔진",
+      "HD현대에너지솔루션"
     ],
     "한화": [
       "한화에어로스페이스",
-      "한화오션"
+      "한화오션",
+      "한화시스템",
+      "한화솔루션",
+      "한화",
+      "한화생명",
+      "한화엔진",
+      "한화비전",
+      "쎄트렉아이"
     ],
     "금융주": [
       "KB금융",
       "신한금융지주",
       "하나금융지주",
-      "우리금융지주"
+      "우리금융지주",
+      "메리츠금융지주",
+      "기업은행",
+      "미래에셋증권",
+      "카카오뱅크",
+      "NH투자증권",
+      "한국금융지주",
+      "삼성증권",
+      "키움증권",
+      "삼성카드",
+      "JB금융지주",
+      "BNK금융지주",
+      "iM금융지주",
+      "케이뱅크",
+      "신영증권"
     ],
     "은행주": [
       "KB금융",
       "신한금융지주",
       "하나금융지주",
-      "우리금융지주"
+      "우리금융지주",
+      "기업은행",
+      "카카오뱅크",
+      "JB금융지주",
+      "BNK금융지주",
+      "iM금융지주",
+      "케이뱅크"
     ],
     "보험주": [
       "삼성생명",
-      "삼성화재"
+      "삼성화재",
+      "메리츠금융지주",
+      "DB손해보험",
+      "현대해상",
+      "한화생명",
+      "서울보증보험",
+      "코리안리",
+      "미래에셋생명"
     ],
     "조선주": [
       "HD현대중공업",
       "HD한국조선해양",
-      "한화오션"
+      "한화오션",
+      "삼성중공업",
+      "HD현대마린솔루션",
+      "대한조선",
+      "HJ중공업"
     ],
     "배터리주": [
       "LG에너지솔루션",
-      "삼성SDI"
+      "삼성SDI",
+      "DN오토모티브",
+      "LG에너지솔루션",
+      "삼성SDI",
+      "SK이노베이션",
+      "신성델타테크"
     ],
     "반도체주": [
       "삼성전자",
       "SK하이닉스",
-      "삼성전기"
+      "DB하이텍",
+      "파두",
+      "제주반도체",
+      "SK하이닉스",
+      "DB하이텍"
     ],
     "전력기기주": [
       "LS ELECTRIC",
       "HD현대일렉트릭",
-      "효성중공업"
+      "효성중공업",
+      "산일전기",
+      "일진전기",
+      "제룡전기"
+    ],
+    "롯데": [
+      "롯데에너지머티리얼즈",
+      "롯데쇼핑",
+      "롯데지주",
+      "롯데케미칼",
+      "롯데렌탈",
+      "롯데웰푸드"
+    ],
+    "카카오": [
+      "카카오",
+      "카카오뱅크",
+      "카카오페이",
+      "에스엠",
+      "카카오게임즈",
+      "디어유"
+    ],
+    "두산": [
+      "두산에너빌리티",
+      "두산",
+      "두산밥캣",
+      "두산로보틱스",
+      "두산퓨얼셀",
+      "두산테스나"
+    ],
+    "CJ": [
+      "CJ",
+      "CJ제일제당",
+      "CJ대한통운",
+      "CJ ENM",
+      "스튜디오드래곤"
+    ],
+    "GS": [
+      "GS",
+      "GS건설",
+      "GS리테일"
+    ],
+    "LS": [
+      "LS ELECTRIC",
+      "가온전선",
+      "LS",
+      "LS에코에너지",
+      "LS마린솔루션",
+      "LS머트리얼즈"
+    ],
+    "효성": [
+      "효성중공업",
+      "효성",
+      "효성티앤씨"
+    ],
+    "포스코": [
+      "POSCO홀딩스",
+      "포스코퓨처엠",
+      "포스코인터내셔널",
+      "포스코DX"
+    ],
+    "한진": [
+      "대한항공",
+      "한진칼"
+    ],
+    "신세계": [
+      "신세계",
+      "이마트"
+    ],
+    "에코프로": [
+      "에코프로머티",
+      "에코프로",
+      "에코프로비엠",
+      "에코프로에이치엔"
+    ],
+    "원익": [
+      "원익IPS",
+      "원익홀딩스",
+      "원익QnC"
+    ],
+    "한미": [
+      "한미약품",
+      "한미사이언스"
+    ],
+    "코오롱": [
+      "코오롱인더",
+      "코오롱티슈진"
+    ],
+    "미래에셋": [
+      "미래에셋증권",
+      "미래에셋생명"
+    ],
+    "증권주": [
+      "미래에셋증권",
+      "NH투자증권",
+      "한국금융지주",
+      "삼성증권",
+      "키움증권",
+      "신영증권"
+    ],
+    "2차전지주": [
+      "LG에너지솔루션",
+      "삼성SDI",
+      "SK이노베이션",
+      "신성델타테크",
+      "POSCO홀딩스",
+      "LG화학",
+      "포스코퓨처엠",
+      "엘앤에프",
+      "롯데에너지머티리얼즈",
+      "이수스페셜티케미컬",
+      "에코프로머티",
+      "SK아이이테크놀로지",
+      "코스모신소재",
+      "에코프로",
+      "에코프로비엠"
+    ],
+    "반도체장비주": [
+      "한미반도체",
+      "케이씨텍",
+      "주성엔지니어링",
+      "이오테크닉스",
+      "원익IPS",
+      "HPSP",
+      "피에스케이홀딩스",
+      "피에스케이",
+      "유진테크",
+      "원익홀딩스",
+      "테크윙"
+    ],
+    "반도체소재주": [
+      "케이씨텍",
+      "티씨케이",
+      "솔브레인",
+      "동진쎄미켐",
+      "하나머티리얼즈",
+      "에스앤에스텍",
+      "원익QnC"
+    ],
+    "전선주": [
+      "가온전선",
+      "LS",
+      "대한전선",
+      "일진전기",
+      "LS에코에너지"
+    ],
+    "방산주": [
+      "HD현대중공업",
+      "한화에어로스페이스",
+      "한화오션",
+      "한화시스템",
+      "LIG디펜스앤에어로스페이스",
+      "한국항공우주",
+      "현대로템",
+      "한화",
+      "한화비전",
+      "풍산",
+      "RFHIC"
+    ],
+    "원전주": [
+      "두산에너빌리티",
+      "한전기술"
+    ],
+    "조선기자재주": [
+      "한화엔진",
+      "HD현대마린엔진"
+    ],
+    "자동차주": [
+      "현대자동차",
+      "기아"
+    ],
+    "자동차부품주": [
+      "현대모비스",
+      "한국타이어앤테크놀로지",
+      "한온시스템",
+      "DN오토모티브",
+      "에스엘",
+      "HL만도",
+      "현대위아"
+    ],
+    "바이오주": [
+      "삼성바이오로직스",
+      "셀트리온",
+      "SK바이오팜",
+      "CJ제일제당",
+      "SK바이오사이언스",
+      "한올바이오파마",
+      "녹십자",
+      "알테오젠",
+      "HLB",
+      "에이비엘바이오",
+      "리가켐바이오",
+      "보로노이",
+      "펩트론",
+      "올릭스",
+      "케어젠",
+      "디앤디파마텍",
+      "에스티팜",
+      "엘앤씨바이오",
+      "오스코텍",
+      "코오롱티슈진",
+      "메디톡스"
+    ],
+    "제약주": [
+      "삼성바이오로직스",
+      "셀트리온",
+      "유한양행",
+      "SK바이오팜",
+      "한미약품",
+      "한미사이언스",
+      "한올바이오파마",
+      "녹십자",
+      "대웅제약",
+      "알테오젠",
+      "삼천당제약",
+      "파마리서치",
+      "셀트리온제약",
+      "동국제약",
+      "HK이노엔"
+    ],
+    "화장품주": [
+      "에이피알",
+      "아모레퍼시픽",
+      "LG생활건강",
+      "달바글로벌",
+      "아모레퍼시픽홀딩스",
+      "코스맥스",
+      "한국콜마",
+      "코스메카코리아"
+    ],
+    "게임주": [
+      "크래프톤",
+      "NC",
+      "넷마블",
+      "시프트업",
+      "NHN",
+      "더블유게임즈",
+      "펄어비스",
+      "카카오게임즈",
+      "넥슨게임즈",
+      "위메이드"
+    ],
+    "엔터주": [
+      "하이브",
+      "에스엠",
+      "JYP Ent.",
+      "와이지엔터테인먼트"
+    ],
+    "통신주": [
+      "SK텔레콤",
+      "KT",
+      "LG유플러스"
+    ],
+    "유통주": [
+      "신세계",
+      "롯데쇼핑",
+      "BGF리테일",
+      "이마트",
+      "GS리테일",
+      "현대백화점"
+    ],
+    "식품주": [
+      "KT&G",
+      "삼양식품",
+      "오리온",
+      "동서",
+      "CJ제일제당",
+      "농심",
+      "동원산업",
+      "오리온홀딩스",
+      "오뚜기",
+      "롯데웰푸드",
+      "하림지주"
+    ],
+    "건설주": [
+      "삼성물산",
+      "삼성E&A",
+      "현대건설",
+      "대우건설",
+      "GS건설",
+      "DL이앤씨",
+      "IPARK현대산업개발",
+      "HJ중공업"
+    ],
+    "철강주": [
+      "POSCO홀딩스",
+      "현대제철",
+      "세아베스틸지주"
+    ],
+    "화학주": [
+      "SK이노베이션",
+      "LG화학",
+      "S-Oil",
+      "한화솔루션",
+      "한화",
+      "SKC",
+      "OCI홀딩스",
+      "KCC",
+      "금호석유화학",
+      "한솔케미칼",
+      "이수스페셜티케미컬",
+      "롯데케미칼",
+      "코오롱인더",
+      "후성"
+    ],
+    "지주사": [
+      "SK스퀘어",
+      "삼성물산",
+      "SK",
+      "HD한국조선해양",
+      "POSCO홀딩스",
+      "메리츠금융지주",
+      "LG",
+      "두산",
+      "HD현대",
+      "한국금융지주",
+      "한진칼",
+      "GS",
+      "LS",
+      "한화",
+      "OCI홀딩스",
+      "CJ",
+      "한미사이언스",
+      "한국앤컴퍼니",
+      "롯데지주",
+      "영원무역홀딩스",
+      "현대지에프홀딩스",
+      "미스토홀딩스",
+      "효성",
+      "아모레퍼시픽홀딩스",
+      "동원산업",
+      "다우기술",
+      "오리온홀딩스",
+      "HDC",
+      "세아베스틸지주",
+      "에코프로",
+      "피에스케이홀딩스",
+      "원익홀딩스",
+      "하림지주",
+      "솔브레인홀딩스"
+    ],
+    "로봇주": [
+      "두산로보틱스",
+      "레인보우로보틱스",
+      "로보티즈"
+    ],
+    "태양광주": [
+      "한화솔루션",
+      "OCI홀딩스",
+      "HD현대에너지솔루션"
+    ],
+    "항공주": [
+      "대한항공",
+      "한진칼",
+      "아시아나항공"
+    ],
+    "해운주": [
+      "HMM",
+      "현대글로비스",
+      "팬오션"
     ]
   },
   "stock_intents": {

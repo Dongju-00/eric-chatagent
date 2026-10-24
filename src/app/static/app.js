@@ -9,9 +9,7 @@ const sendBtn = document.getElementById("sendBtn");
 let threadId = null;
 
 // ── 답변 생성 함수 ────────────────────────────
-// 지금은 데모용 규칙 기반 답변입니다.
-// 나중에 실제 모델 API(llama.cpp 서버 등)를 연결하려면
-// 이 함수 내용만 fetch 호출로 바꾸면 됩니다. (아래 주석 예시 참고)
+// 챗봇 API 호출 및 세션 유지
 async function getBotReply(userText) {
   const res = await fetch("/agent/chat", {
     method: "POST",
@@ -94,10 +92,6 @@ function showTyping() {
 
 function scrollToBottom() {
   messagesEl.scrollTop = messagesEl.scrollHeight;
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // ── 전송 흐름 ─────────────────────────────────

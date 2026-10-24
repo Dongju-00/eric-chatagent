@@ -8,17 +8,15 @@ from dotenv import load_dotenv
 from google import genai
 
 from model.store.vector_store import ChromaNewsVectorStore
-from model.rag.baseline import stock_news_chain, build_llm  # 실제 서빙에 쓰는 LLM 재사용
+from model.rag.baseline import build_llm  # 실제 서빙에 쓰는 LLM 재사용
+from model.rag.prompts import build_stock_news_chain
 from model.graph.query_rewrite import rewrite_stock_query
+from model.news.collect import collect_and_index
+from model.paths import DATA_DIR
 
 load_dotenv()
 
-MODEL_DIR = Path(__file__).resolve().parents[1]
-DATA_DIR = MODEL_DIR / "data"
-
 DEFAULT_OUTPUT_PATH = DATA_DIR / "eval" / "eval_results.csv"
-
-stock_news_llm = build_llm("stock_news")
 
 TEST_QUESTIONS = [
     "삼성전자 주가 전망 알려줘",
@@ -123,7 +121,7 @@ def compute_groundedness(answer: str, contexts: list[str]) -> float:
     return grounded / len(candidates)
 
 # 실제 서빙 LLM으로 답변을 생성하고 규칙 기반 지표를 계산.
-def evaluate_generation(question: str, contexts: list[str]) -> dict:
+def evaluate_generation(question: str, contexts: list[str], chain) -> dict:
 
     if not contexts:
         return {
@@ -135,9 +133,7 @@ def evaluate_generation(question: str, contexts: list[str]) -> dict:
         }
 
     context_text = "\n\n".join(contexts)
-    filled = f"참고 뉴스:\n{context_text}\n\n질문: {question}\n답변: "
-    # answer = stock_news_llm.invoke(filled)
-    answer = stock_news_chain.invoke({"context_text": context_text, "question": question})
+    answer = chain.invoke({"context_text": context_text, "question": question})
 
     repetition_ratio = compute_repetition_ratio(answer)
     ngram_repeats = compute_ngram_repetition(answer)
@@ -162,6 +158,8 @@ def evaluate_generation(question: str, contexts: list[str]) -> dict:
 def evaluate_questions(questions=None, output_path=DEFAULT_OUTPUT_PATH):
     questions = questions or TEST_QUESTIONS
     store = ChromaNewsVectorStore()
+    # 체인은 호출 시점에 한 번 조립한다 (모듈 레벨 전역을 쓰지 않는다).
+    chain = build_stock_news_chain(build_llm("stock_news"))
     rows = []
 
     for question in questions:
@@ -169,7 +167,7 @@ def evaluate_questions(questions=None, output_path=DEFAULT_OUTPUT_PATH):
         print("질문:", question)
         rw = rewrite_stock_query(question)
 
-        question_id = store.build_news_vector_db(query=rw["rewritten_query"], display=10, sort=rw["sort"], company=rw["company"], aliases=rw["company_aliases"])
+        question_id = collect_and_index(store, query=rw["rewritten_query"], display=10, sort=rw["sort"], company=rw["company"], aliases=rw["company_aliases"])
         print("저장된 질문 ID:", question_id)
 
         result = store.search_similar_news(question, question_id=question_id, top_k=3)
@@ -187,7 +185,7 @@ def evaluate_questions(questions=None, output_path=DEFAULT_OUTPUT_PATH):
         print("검색 평가:", retrieval_eval)
 
         # 생성 품질
-        gen_eval = evaluate_generation(question, contexts)
+        gen_eval = evaluate_generation(question, contexts, chain)
         print("생성 평가:", {k: v for k, v in gen_eval.items() if k != "answer"})
         print("답변:", gen_eval["answer"][:150])
 

@@ -21,3 +21,7 @@ src/model/data/sp_korean.vocab
 
 # model checkpoints
 src/model/checkpoints/
+
+# local editor and macOS metadata
+**/.DS_Store
+.idea/

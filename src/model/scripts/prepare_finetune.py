@@ -1,13 +1,19 @@
-import ast
 import csv
 import random
-from pathlib import Path
 
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[1]
-RAW_DIR = ROOT / "data" / "raw_hf"
-OUT_DIR = ROOT / "data" / "processed"
+try:  # 직접 실행 / -m 실행 양쪽 지원
+    from _bootstrap import ensure_src_on_path
+except ImportError:
+    from model.scripts._bootstrap import ensure_src_on_path
+
+ensure_src_on_path()
+
+from model.paths import DATA_DIR  # noqa: E402
+
+RAW_DIR = DATA_DIR / "raw_hf"
+OUT_DIR = DATA_DIR / "processed"
 
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 

@@ -8,23 +8,19 @@
 import os
 import sys
 import torch
-from pathlib import Path
 
-from model.rag.generator import generate_reply_rag
 from model.train.model import device, steps, lr, KoreanGPT
 from model.train.tokenizer import load_korean_chatbot_data, load_qa_pairs
 from model.train.sp_tokenizer import train_sp, load_sp, encode
 from model.train.train_utils import make_batcher, train_loop, make_qa_batcher
-from model.store.vector_store import ChromaNewsVectorStore
+from model.paths import CHECKPOINT_DIR, DATA_DIR, SP_PREFIX
 
 SP_VOCAB_SIZE = 16000
-BASE_DIR = Path(__file__).resolve().parents[1]
 
-SP_PREFIX = str(BASE_DIR / "data" / "sp_korean")    # data/sp_korean.model / .vocab 으로 생성됨
+SP_PREFIX = str(SP_PREFIX)    # data/sp_korean.model / .vocab 으로 생성됨
 
-CKPT_DIR = BASE_DIR / "checkpoints"
+CKPT_DIR = CHECKPOINT_DIR
 GEN_CKPT = str(CKPT_DIR / "KoreanGPT.pt")      # Stage 1 가중치
-# QA_CKPT = str(CKPT_DIR / "KoreanGPT_qa.pt")    # Stage 2 가중치  # 파인튜닝을 두 번 진행해서 최적화 된 모델 2개를 만듦
 SMALLTALK_CKPT = str(CKPT_DIR / "KoreanGPT_smalltalk.pt")
 NEWS_CKPT = str(CKPT_DIR / "KoreanGPT_news.pt")
 
@@ -35,13 +31,13 @@ FT_STEPS = 2000
 FT_LR = 1e-4                 # Stage 1보다 낮은 lr로 미세조정 (급격한 망각 방지)
 
 def pretrain_path() -> str:
-    return str(BASE_DIR / "data" / "processed" / "pretrain.txt")
+    return str(DATA_DIR / "processed" / "pretrain.txt")
 
 def build_pretrain_text() -> str:
     return load_korean_chatbot_data()
 
 
-os.makedirs(BASE_DIR / "data", exist_ok=True)
+os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(CKPT_DIR, exist_ok=True)
 
 if os.path.exists(f"{SP_PREFIX}.model"):
@@ -53,7 +49,7 @@ vocab_size = sp.get_piece_size()
 
 
 def train_stage1(model):
-    token_cache = "model/data/processed/pretrain_tokens.pt"
+    token_cache = str(DATA_DIR / "processed" / "pretrain_tokens.pt")
 
     if os.path.exists(token_cache):
         print(f"loading token cache: {token_cache}", flush=True)

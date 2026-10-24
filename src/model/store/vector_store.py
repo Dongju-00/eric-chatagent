@@ -1,150 +1,25 @@
+"""Chroma 저장과 검색.
+
+뉴스 검색·종목 필터·본문 추출·청킹은 :mod:`model.news.collect` 에 있다.
+이 파일은 받은 청크를 색인하고 다시 꺼내는 일만 한다.
+"""
+
+import hashlib
 import uuid
-from datetime import datetime
-from html.parser import HTMLParser
-from html import unescape
-import chromadb
-from model.rag.search import search_stock_news
-from model.embed.embedder import KoreanGPTEmbedder
-import trafilatura
+from datetime import datetime, timedelta
 from pathlib import Path
 
-from datetime import datetime, timedelta, timezone
-from email.utils import parsedate_to_datetime
-from model.graph.query_rewrite import rewrite_stock_query
+import chromadb
 
-from concurrent.futures import ThreadPoolExecutor
-from trafilatura.settings import use_config
+from model.embed.embedder import KoreanGPTEmbedder
+from model.paths import CHROMA_PATH
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_CHROMA_PATH = PROJECT_ROOT / "storage" / "chroma"
-
-# 응답 없는 사이트에서 무한 대기하는 걸 방지
-_TRAFILATURA_CFG = use_config()
-_TRAFILATURA_CFG.set("DEFAULT", "DOWNLOAD_TIMEOUT", "5")
-
-class HTMLTextExtractor(HTMLParser):
-    def __init__(self):
-        super().__init__()
-        self.texts = []
-
-    def handle_data(self, data):
-        data = data.strip()
-        if data:
-            self.texts.append(data)
-
-    def get_text(self):
-        return " ".join(self.texts)
-
-
-def html_to_text(html_text):
-    parser = HTMLTextExtractor()
-    parser.feed(unescape(html_text or ""))
-    return parser.get_text()
-
-def extract_article_body(url: str) -> str:
-    if not url:
-        return ""
-
-    try:
-        downloaded = trafilatura.fetch_url(url, config=_TRAFILATURA_CFG) # config=_TRAFILATURA_CFG
-
-        if not downloaded:
-            return ""
-
-        body = trafilatura.extract(
-            downloaded,
-            include_comments=False,
-            include_tables=False,
-            favor_precision=True,
-        )
-
-        return body.strip() if body else ""
-
-    except Exception as e:
-        print(f"기사 본문 추출 실패: {url} / {e}")
-        return ""
-
-def extract_news_body(original_link, naver_link, min_length=100):
-    body = extract_article_body(original_link)
-
-    if body and len(body) >= min_length:
-        return body, original_link, "article_body"
-
-    body = extract_article_body(naver_link)
-
-    if body and len(body) >= min_length:
-        return body, naver_link, "article_body"
-
-    return "", original_link or naver_link, "naver_description"
-
-def parse_news_items(items):
-    def build(item):
-        title = html_to_text(item.get("title", ""))
-        description = html_to_text(item.get("description", ""))
-
-        # 원문 링크를 우선 사용하고, 없으면 네이버 링크 사용
-        original_link = item.get("originallink", "")
-        naver_link = item.get("link", "")
-        pub_date = item.get("pubDate", "")
-
-        article_body, article_link, content_type = extract_news_body(original_link, naver_link)
-        content = article_body if article_body else description
-        # 너무 긴 기사는 최대 길이 제한
-        content = content[:5000]
-
-        # text = f"""
-        #         제목: {title}
-        #         작성일: {pub_date}
-        #         내용: {content}
-        #         """.strip()
-
-        return ({
-            # 아직 제목과 날짜를 합치지 않고 본문만 저장
-            "content": content,
-            "metadata": {
-                "title": title,
-                "link": article_link,
-                "pubDate": pub_date,
-                "source": "naver_news",
-                "content_type": content_type,
-            }
-        })
-
-    with ThreadPoolExecutor(max_workers=10) as ex:
-        return list(ex.map(build, items))
-
-
-def chunk_text(text, chunk_size=500, overlap=100):
-    chunks = []
-    start = 0
-
-    while start < len(text):
-        end = start + chunk_size
-        chunks.append(text[start:end])
-
-        if end >= len(text):
-            break
-
-        start = end - overlap
-
-    return chunks
-
-CUTOFF_DAYS = 30
-
-
-def is_recent(item, days=CUTOFF_DAYS):
-    """네이버 pubDate(RFC 822 형식)를 파싱해 최근 기사인지 확인"""
-    try:
-        pub = parsedate_to_datetime(item["pubDate"])
-        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
-        return pub > cutoff
-    except Exception:
-        return True  # 파싱 실패 시 일단 통과
+__all__ = ["ChromaNewsVectorStore"]
 
 
 class ChromaNewsVectorStore:
     def __init__(self, persist_path=None):
-        path = Path(persist_path) if persist_path else DEFAULT_CHROMA_PATH
+        path = Path(persist_path) if persist_path else CHROMA_PATH
         path.mkdir(parents=True, exist_ok=True)
         self.client = chromadb.PersistentClient(path=str(path))
 
@@ -179,8 +54,9 @@ class ChromaNewsVectorStore:
 
         return question_id
 
-    def save_news_chunks(self, question_id, chunked_docs):
-        if not chunked_docs:
+    def index_chunks(self, question_id: str, chunks: list[dict]) -> int:
+        """청크를 질문 단위로 색인한다. 원소는 ``{"text", "metadata"}``."""
+        if not chunks:
             return 0
 
         ids = []
@@ -188,15 +64,12 @@ class ChromaNewsVectorStore:
         embeddings = []
         metadatas = []
 
-        for idx, doc in enumerate(chunked_docs):
-            chunk_id = f"{question_id}_chunk_{idx}"
+        for idx, doc in enumerate(chunks):
             text = doc["text"]
             metadata = doc["metadata"]
 
-            ids.append(chunk_id)
+            ids.append(f"{question_id}_chunk_{idx}")
             documents.append(text)
-
-            # 임베딩
             embeddings.append(self.embedder.embed_text(text))
             metadatas.append({
                 "question_id": question_id,
@@ -207,6 +80,11 @@ class ChromaNewsVectorStore:
                 "source": metadata.get("source", "naver_news"),
                 "content_type": metadata.get("content_type", "naver_description"),
                 "created_at": datetime.now().isoformat(),
+                # scope 는 청크의 수명을 가른다. question 은 TTL 대상,
+                # corpus 는 상시 유지. source 는 발행처 의미로 남긴다.
+                "scope": "question",
+                "indexed_at": datetime.now().isoformat(),
+                "match_kind": metadata.get("match_kind", ""),
             })
 
         self.news_collection.add(
@@ -218,68 +96,112 @@ class ChromaNewsVectorStore:
 
         return len(documents)
 
-    def build_news_vector_db(self, query, display=10, sort="sim", company = None, aliases = None):
-        # 사용자 질문 저장
-        question_id = self.save_question(query)
-        result = search_stock_news(query=query, display=display*3, sort=sort)
-        items = result["items"]
+    def index_corpus_chunks(self, chunks: list[dict]) -> int:
+        """RSS 코퍼스 청크를 색인한다. 질문에 묶이지 않고 상시 유지된다.
 
-        # 최근 + 제목에 종목명(별칭 포함) 매칭
-        def matches_company(item):
-            if not company:
-                return True
-            text = (html_to_text(item.get("title", "")) + " " +
-                    html_to_text(item.get("description", "")))
-            return any(a.lower() in text.lower() for a in [company, *(aliases or [])])
+        같은 기사가 다시 수집돼도 중복되지 않도록 링크와 청크 번호로 id를
+        만든다. Chroma의 ``upsert`` 는 같은 id를 덮어쓴다.
+        """
+        if not chunks:
+            return 0
 
-        recent = [it for it in items if is_recent(it) and matches_company(it)]
-        print(f"[수집] 전체 {len(items)}건 → 최근+종목매칭 {len(recent)}건", flush=True)
+        ids, documents, embeddings, metadatas = [], [], [], []
+        now = datetime.now().isoformat()
+        seen_ids = set()
 
-        # 필터 후 남은 게 없으면 원본 사용 (검색 결과 0건 방지)
-        if not recent:
-            recent = items[:display]
-
-        documents = parse_news_items(recent[:display])
-
-        # 파싱
-        chunked_docs = []
-
-        # 청킹
-        for doc in documents:
-            # chunks = chunk_text(doc["text"])
-            content = doc["content"]
+        for idx, doc in enumerate(chunks):
+            text = doc["text"]
             metadata = doc["metadata"]
+            link = metadata.get("link", "") or f"nolink-{idx}"
+            chunk_id = metadata.get("chunk_id", idx)
 
-            # 직접 만든 모델의 block_size가 작으므로
-            # 500자보다 조금 작게 자르는 편이 좋음
-            chunks = chunk_text(content, chunk_size=358, overlap=50,)
+            chunk_key = f"corpus_{hashlib.sha1(link.encode()).hexdigest()[:16]}_{chunk_id}"
+            # 같은 기사가 여러 피드에 실리면 같은 id가 한 배치에 두 번 들어온다.
+            # Chroma upsert 는 배치 내 중복을 거부하므로 먼저 걸러낸다.
+            if chunk_key in seen_ids:
+                continue
+            seen_ids.add(chunk_key)
 
-            for idx, chunk in enumerate(chunks):
-                # 모든 chunk에 제목과 작성일을 다시 붙임
-                formatted_chunk = (
-                    f"제목: {metadata.get('title', '')}\n"
-                    f"작성일: {metadata.get('pubDate', '')}\n"
-                    f"내용: {chunk}"
-                )
+            ids.append(chunk_key)
+            documents.append(text)
+            embeddings.append(self.embedder.embed_text(text))
+            metadatas.append({
+                "chunk_id": chunk_id,
+                "title": metadata.get("title", ""),
+                "link": metadata.get("link", ""),
+                "pubDate": metadata.get("pubDate", ""),
+                "source": metadata.get("source", "rss"),
+                "content_type": metadata.get("content_type", "article_body"),
+                "company": metadata.get("company", ""),
+                "ticker": metadata.get("ticker", ""),
+                "created_at": now,
+                "scope": "corpus",
+                "indexed_at": now,
+            })
 
-                chunked_docs.append({
-                    "text": formatted_chunk,
-                    "metadata": {
-                        **metadata,
-                        "chunk_id": idx,
-                    }
-                })
+        self.news_collection.upsert(
+            ids=ids, documents=documents, embeddings=embeddings, metadatas=metadatas,
+        )
+        return len(documents)
 
-        # 인덱싱
-        save_count = self.save_news_chunks(question_id, chunked_docs)
+    def backfill_scope(self) -> int:
+        """``scope`` 가 없는 기존 청크를 ``question`` 으로 표시한다.
 
-        print(f"질문 ID: {question_id}")
-        print(f"{save_count}개 chunk 저장 완료")
+        Chroma의 ``where`` 로는 "키가 없음"을 표현하기 어렵다. 표시가 없는
+        레거시 청크가 TTL 삭제에서 조용히 빠지는 것을 막기 위한 1회성 보정이다.
+        """
+        got = self.news_collection.get(include=["metadatas"])
+        targets = [
+            (cid, meta) for cid, meta in zip(got["ids"], got["metadatas"])
+            if "scope" not in meta or "indexed_at" not in meta
+        ]
+        if not targets:
+            return 0
 
-        return question_id
+        self.news_collection.update(
+            ids=[cid for cid, _ in targets],
+            metadatas=[{
+                **meta,
+                "scope": meta.get("scope", "question"),
+                # 시각을 모르면 created_at 을 쓰고, 그것도 없으면 즉시 만료로 본다
+                "indexed_at": meta.get("indexed_at", meta.get("created_at", "")),
+            } for _, meta in targets],
+        )
+        return len(targets)
 
-    # Retrieval 임베딩
-    def search_similar_news(self, question: str, question_id: str, top_k=10, max_distance: float = 1.3):
+    def purge_expired_question_chunks(self, ttl_hours: int) -> int:
+        """TTL이 지난 질문별 청크를 지운다.
+
+        ``scope == "corpus"`` 인 RSS 코퍼스와 ``user_questions`` 컬렉션은
+        대상이 아니다. ``indexed_at`` 을 못 읽는 청크는 만료로 본다 —
+        레거시 청크가 영구히 남는 것을 막는다.
+        """
+        self.backfill_scope()
+
+        got = self.news_collection.get(
+            where={"scope": {"$eq": "question"}}, include=["metadatas"],
+        )
+        cutoff = datetime.now() - timedelta(hours=ttl_hours)
+
+        expired = []
+        for cid, meta in zip(got["ids"], got["metadatas"]):
+            stamp = meta.get("indexed_at") or meta.get("created_at") or ""
+            try:
+                indexed_at = datetime.fromisoformat(stamp)
+            except ValueError:
+                expired.append(cid)  # 시각을 모르면 만료로 본다
+                continue
+            if indexed_at < cutoff:
+                expired.append(cid)
+
+        if expired:
+            self.news_collection.delete(ids=expired)
+            print(f"[TTL] 만료된 질문별 청크 {len(expired)}건 삭제", flush=True)
+
+        return len(expired)
+
+    def search_similar_news(self, question: str, question_id: str, top_k=10,
+                            max_distance: float = 1.3, company: str | None = None):
         query_embedding = self.embedder.embed_text(question)
 
         query_args = {
@@ -293,11 +215,24 @@ class ChromaNewsVectorStore:
             ],
         }
 
-        # 현재 질문으로 수집한 뉴스만 검색
+        # 이번 질문으로 수집한 청크 + 상시 RSS 코퍼스를 함께 본다.
+        # 코퍼스 쪽은 종목 메타데이터로 1차 필터해 키워드 검색의 정확도를
+        # 임베더에만 맡기지 않는다.
+        scopes = []
         if question_id:
-            query_args["where"] = {
-                "question_id": question_id
-            }
+            scopes.append({"question_id": {"$eq": question_id}})
+        if company:
+            scopes.append({
+                "$and": [
+                    {"scope": {"$eq": "corpus"}},
+                    {"company": {"$eq": company}},
+                ]
+            })
+
+        if len(scopes) == 1:
+            query_args["where"] = scopes[0]
+        elif len(scopes) > 1:
+            query_args["where"] = {"$or": scopes}
 
         result = self.news_collection.query(**query_args)
 

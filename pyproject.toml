@@ -7,6 +7,7 @@ dependencies = [
     "torch",
     "sentencepiece",
     "numpy",
+    "huggingface-hub",        # 가중치/토크나이저 주입 (Dockerfile, README)
     # 데이터
     "datasets",
     "pandas",
@@ -22,11 +23,13 @@ dependencies = [
     "fastapi",
     "uvicorn[standard]",
     "pydantic",
+    "httpx",                  # vLLM 라우터 호출 (graph.py)
     # 기타
     "python-dotenv",
     "google-genai",
     "trafilatura",
     "transformers>=5.14.1",
+    "typing-extensions",      # TypedDict/Annotated (graph.py)
     "modal>=1.5.3",
 ]
 

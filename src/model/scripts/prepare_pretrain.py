@@ -1,13 +1,22 @@
 from pathlib import Path
+
 from datasets import load_dataset
+
+try:  # 직접 실행 / -m 실행 양쪽 지원
+    from _bootstrap import ensure_src_on_path
+except ImportError:
+    from model.scripts._bootstrap import ensure_src_on_path
+
+ensure_src_on_path()
+
+from model.paths import DATA_DIR  # noqa: E402
 
 # 사전학습을 위한 데이터셋 구성하기 위해
 # Hugging Face에서 KOREAN-WEBTEXT + namuwiki dataset 가지고 와서 txt 파일로 변환 후 합침
-OUT1 = Path("model/data/processed/pretrain1.txt")
-OUT2 = Path("model/data/processed/pretrain2.txt")
-OUT_FINAL = Path("model/data/processed/pretrain.txt")
-
-OUT1.parent.mkdir(parents=True, exist_ok=True)
+_PROCESSED = DATA_DIR / "processed"
+OUT1 = _PROCESSED / "pretrain1.txt"
+OUT2 = _PROCESSED / "pretrain2.txt"
+OUT_FINAL = _PROCESSED / "pretrain.txt"
 
 WEBTEXT = 400_000_000
 NAMUWIKI = 500_000_000
@@ -61,16 +70,24 @@ def merge_pretrain_files():
     OUT_FINAL.write_text("\n\n".join(docs), encoding="utf-8")
     print(f"merged: {len(docs):,} docs, {OUT_FINAL.stat().st_size/1e9:.2f} GB")
 
-write_dataset_to_txt(
-    dataset_name="HAERAE-HUB/KOREAN-WEBTEXT",
-    output_path=OUT1,
-    max_chars=WEBTEXT,
-)
 
-write_dataset_to_txt(
-    dataset_name="heegyu/namuwiki-extracted",
-    output_path=OUT2,
-    max_chars=NAMUWIKI,
-)
+def main():
+    _PROCESSED.mkdir(parents=True, exist_ok=True)
 
-merge_pretrain_files()
+    write_dataset_to_txt(
+        dataset_name="HAERAE-HUB/KOREAN-WEBTEXT",
+        output_path=OUT1,
+        max_chars=WEBTEXT,
+    )
+
+    write_dataset_to_txt(
+        dataset_name="heegyu/namuwiki-extracted",
+        output_path=OUT2,
+        max_chars=NAMUWIKI,
+    )
+
+    merge_pretrain_files()
+
+
+if __name__ == "__main__":
+    main()

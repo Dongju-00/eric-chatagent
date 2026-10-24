@@ -21,7 +21,7 @@ SentencePiece 토크나이저 → Decoder-only Transformer 사전학습 → 도�
 | 성능 최적화 | 본문 추출 병렬화 · 종목별 뉴스 캐싱으로 응답 지연 개선 |
 | UI | 카카오톡 스타일 채팅 인터페이스 (Vanilla JS) — 카카오톡 채널 이식을 염두에 둔 설계 |
 | 서빙 | FastAPI + nginx 리버스 프록시, 웹/모델 서버 물리 분리 |
-| 라우터 서빙 | vLLM 외부 서버 연동 (`VLLM_BASE_URL`), 미설정 시 로컬 모델 폴백 |
+| 라우터 서빙 | vLLM 외부 서버 연동 (`VLLM_BASE_URL`), 미설정 또는 호출 실패 시 기본 안내 응답 |
 | 배포 | GitHub Actions 4-job 파이프라인 → Docker Hub → EC2 2대 자동 반영 |
 | 모델 배포 | 가중치를 Git이 아닌 Hugging Face Hub에서 이미지 빌드 시 주입 |
 
@@ -160,7 +160,7 @@ GPT-2와 동일한 Decoder-only Transformer를 Multi-Head Attention부터 직접
 flowchart TB
     R[router_node] --> C{VLLM_BASE_URL<br/>설정?}
     C -->|있음| V[vLLM 서버<br/>OpenAI 호환 API]
-    C -->|없음| L[로컬 Transformers<br/>폴백]
+    C -->|없음| L[고정 안내 문구]
     V --> P[라벨 파싱]
     L --> P
     P --> D{유효 라벨?}
@@ -174,10 +174,14 @@ flowchart TB
 | 방식 | 백엔드 | 메모리 | 특징                                                   |
 |---|---|---|------------------------------------------------------|
 | vLLM (권장) | vLLM OpenAI API | 외부 서버 | PagedAttention · continuous batching, 앱 프로세스와 메모리 격리 |
-| 로컬 Transformers | Transformers CPU | 앱 프로세스 내 | 환경변수 미설정 시 폴백, 가용성 확보                                |
-| 외부 API | Google Gemini | 없음 | 초기 구현, 의존성 제거 대상 (graph.py에 주석처리로 남겨놓음)              |
+| 고정 안내 문구 | 없음 | 없음 | `VLLM_BASE_URL` 미설정 또는 호출 실패 시. 분류를 포기하고 `fallback` 경로로 보낸다 |
+| OpenRouter | 외부 API | 없음 | **분류가 아니라 fallback 자유 답변 담당.** 라우터 장애와 분리하기 위해 분리했다 |
 
-**vLLM을 도입한 이유**: 라우터 모델을 앱 프로세스 안에 로드하면 KoreanGPT 3종 + ChromaDB와 메모리를 공유해 OOM 위험이 커진다. 외부 서버로 분리하면 **메모리가 격리되어 라우터 장애가 앱 전체로 번지지 않고**, PagedAttention·continuous batching으로 동시 요청 처리량도 개선된다. 서버가 응답하지 않으면 로컬 모델로 폴백해 가용성을 유지한다.
+**vLLM을 도입한 이유**: 라우터 모델을 앱 프로세스 안에 로드하면 KoreanGPT 3종 + ChromaDB와 메모리를 공유해 OOM 위험이 커진다. 외부 서버로 분리하면 **메모리가 격리되어 라우터 장애가 앱 전체로 번지지 않고**, PagedAttention·continuous batching으로 동시 요청 처리량도 개선된다.
+
+**분류와 자유 답변을 분리한 이유**: 라우터 서버가 죽으면 분류가 실패해 모든 질문이 `fallback`으로 간다. 자유 답변까지 같은 서버에 묶여 있으면 그 순간 고정 문구밖에 나오지 않는다. `fallback_node`의 자유 답변을 OpenRouter로 옮겨, 라우터 장애와 자유 답변 가용성을 분리했다. 분류는 vLLM에 남아 있다.
+
+OpenRouter 키(`ERIC_CHATAGENT_OPENROUTER_KEY`)가 없으면 `fallback_node`는 고정 안내 문구로 답한다. 호출이 실패해도 예외를 밖으로 내지 않는다 — 라우터가 죽은 상태에서는 이 경로가 상시 경로이므로, 여기서 터지면 모든 질문이 500이 된다.
 
 **파싱 방어**: 소규모 모델은 지시한 라벨 형식을 벗어나는 경우가 있어(`'주식'`, `'주식 inquiry'` 등), 영어 라벨·한국어 키워드를 모두 수용하고 매칭 실패 시 `fallback`으로 처리하도록 파서를 이중화했다.
 
@@ -449,7 +453,7 @@ Stage 5 파인튜닝 이후에도 남아 있던 생성 품질 문제의 원인�
 | 시장 전체 질문 (종목 미포함) | 검색 확장성 검증 |
 
 ```bash
-uv run python src/model/rag/evaluate_rag.py
+PYTHONPATH=src uv run python -m model.rag.evaluate_rag
 ```
 
 <br>
@@ -480,6 +484,7 @@ eric-chatagent/
     │       └── app.js            # 세션 관리 · 메시지 렌더링 · API 통신
     │
     └── model/
+        ├── paths.py              # 모든 경로의 단일 출처 (ERIC_* 환경변수로 override)
         ├── train/
         │   ├── model.py          # KoreanGPT · Block · Attention 구현, generate()
         │   ├── tokenizer.py      # smalltalk, stock_news 파인튜닝
@@ -497,7 +502,12 @@ eric-chatagent/
         ├── graph/
         │   ├── graph.py          # LangGraph StateGraph 조립 · 노드 정의
         │   ├── query_rewrite.py  # 질문 → 검색어 변환
+        ├── serving/
+        │   └── vllm_serve.py     # 라우터용 vLLM 서버 (Modal)
         ├── scripts/
+        │   ├── _bootstrap.py     # 스크립트 직접 실행 시 src/를 sys.path에 추가
+        │   ├── prepare_pretrain.py  # Stage 1 사전학습 코퍼스 구성
+        │   ├── prepare_finetune.py  # Stage 2 QA 데이터 분할
         │   └── finetune_news.py  # Stage 5 추가 파인튜닝
         ├── data/                 # 토크나이저 (HF 주입)
         │   ├── news/             # Stage 5 추가 파인튜닝 데이터
@@ -559,12 +569,27 @@ NAVER_CLIENT_ID=...
 NAVER_CLIENT_SECRET=...
 GOOGLE_API_KEY=...                # 검색 품질 평가(LLM-judge)용
 
-# 라우터 서빙 - 설정 시 vLLM 사용, 미설정 시 로컬 모델 폴백
+# 라우터 서빙 - 설정 시 vLLM 사용, 미설정 또는 호출 실패 시 기본 안내 응답
 VLLM_BASE_URL=http://localhost:8001/v1
-VLLM_MODEL=Qwen/Qwen2.5-0.5B-Instruct
+VLLM_API_KEY=...
+```
 
-# 캐시
-NEWS_CACHE_TTL=300
+### 경로 재지정 (선택)
+
+모든 경로는 `src/model/paths.py`에서 한 번만 해석한다. 기본값은 `pyproject.toml`이 있는 저장소 루트를 찾아 유도하므로 어느 디렉터리에서 실행해도 동일하게 동작한다. 데이터나 벡터 DB를 저장소 밖에 두려면 아래 환경변수로 덮어쓴다.
+
+| 환경변수 | 기본값 |
+|---|---|
+| `ERIC_PROJECT_ROOT` | `pyproject.toml`이 있는 상위 디렉터리 |
+| `ERIC_MODEL_ROOT` | `<project>/src/model` |
+| `ERIC_DATA_DIR` | `<model>/data` |
+| `ERIC_CHECKPOINT_DIR` | `<model>/checkpoints` |
+| `ERIC_CHROMA_PATH` | `<project>/storage/chroma` |
+| `ERIC_SP_PREFIX` | `<data>/sp_korean` (확장자 없는 prefix) |
+
+```bash
+# 예: 벡터 DB를 외부 볼륨에 두고 실행
+ERIC_CHROMA_PATH=/mnt/data/chroma uv run python main.py
 ```
 
 ## 로컬
@@ -572,8 +597,10 @@ NEWS_CACHE_TTL=300
 ### 실행
 
 ```bash
-uv sync                          # 의존성 설치 (최초 1회)
+uv sync --locked                 # pyproject.toml + uv.lock 기준 의존성 설치
 ```
+
+의존성은 `pyproject.toml`에서 관리하고 `uv.lock`으로 고정합니다. CI와 Docker도 `uv sync --locked`를 사용합니다.
 
 #### 모델 파일 준비
 
@@ -605,16 +632,15 @@ vllm serve Qwen/Qwen2.5-1.5B-Instruct --port 8001
 
 # 챗봇 실행 시 환경변수 지정
 VLLM_BASE_URL=http://localhost:8001/v1 \
-VLLM_MODEL=Qwen/Qwen2.5-0.5B-Instruct \
 uv run python main.py
 ```
 
-`VLLM_BASE_URL`을 설정하지 않으면 로컬 Transformers 모델로 폴백한다.
+`VLLM_BASE_URL`을 설정하지 않거나 호출에 실패하면 기본 안내 응답을 반환한다. 라우터 모델명은 `src/model/graph/graph.py`의 `MODEL_ID`로 지정한다.
 
 ### 평가 실행
 
 ```bash
-uv run python src/model/rag/evaluate_rag.py
+PYTHONPATH=src uv run python -m model.rag.evaluate_rag
 ```
 
 ### Docker 실행
@@ -804,4 +830,4 @@ explicit = true
 - **네이버 뉴스 검색 API** — 실시간 뉴스 수집 ([개발자센터](https://developers.naver.com/))
 - **한국어 위키백과 · 나무위키** — Stage 1 사전학습 코퍼스
 
-자세한 개발 과정: [회고](./RETROSPECTIVE.md) · 변경 이력: [CHANGELOG.md](./CHANGELOG.md)
+자세한 개발 과정: [회고](./docs/회고.md) · 변경 이력: [CHANGELOG.md](./docs/CHANGELOG.md)

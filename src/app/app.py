@@ -1,16 +1,16 @@
 import asyncio
 import uuid
 from contextlib import asynccontextmanager
-from typing import Any, Literal
+from pathlib import Path
+from typing import Any
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from model.graph.graph import build_graph
-from model.rag.search import search_stock_news
-from model.store.vector_store import ChromaNewsVectorStore, parse_news_items
+from model.resources import build_resources
 
 # ──────────────────────────────────────────────
 # 전역 리소스 (서버 시작 시 1회 초기화)
@@ -21,8 +21,11 @@ resources: dict[str, Any] = {}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("모델 및 그래프 로딩 중...", flush=True)
-    resources["graph"] = build_graph()      # KoreanGPT 2종 + 라우터 로딩
-    resources["store"] = ChromaNewsVectorStore()
+    # 리소스 생성은 여기 한 곳에서만 일어난다.
+    # 임베더 1벌 + KoreanGPT 2종 = torch.load 3회, Chroma 클라이언트 1개.
+    app_resources = build_resources()
+    resources["resources"] = app_resources
+    resources["graph"] = build_graph(app_resources)
     print("준비 완료. http://127.0.0.1:8000/docs", flush=True)
     yield
     resources.clear()
@@ -48,18 +51,6 @@ class ChatRequest(BaseModel):
         default=None,
         description="대화 세션 ID. 같은 값을 쓰면 이전 상태가 유지된다.",
     )
-
-
-class IndexRequest(BaseModel):
-    query: str = Field(..., min_length=1)
-    display: int = Field(default=10, ge=1, le=30)
-
-
-class NewsSearchRequest(BaseModel):
-    query: str = Field(..., min_length=1)
-    display: int = Field(default=10, ge=1, le=30)
-    start: int = Field(default=1, ge=1)
-    sort: Literal["sim", "date"] = "date"
 
 
 # ──────────────────────────────────────────────
@@ -105,43 +96,4 @@ async def agent_chat(request: ChatRequest) -> dict[str, Any]:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
-app.mount("/", StaticFiles(directory="src/app/static", html=True), name="home")
-
-""" 검색이 제대로 되는지 확인하기 위한 디버깅 코드, 실제 배포에서는 필요 없음
-@app.post("/rag/index", include_in_schema=False)
-async def index_news(request: IndexRequest) -> dict[str, Any]:
-    store = resources.get("store")
-    if store is None:
-        raise HTTPException(status_code=503, detail="스토어가 준비되지 않았습니다.")
-
-    try:
-        question_id = await asyncio.to_thread(
-            store.build_news_vector_db,
-            request.query,
-            request.display,
-        )
-        return {"query": request.query, "question_id": question_id}
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
-
-
-@app.get("/rag/search", include_in_schema=False)
-async def search_indexed(
-    question: str = Query(..., min_length=1),
-    top_k: int = Query(default=3, ge=1, le=10),
-) -> dict[str, Any]:
-    store = resources.get("store")
-    if store is None:
-        raise HTTPException(status_code=503, detail="스토어가 준비되지 않았습니다.")
-
-    try:
-        result = await asyncio.to_thread(store.search_similar_news, question, top_k)
-        return {
-            "question": question,
-            "documents": result.get("documents", [[]])[0],
-            "metadatas": result.get("metadatas", [[]])[0],
-            "distances": result.get("distances", [[]])[0],
-        }
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
-"""
+app.mount("/", StaticFiles(directory=str(Path(__file__).resolve().parent / "static"), html=True), name="home")

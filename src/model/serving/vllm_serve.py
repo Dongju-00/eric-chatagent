@@ -1,8 +1,6 @@
 import json
 import os
-from typing import Any
 
-import aiohttp
 import modal
 
 vllm_image = (
@@ -82,7 +80,7 @@ class Server:
             json.dumps({"image": 0, "video": 0, "audio": 0}),
         ]
 
-        print(*cmd)
+        print(f"Starting vLLM server for {MODEL_NAME} on port {VLLM_PORT}")
 
         self.process = subprocess.Popen(cmd)
 

@@ -11,8 +11,6 @@ KoreanGPT_news.pt 추가 파인튜닝
 
 import math
 import random
-import sys
-from pathlib import Path
 
 import pandas as pd
 import sentencepiece as spm
@@ -20,17 +18,22 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(PROJECT_ROOT / "src"))
+try:  # 직접 실행 / -m 실행 양쪽 지원
+    from _bootstrap import ensure_src_on_path
+except ImportError:
+    from model.scripts._bootstrap import ensure_src_on_path
+
+ensure_src_on_path()
 
 from model.train.model import KoreanGPT, block_size   # noqa: E402
+from model.paths import CHECKPOINT_DIR, DATA_DIR      # noqa: E402
 
 CONFIG = {
-    "sp_model":  PROJECT_ROOT / "src/model/data/sp_korean.model",
-    "ckpt_in":   PROJECT_ROOT / "src/model/checkpoints/KoreanGPT_news.pt",
-    "ckpt_out":  PROJECT_ROOT / "src/model/checkpoints/KoreanGPT_news_v2.pt",
-    "train_csv": PROJECT_ROOT / "src/model/data/news/qa_news_train_merged.csv",
-    "val_csv":   PROJECT_ROOT / "src/model/data/news/qa_news_recent_val.csv",
+    "sp_model":  DATA_DIR / "sp_korean.model",
+    "ckpt_in":   CHECKPOINT_DIR / "KoreanGPT_news.pt",
+    "ckpt_out":  CHECKPOINT_DIR / "KoreanGPT_news_v2.pt",
+    "train_csv": DATA_DIR / "news" / "qa_news_train_merged.csv",
+    "val_csv":   DATA_DIR / "news" / "qa_news_recent_val.csv",
 
     "batch_size":   8,
     "epochs":       3,
