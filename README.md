@@ -1,833 +1,270 @@
 # 한국어 Mini-GPT 기반 주식 뉴스 챗봇
 
-SentencePiece 토크나이저 → Decoder-only Transformer 사전학습 → 도메인 파인튜닝 → RAG → LangChain/LangGraph 파이프라인 → 자동 평가 → CI/CD 배포까지 전 과정을 직접 구현한 한국어 챗봇.
-네이버 뉴스 API를 지식 소스로 사용해 **국내 상장 종목**에 대한 최신 뉴스 질문에 특화하여 답변한다.
+SentencePiece와 약 42M 파라미터의 Decoder-only Transformer를 직접 구현하고, 한국어 대화·주식 뉴스 응답 학습부터 뉴스 수집, RAG, FastAPI, 배포까지 연결한 개인 프로젝트입니다.
 
-**모델**: [🤗 Dongju-00/eric-chatagent](https://huggingface.co/Dongju-00/eric-chatagent)
+최근 작업에서는 중복 모델 적재, 뉴스 필터, 세션 상태를 개선하고 Colab에서 멀티턴 fine-tuning과 학습 전후 평가를 수행했습니다. **검증 loss는 감소했지만 자체 모델의 문맥 참조 개선은 확인하지 못해 새 체크포인트의 서빙 교체를 보류했습니다.**
 
-<br>
+[모델 저장소](https://huggingface.co/Dongju-00/eric-chatagent) · [뉴스 학습 노트북](notebooks/colab/eric_news_multiturn_colab.ipynb) · [스몰톡 학습 노트북](notebooks/colab/eric_smalltalk_multiturn_colab.ipynb)
 
-## 특징
+## 구현 범위
 
-| 항목 | 내용 |
+| 영역 | 구현 |
 |---|---|
-| 모델 | KoreanGPT (~42M, Decoder-only Transformer 자체 구현) — 스몰톡 / 뉴스 / 임베딩 3종 |
-| 검색 | 네이버 뉴스 API + 자체 임베더 기반 ChromaDB 벡터 검색 + distance 임계값 필터 |
-| 질문 재작성 | 상장사 별칭 사전 · 의도 추출 · 시간 표현 정규화로 검색어 자동 생성 |
-| 파이프라인 | LCEL 체인 · LangGraph StateGraph (조건부 분기 3경로) |
-| 자동 라우팅 | LLM이 질문 유형 분류(smalltalk / stock_rag / fallback) → 경로 자동 선택 |
-| 자동 평가 | 생성 품질(반복률·근거성·형식)은 규칙 기반, 검색 품질은 LLM-as-judge로 이원화하여 정량 측정 |
-| 비교 실험 | 자체 모델과 대형 모델(Gemini)의 생성 품질을 동일 컨텍스트로 정량 비교 |
-| 성능 최적화 | 본문 추출 병렬화 · 종목별 뉴스 캐싱으로 응답 지연 개선 |
-| UI | 카카오톡 스타일 채팅 인터페이스 (Vanilla JS) — 카카오톡 채널 이식을 염두에 둔 설계 |
-| 서빙 | FastAPI + nginx 리버스 프록시, 웹/모델 서버 물리 분리 |
-| 라우터 서빙 | vLLM 외부 서버 연동 (`VLLM_BASE_URL`), 미설정 또는 호출 실패 시 기본 안내 응답 |
-| 배포 | GitHub Actions 4-job 파이프라인 → Docker Hub → EC2 2대 자동 반영 |
-| 모델 배포 | 가중치를 Git이 아닌 Hugging Face Hub에서 이미지 빌드 시 주입 |
-
-<br>
-
-## 화면 구성도
-
-```mermaid
-flowchart TB
-    subgraph UI["채팅 화면 - 카카오톡 UI 컨벤션"]
-        direction TB
-        H["상단 헤더 / 챗봇, 참여자 수"]
-        B["대화 영역 / 날짜 구분선, 말풍선, 전송 시각, 입력 중 표시"]
-        I["입력 영역 / 텍스트 입력, 전송 버튼, Enter 전송"]
-        H --- B --- I
-    end
-
-    B -.->|POST agent chat| API[FastAPI]
-    API -.->|answer| B
-
-    style UI fill:#b2c7d9,stroke:#7a94ab,stroke-width:2px,color:#111111
-    style H fill:#a9c0d5,stroke:#7a94ab,stroke-width:2px,color:#111111
-    style B fill:#ffffff,stroke:#cccccc,stroke-width:2px,color:#111111
-    style I fill:#ffffff,stroke:#cccccc,stroke-width:2px,color:#111111
-```
-
-**카카오톡 UI를 따른 이유**: 국내 사용자에게 가장 익숙한 채팅 인터페이스이므로 별도 학습 없이 사용할 수 있고, 이후 **카카오톡 채널 챗봇으로 이식할 때 사용자 경험의 단절이 없다.** 말풍선 정렬·시간 표기·Enter 전송 규칙 등 인터랙션 컨벤션을 미리 맞춰 두었다.
-
-<br>
-
-## 전체 구조도
-
-```mermaid
-graph LR
-    User([사용자]) -->|HTTP :80| Nginx
-
-    subgraph WEB["Web 서버 (EC2 · Elastic IP)"]
-        Nginx[nginx<br/>리버스 프록시]
-    end
-
-    subgraph MODEL["Model 서버 (EC2)"]
-        API[FastAPI :8000]
-        Graph[LangGraph Agent]
-        Cache[(뉴스 캐시)]
-        Store[(ChromaDB)]
-        Models[KoreanGPT x3]
-        API --> Graph
-        Graph --> Cache
-        Graph --> Store
-        Graph --> Models
-    end
-
-    Nginx -->|Private IP :8000| API
-    Graph -->|캐시 미스 시| Naver[네이버 뉴스 API]
-    Graph -->|의도 분류| VLLM[vLLM 서버]
-
-    style WEB fill:#e8f4f8,stroke:#4a90d9,stroke-width:2px,color:#111111
-    style MODEL fill:#fff4e6,stroke:#f5a623,stroke-width:2px,color:#111111
-    style VLLM fill:#e8f8e8,stroke:#5cb85c,stroke-width:2px,color:#111111
-```
-
-서버를 나눈 이유는 OOM 장애 때문이다. 초기에는 단일 인스턴스에서 웹 서빙과 모델 추론을 함께 처리했는데, 모델이 메모리를 소진하면 웹 서버까지 동시에 죽어 서비스 전체가 중단됐다. 역할을 분리한 뒤로는 모델 서버에 장애가 발생해도 nginx가 살아 있어 사용자에게 상태를 안내할 수 있다.
-
-<br>
-
-## 학습 파이프라인
-
-```mermaid
-flowchart LR
-    C[코퍼스<br/>위키 + 나무위키] --> T[Stage 0<br/>SentencePiece]
-    T --> P[Stage 1<br/>사전학습]
-    P --> S[Stage 2<br/>스몰톡 파인튜닝]
-    P --> N[Stage 3<br/>뉴스 파인튜닝]
-    P --> E[Stage 4<br/>임베딩 전용]
-    N --> V[Stage 5<br/>RAG 추가 파인튜닝]
-
-    S --> SM[[KoreanGPT_smalltalk.pt]]
-    V --> NM[[KoreanGPT_news_v2.pt]]
-    E --> EM[[KoreanGPT.pt]]
-
-    style P fill:#e8f4f8,stroke-width:2px,color:#111111
-    style V fill:#ffe8e8,stroke-width:2px,color:#111111
-```
-
-단계를 나눈 이유는 각 Stage가 서로 다른 능력을 순서대로 쌓기 위해서다. 처음부터 도메인 응답 포맷으로만 학습하면 언어 자체를 충분히 익히지 못한 채 형식만 흉내 내는 모델이 된다. 먼저 대규모 텍스트로 언어 패턴을 익힌 뒤, 그 위에 태스크를 순차적으로 올리는 전이학습 구조다.
-
-| Stage | 역할 | 결과물 | 단계를 나눈 이유                                                                                                                 |
-|---|---|---|---------------------------------------------------------------------------------------------------------------------------|
-| Stage 0 | SentencePiece 토크나이저 학습 | `sp_korean.model` | 한국어는 교착어라 공백 분리로는 어휘가 폭발한다. 서브워드 단위로 어휘를 압축해 소규모 모델에서도 표현력을 확보                                                            |
-| Stage 1 | 이어쓰기 사전학습 (위키 + 나무위키 430M 토큰) | `KoreanGPT.pt` | 베이스 언어 능력 확보. 다음 토큰 예측으로 어휘·문법·문맥을 먼저 학습. 초기 34M 토큰 / 23M 파라미터에서 확대                                                       |
-| Stage 2 | 스몰톡 파인튜닝 | `KoreanGPT_smalltalk.pt` | 단일 모델로 잡담과 뉴스 요약을 모두 처리하면 응답 성격이 섞인다. 도메인별 체크포인트를 분리해 각 경로에서 전용 모델을 로드                                                    |
-| Stage 3 | 뉴스 요약 파인튜닝 | `KoreanGPT_news.pt` | 참고 뉴스를 받아 요약하는 형식(`참고 뉴스: … 질문: … 답변: …`)을 학습                                                                             |
-| Stage 4 | 임베딩 전용 사용 | `KoreanGPT.pt` | 외부 임베딩 모델 없이 RAG 전 과정을 자체 모델로 구성하는 것이 목표였다. Stage 1 체크포인트의 hidden state를 평균해 문서 벡터로 사용                                    |
-| Stage 5 | RAG 추가 파인튜닝 | `KoreanGPT_news_v2.pt` | 학습 데이터 3,084건 중 28%를 "참고 뉴스에 해당 정보가 없습니다" 케이스로 구성해, 근거 없는 생성을 억제하는 방향으로 접근했다. 아래 비교 실험 결과 이 방향성 자체는 유효했음을 확인했고, 42M 규모라는 파라미터 한계가 최종 품질의 병목이라는 점도 함께 규명했다 |
-
-**최적화**: PyTorch 내장 최적화 어텐션(causal mask 자동 처리) · 답변 토큰만 손실 계산(프롬프트 `-100` 마스킹) · 낮은 학습률(1e-5)로 기존 지식 보존 · 코사인 스케줄러 + 워밍업
-
-<br>
-
-## 모델 아키텍처
-
-학습된 가중치(`.pt`)는 용량 문제로 저장소에 포함되지 않으며, Hugging Face Hub에서 주입된다.
-
-### KoreanGPT — 생성 / 임베딩
-
-GPT-2와 동일한 Decoder-only Transformer를 Multi-Head Attention부터 직접 구현.
-
-| 하이퍼파라미터 | 값 |
-|---|---|
-| block_size | 384 |
-| 파라미터 수 | ~42M |
-| 학습 코퍼스 | 위키 + 나무위키 430M 토큰 |
-| 토크나이저 | SentencePiece (자체 학습) |
-
-| 파일 | 역할 |
-|---|---|
-| `KoreanGPT.pt` | Stage 1 — 문서·질문 임베딩 생성 (RAG 벡터 검색) |
-| `KoreanGPT_smalltalk.pt` | Stage 2 — 일상 대화 응답 |
-| `KoreanGPT_news_v2.pt` | Stage 5 — 검색된 뉴스 기반 답변 생성 |
-
-### 생성 파라미터
-
-소규모 모델은 반복 루프에 빠지기 쉬워 샘플링 제어가 필수였다.
-
-| 파라미터 | 값   | 선택 이유 |
-|---|-----|---|
-| `temperature` | 0.3 | 뉴스 요약은 사실 전달이 목적이므로 무작위성을 낮춤 |
-| `top_k` | 10  | 확률이 낮은 토큰을 후보에서 배제 |
-| `repetition_penalty` | 1.3 | 동일 구절 반복 억제 (부호에 따라 나눗셈/곱셈 분기 적용) |
-
-### 라우터 모델 — 서빙 방식 선택
-
-질문 분류에는 지시를 따르는 능력이 필요해 자체 모델(42M) 대신 Instruct 계열 공개 가중치를 사용한다. `VLLM_BASE_URL` 환경변수 유무로 서빙 방식이 자동 분기된다.
-
-```mermaid
-flowchart TB
-    R[router_node] --> C{VLLM_BASE_URL<br/>설정?}
-    C -->|있음| V[vLLM 서버<br/>OpenAI 호환 API]
-    C -->|없음| L[고정 안내 문구]
-    V --> P[라벨 파싱]
-    L --> P
-    P --> D{유효 라벨?}
-    D -->|예| OUT([smalltalk / stock_rag / fallback])
-    D -->|아니오| FB([fallback])
-
-    style V fill:#e8f8e8,stroke:#5cb85c,stroke-width:2px,color:#111111
-    style D fill:#fff4e6,stroke:#f5a623,stroke-width:2px,color:#111111
-```
-
-| 방식 | 백엔드 | 메모리 | 특징                                                   |
-|---|---|---|------------------------------------------------------|
-| vLLM (권장) | vLLM OpenAI API | 외부 서버 | PagedAttention · continuous batching, 앱 프로세스와 메모리 격리 |
-| 고정 안내 문구 | 없음 | 없음 | `VLLM_BASE_URL` 미설정 또는 호출 실패 시. 분류를 포기하고 `fallback` 경로로 보낸다 |
-| OpenRouter | 외부 API | 없음 | **분류가 아니라 fallback 자유 답변 담당.** 라우터 장애와 분리하기 위해 분리했다 |
-
-**vLLM을 도입한 이유**: 라우터 모델을 앱 프로세스 안에 로드하면 KoreanGPT 3종 + ChromaDB와 메모리를 공유해 OOM 위험이 커진다. 외부 서버로 분리하면 **메모리가 격리되어 라우터 장애가 앱 전체로 번지지 않고**, PagedAttention·continuous batching으로 동시 요청 처리량도 개선된다.
-
-**분류와 자유 답변을 분리한 이유**: 라우터 서버가 죽으면 분류가 실패해 모든 질문이 `fallback`으로 간다. 자유 답변까지 같은 서버에 묶여 있으면 그 순간 고정 문구밖에 나오지 않는다. `fallback_node`의 자유 답변을 OpenRouter로 옮겨, 라우터 장애와 자유 답변 가용성을 분리했다. 분류는 vLLM에 남아 있다.
-
-OpenRouter 키(`ERIC_CHATAGENT_OPENROUTER_KEY`)가 없으면 `fallback_node`는 고정 안내 문구로 답한다. 호출이 실패해도 예외를 밖으로 내지 않는다 — 라우터가 죽은 상태에서는 이 경로가 상시 경로이므로, 여기서 터지면 모든 질문이 500이 된다.
-
-**파싱 방어**: 소규모 모델은 지시한 라벨 형식을 벗어나는 경우가 있어(`'주식'`, `'주식 inquiry'` 등), 영어 라벨·한국어 키워드를 모두 수용하고 매칭 실패 시 `fallback`으로 처리하도록 파서를 이중화했다.
-
-<br>
-
-## RAG 파이프라인
-
-**지식 소스**: 네이버 뉴스 검색 API — 질문 시점에 실시간 수집 후 인덱싱 (사전 구축된 고정 지식 베이스가 아님)
-
-주식 뉴스는 시의성이 생명이라 미리 인덱싱해 둔 문서로는 답할 수 없다. 그래서 질문마다 뉴스를 새로 수집하고, `question_id`로 격리해 해당 질문의 컨텍스트만 검색하도록 설계했다.
-
-Vector DB에 뉴스를 저장해 최근에 물어본 주식관련 뉴스는 바로 뽑을 수 있게 만들었다.
-
-### STEP 1 — 기본 검색
-
-질문을 불필요한 단어, 노이즈, 줄임말 등에 입력 데이터를 전처리(질문 재작성) 과정을 거쳐 네이버 API에 전달하고, 수집한 기사의 `Context`을 청킹해 인덱싱.
-
-### STEP 2 — 본문 추출과 필터링
-
-```mermaid
-flowchart TB
-    Q[질문] --> R["질문 재작성<br/>입력 데이터 전처리"]
-    R --> N["네이버 API<br/>display × 3 수집"]
-
-    N --> D{"최근 30일<br/>이내인가?"}
-    D -- 아니요 --> X1[Fallback]
-    D -- 예 --> M{"종목명이<br/>일치하는가?"}
-
-    M -- 아니요 --> X2[Fallback]
-    M -- 예 --> B["trafilatura<br/>본문 병렬 추출"]
-
-    B --> CH["청킹 500자<br/>overlap 100"]
-    CH --> EM[임베딩]
-    EM --> DB[(ChromaDB)]
-
-    style Q fill:#ffffff,stroke:#222222,stroke-width:2px,color:#111111
-    style R fill:#fff4e6,stroke:#d35400,stroke-width:2px,color:#111111
-    style N fill:#ffffff,stroke:#222222,stroke-width:2px,color:#111111
-    style D fill:#fff4e6,stroke:#d35400,stroke-width:2px,color:#111111
-    style M fill:#fff4e6,stroke:#d35400,stroke-width:2px,color:#111111
-    style X1 fill:#ffe6e6,stroke:#cc0000,stroke-width:2px,color:#111111
-    style X2 fill:#ffe6e6,stroke:#cc0000,stroke-width:2px,color:#111111
-    style B fill:#ffffff,stroke:#222222,stroke-width:2px,color:#111111
-    style CH fill:#ffffff,stroke:#222222,stroke-width:2px,color:#111111
-    style EM fill:#ffffff,stroke:#222222,stroke-width:2px,color:#111111
-    style DB fill:#e6f2ff,stroke:#2457a6,stroke-width:2px,color:#111111
-```
-
-- **`trafilatura` 본문 추출** — `description` 대신 원문 링크에서 기사 본문을 가져옴
-- **날짜 필터** — `pubDate`를 파싱해 30일 이내 기사만 사용
-- **종목명 매칭** — 제목·요약에 종목명(별칭 포함)이 있는 기사만 통과
-
-**본문 추출을 도입한 이유**: 요약문만으로는 "왜 올랐는가", "리스크는 무엇인가" 같은 질문에 답할 근거가 없었다. 다만 본문에는 `ADVERTISEMENT`, `좋아요 0`, 저작권 문구 같은 페이지 요소가 섞여 들어와, `favor_precision` 옵션으로 본문만 정밀 추출하도록 설정했다.
-
-### STEP 3 — 질문 재작성 모듈
-
-검색 품질 문제의 근본 원인이 **질문 문장과 검색어의 불일치**라고 판단하고, 별도 모듈로 분리했다.
-
-```
-"삼전 주가 알려줘"  →  "삼성전자 주가 전망"  (sort=date)
-```
-
-| 구성 요소 | 역할 |
-|---|---|
-| 별칭 사전 | `삼전` → `삼성전자`, 티커 매핑. 긴 별칭부터 검사해 부분 매칭 사고 방지 |
-| 의도 추출 | `price_outlook`, `earnings`, `dividend` 등 — 매칭 키워드 길이·개수로 스코어링 |
-| 시간 표현 | `최근`, `2분기` 등을 정규화하고, 시간 표현이 있으면 정렬을 `date`로 자동 전환 |
-| 중복 제거 | 포함 관계에 있는 표현 정리 (`2분기` + `분기` → `2분기`) |
-
-**모듈로 분리한 이유**: 검색어 생성은 그래프의 다른 노드와 관심사가 다르고, 별칭 사전은 JSON으로 외부화해 코드 수정 없이 종목을 추가할 수 있어야 했다.
-
-### STEP 4 — 벡터 검색과 임계값
-
-`question_id`로 범위를 좁힌 뒤 유사도 검색, `max_distance` 미달 문서는 폐기.
-
-```
-검색 결과 거리 확인
-20% 넘는 폭등에도…삼전닉스 주가, 목표가의 반토막 / distance: 0.6895
-골드만삭스, 삼성전자 목표가 48만원→49만원 상향     / distance: 0.7025
-```
-
-**측정 결과와 한계**: distance 분포를 로깅해 확인한 결과, 관련 기사(0.66~0.82)와 무관 기사(0.80~1.22)의 분포가 겹쳐 임계값만으로는 분리되지 않았다.
-
-원인은 **다음 토큰 예측으로 학습한 생성 모델을 임베더로 전용한 구조적 한계**다. 의미 유사도를 재도록 훈련된 적이 없으므로(대조 학습 미적용) 벡터 공간에서 문서 간 거리가 변별력을 갖지 못한다.
-
-단기 대응으로 STEP 2의 종목명 키워드 필터를 병행해 벡터 검색의 약점을 규칙으로 보완했고, 근본 해결인 대조 학습 기반 임베더 재학습은 후속 과제로 남겼다.
-
-### STEP 5 — LangGraph 파이프라인
-
-LangChain 체인의 조건 분기를 명시적 그래프로 표현.
+| 모델 | PyTorch KoreanGPT, SentencePiece, 사전학습·태스크별 fine-tuning |
+| 검색 | 네이버 뉴스 수집, 종목·날짜 필터, 자체 임베더와 Chroma 검색, RSS 코퍼스 |
+| 대화 흐름 | LangGraph의 `smalltalk` / `stock_rag` / `fallback` 분기 |
+| 세션 | `thread_id`별 이력, 현재 턴의 trace·검색 근거 초기화 |
+| 외부 모델 | vLLM 질문 분류, OpenRouter fallback 자유 답변 |
+| 평가 | 검색·생성 진단, 데이터 감사, 동일 평가셋의 학습 전후 비교 |
+| 서비스 | FastAPI, 웹 채팅 UI, Docker, nginx, GitHub Actions·EC2 배포 |
+
+## 실행 구조
 
 ```mermaid
 flowchart TD
-    START([START]) --> Router{router_node<br/>의도 분류}
-
-    Router -->|smalltalk| ST[small_talk_node]
-    Router -->|stock_rag| RW[rewrite_query_node]
-    Router -->|fallback| FB[fallback_node]
-
-    RW --> CA{캐시 히트?}
-    CA -->|예| RN[retrieve_news_node]
-    CA -->|아니오| SN[search_news_node]
-    SN --> RN
-    RN --> GEN{contexts<br/>존재?}
-    GEN -->|있음| G[generate_node]
-    GEN -->|없음| NF[관련 뉴스 없음 안내]
-
-    ST --> E([END])
-    G --> E
-    NF --> E
-    FB --> E
-
-    style Router fill:#ffe8e8,stroke:#d9534f,stroke-width:2px,color:#111111
-    style CA fill:#e8f8e8,stroke:#5cb85c,stroke-width:2px,color:#111111
-    style GEN fill:#fff4e6,stroke:#f5a623,stroke-width:2px,color:#111111
+    U[웹 채팅 사용자] --> API[FastAPI /agent/chat]
+    API --> ROUTE[LangGraph router]
+    ROUTE -->|분류 요청| V[vLLM 서버]
+    ROUTE -->|smalltalk| ST[KoreanGPT smalltalk]
+    ROUTE -->|stock_rag| RW[종목·별칭·시간 표현 정리]
+    RW --> N[네이버 뉴스 후보 수집·본문 추출]
+    N --> STORE[Chroma 질문별 청크]
+    RSS[별도 RSS 색인 작업] --> CORPUS[Chroma 상시 코퍼스]
+    STORE --> RET[종목·거리 조건 검색]
+    CORPUS --> RET
+    RET --> GEN[뉴스 모델 생성 또는 근거 없음 안내]
+    ROUTE -->|fallback 또는 분류 실패| FB[OpenRouter 또는 고정 안내]
+    ST --> HIST[이력 기록]
+    GEN --> HIST
+    FB --> HIST
+    HIST --> OUT[답변·route·trace·contexts 반환]
 ```
 
-```
-LangGraph StateGraph
- ├─ smalltalk : small_talk_node → KoreanGPT_smalltalk
- ├─ stock_rag : rewrite_query → (캐시 확인) → search_news → retrieve_news → generate
- └─ fallback  : 처리 범위 안내
-```
+모델과 스토어는 FastAPI `lifespan`의 `build_resources()`에서 프로세스 시작 시 생성하고 그래프에 주입합니다. 모듈 import만으로 가중치나 Chroma 클라이언트를 생성하지 않습니다. 실제 리소스 구성은 임베더 1벌, 생성 모델 2벌, Chroma 클라이언트 1개입니다.
 
-**메모리**: `MemorySaver` 체크포인터로 `thread_id` 단위 세션 유지. `trace` 필드는 `Annotated[list, operator.add]`로 누적해 어떤 노드를 거쳤는지 응답에 함께 반환한다 — 디버깅 시 경로를 즉시 확인할 수 있다.
+### 뉴스 수집·검색
 
-**컨텍스트 부재 시 폴백**: 임계값에 걸려 컨텍스트가 비면 생성 노드가 모델을 호출하지 않고 "관련성이 충분한 뉴스를 찾지 못했습니다"를 반환한다. 근거 없이 답을 지어내는 것보다 정직한 안내가 낫다고 판단했다.
+- 기본 최근 기준은 5일입니다. 종목 사전 299종과 별칭을 사용하고 제목 일치를 우선하며, 필터 결과가 비면 무관한 원본 기사로 되돌아가지 않습니다.
+- 기본 네이버 후보 풀은 요청 기사 수의 8배입니다. 서빙에서는 본문 추출 대상 최대 3건, 최대 10개 스레드와 5초 다운로드 타임아웃을 사용합니다.
+- 서빙 청크는 358자, 중첩 50자입니다. 그래프는 거리 상한 `1.25`로 최대 2개 문서를 선택합니다.
+- 검색 범위는 이번 `question_id`의 청크와 대상 종목의 RSS 코퍼스입니다. 종목별 수집 결과 캐시로 네이버 요청을 건너뛰는 분기는 구현돼 있지 않습니다.
+- RSS 색인·질문 청크 정리는 별도 스크립트로 실행합니다. 기본 TTL은 6시간이며, 주기 실행은 별도로 설정해야 합니다.
 
-<br>
+### 세션과 모델별 이력 활용
 
-## 성능 최적화
+`MemorySaver`가 `thread_id`별 상태를 메모리에 유지합니다. 매 턴 `trace`, `question_id`, `contexts`, `retrieved_docs`를 초기화하고, 대화 이력은 `history`에 별도로 저장합니다. 기본 이력 예산은 120토큰이며 최신 턴은 예산을 넘더라도 보존합니다. 서버를 재시작하면 메모리의 세션은 유지되지 않습니다.
 
-### 병목 측정
+현재 fallback은 이력을 OpenRouter 메시지에 전달합니다. 자체 스몰톡 경로는 현재 질문만 입력하고, 뉴스 체인은 빈 history 기본값을 사용합니다. **이력을 저장하는 서빙 기능과 자체 모델이 이전 발화를 이해하는 능력은 별개입니다.**
 
-nginx 504가 반복되어 모델 서버에서 직접 요청 시간을 측정했다.
+`VLLM_BASE_URL` 미설정·분류 실패 시 fallback으로 이동합니다. OpenRouter 키가 있으면 외부 모델이 답하고, 키가 없거나 호출이 실패하면 고정 안내 문구를 반환합니다. 이 경로의 외부 모델 응답도 사실 정확성을 보장하지 않습니다.
+
+## 모델과 학습
+
+| 항목 | 값 |
+|---|---|
+| 구조 | Decoder-only Transformer, 8블록·hidden 512·attention head 8개 |
+| 파라미터 | 41,816,704개, 약 42M |
+| 토크나이저 | SentencePiece, 어휘 16,000 |
+| 모델 문맥 상한 | 384토큰 |
+| 임베더 | `KoreanGPT.pt`의 hidden state 평균 사용 |
+| 서빙 스몰톡 | `KoreanGPT_smalltalk.pt` |
+| 서빙 뉴스 | `KoreanGPT_news_v2.pt` |
+
+위키 기반 텍스트 사전학습 후 스몰톡·뉴스 응답 체크포인트를 분리했습니다. 생성용 가중치를 임베더로 사용하며 별도의 대조 학습을 적용한 검색 모델은 아닙니다. 가중치·토크나이저와 학습 원본은 소스 저장소에 포함하지 않습니다.
+
+### 멀티턴 fine-tuning 데이터
+
+| 구분 | 구성·분할 |
+|---|---|
+| 스몰톡 원본 | 유효 SNS 18,040세션 + 합성 전이 400세션 |
+| 스몰톡 샘플 | train 25,651 / val 1,314, train 멀티턴 비율 99.98% |
+| 뉴스 원본 | 실제 기사 600건 중 추출 품질이 낮은 13건 제외, 최종 587기사 |
+| 뉴스 QA | 기사당 4턴, 총 2,348턴; train 528기사 / val 59기사 |
+| 누수 방지 | 원본 세션·기사·합성 템플릿별 분리 후 윈도우 생성, 원본 그룹 중복 0건 |
+
+뉴스 질문은 후속 질문 템플릿, 답변은 원문 발췌와 정보 없음 응답으로 구성했습니다. 정보 없음 응답은 약 28%입니다. 합성 전이 400세션은 집필 흐름 20종과 기업명 20종의 조합입니다. 두 데이터 모두 별도의 사람 검수 독립 정답셋을 대체하지 않습니다.
+
+QA 쌍을 중간에 자르지 않고 인접 윈도우에 QA 1쌍을 중첩했습니다. 스몰톡 샘플 길이는 256토큰, 뉴스는 384토큰이며 모델 자체의 문맥 상한·어휘 수는 유지했습니다. 중첩 때문에 스몰톡 전체 노출 토큰은 기존 약 480만에서 512만으로 증가했습니다.
+
+### 실제 Colab 학습 설정
+
+| 설정 | 스몰톡 | 뉴스 |
+|---|---|---|
+| 학습 방식 | 전체 파라미터 SFT | 전체 파라미터 SFT |
+| 샘플 길이 / 배치 | 256 / 32 | 384 / 16 |
+| learning rate | `2e-5` | `1e-5` |
+| optimizer | AdamW | AdamW |
+| 완료 에폭 / optimizer step | 2 / 1,604 | 2 / 66 |
+
+질문·기사·패딩의 label을 `-100`으로 마스킹해 답변만 감독하고, causal shift를 한 번 적용합니다. 동적 패딩, warm-up 5%, cosine decay, weight decay 0.01, gradient clipping 1.0을 사용했습니다. 최대 2에폭·미개선 1회 조기 종료 기준이며 실제 두 실행에서는 조기 종료가 발생하지 않았습니다. GPU는 A100-SXM4-40GB였습니다.
+
+### 학습 전후 결과 — 2026-10-24 실행
+
+원본과 best 체크포인트를 같은 케이스·생성 설정·평가 프로토콜로 비교했습니다. 고정 케이스는 모델별 38개로 단일턴 16개, held-out 멀티턴 16개, 통제 참조 6개(3쌍)입니다.
+
+| 지표 | 뉴스 전 → 후 | 스몰톡 전 → 후 |
+|---|---|---|
+| 전체 val 답변 NLL | 3.29238 → 1.51870 | 7.72973 → 3.55619 |
+| 전체 val perplexity | 26.9068 → 4.5663 | 2274.9795 → 35.0295 |
+| 통제 참조 대상 일치 | 0/6 → 0/6 | 0/6 → 0/6 |
+| 통제 대조쌍 전체 일치 | 0/3 → 0/3 | 0/3 → 0/3 |
+| 멀티턴 history gain NLL | 0.06846 → 0.05544 | 0.69055 → 0.26298 |
+| 반복 4-gram 발생 답변 | 0/38 → 5/38 | 0/38 → 0/38 |
+
+history gain은 `이력 제거 NLL − 이력 포함 NLL`입니다. 양수면 이력이 정답 likelihood에 도움을 줬다는 뜻이며 이번에는 두 모델 모두 값이 감소했습니다.
+
+정답 앞 토큰을 제공하는 teacher-forcing loss와 자유 생성의 참조 능력은 다릅니다. 스몰톡은 앞에서 수영했다고 말한 뒤 활동을 물어도 이를 회수하지 못했고, 뉴스는 근거 밖 내용과 반복을 생성했습니다. 제한된 6케이스를 전체 멀티턴 정확도로 일반화하지 않습니다. 여러 설정을 함께 변경했으므로 256토큰 윈도우의 독립 효과도 분리하지 못했습니다. 추가 학습 없이 결과를 보존했고 새 가중치는 서빙에 채택하지 않았습니다.
+
+## 서빙·검색 개선 측정
+
+| 측정 항목 | 변경 전 → 후 | 범위 |
+|---|---|---|
+| import 시 가중치 적재 | 4회 → 0회 | 실제 자원 생성 시 모델 3벌 적재 |
+| import 시 Chroma 생성 | 2개 → 0개 | 실제 자원 생성 시 1개 |
+| 가중치 텐서 합계 | 669.1 → 501.8MB | 중복 167.3MB 제거, RSS 절감률 아님 |
+| 종목 식별 | 9/10 → 10/10 | 고정 10질문 라이브 표본 |
+| 검색 청크의 종목명 포함 | 13/20 → 17/20 | 의미 관련성의 보조 지표 |
+| 기사 최대 경과 | 19일 → 4일 | 최근 기준·RSS 등 함께 변경 |
+| 수집 중앙값 | 1.343 → 0.845초 | 기사·네트워크가 고정되지 않은 관찰값 |
+
+별도 후보 풀 3배/8배 비교에서는 빈 문맥 질문이 1/10에서 0/10으로 줄었지만 종목명 포함률은 17/18에서 17/20으로 낮아졌습니다. 관련성과 응답 범위의 상충 관계를 함께 기록했습니다.
+
+기존 5질문의 생성 진단에서는 자체 모델의 규칙 통과가 0/5, Gemini 비교가 5/5였습니다. 두 기록은 검색 문맥·실행 ID가 달라 동일 컨텍스트의 통제 비교가 아닙니다. 어휘 중복률을 사실 정확도나 환각률로 해석하거나, 이 결과만으로 모델 규모가 원인이라고 단정하지 않습니다.
+
+## 로컬 실행
+
+Python 3.12 이상이 필요하며 현재 CI·Docker는 Python 3.14를 사용합니다. 의존성의 기준은 `pyproject.toml`과 `uv.lock`입니다.
 
 ```bash
-curl -X POST http://localhost:8000/agent/chat \
-  -d '{"question":"삼성전자 주가 알려줘"}' -w '%{time_total}\n'
-# → 99.840219초
+uv sync --locked
+cp .env.example .env
 ```
 
-구간별로 로그를 심어 분해한 결과, 대부분의 시간이 **기사 본문 추출**에 소요되고 있었다. 기사마다 원문 사이트에 HTTP 요청을 순차로 보내는 구조라, 응답이 느린 언론사 한 곳이 전체 파이프라인을 붙잡았다.
+`.env`에 실제 사용할 서비스의 키와 주소를 입력합니다.
 
-```mermaid
-flowchart LR
-    subgraph BEFORE["개선 전 — 순차 처리"]
-        direction LR
-        A1[기사1] --> A2[기사2] --> A3[기사3] --> A4[...] --> A10[기사10]
-    end
-
-    subgraph AFTER["개선 후 — 병렬 + 캐시"]
-        direction TB
-        C{종목 캐시<br/>TTL 확인}
-        C -->|히트| SKIP[네트워크 요청 생략]
-        C -->|미스| POOL[ThreadPoolExecutor<br/>동시 5건 · 타임아웃 5초]
-    end
-
-    BEFORE -.->|개선| AFTER
-
-    style BEFORE fill:#ffe8e8,stroke:#d9534f,stroke-width:2px,color:#111111
-    style AFTER fill:#e8f8e8,stroke:#5cb85c,stroke-width:2px,color:#111111
-```
-
-### 개선 1 — 본문 추출 병렬화
-
-HTTP 요청은 대부분 응답 대기 시간이라 GIL의 영향을 거의 받지 않는다. `ThreadPoolExecutor`로 동시 요청을 보내 대기 시간을 겹쳤다.
-
-```python
-with ThreadPoolExecutor(max_workers=5) as executor:
-    documents = list(executor.map(build_document, items))
-```
-
-동시에 `trafilatura` 다운로드 타임아웃을 설정해, 응답하지 않는 사이트가 전체를 지연시키지 못하도록 차단했다.
-
-```python
-_cfg = use_config()
-_cfg.set("DEFAULT", "DOWNLOAD_TIMEOUT", "10")
-```
-
-`max_workers`를 과도하게 높이면 상대 서버에 부담을 주거나 차단될 수 있어 10으로 제한했다.
-
-이렇게 동시 요청을 보내 응답 시간이 `99.840219초`에서 `2.939691초`로 대폭 감소했다.
-
-### 개선 2 — 종목별 뉴스 캐싱
-
-같은 종목을 연속으로 질문하는 패턴이 많다는 점에 착안해, **종목 단위로 수집 결과를 캐싱**했다. 뉴스는 분 단위로 바뀌지 않으므로 짧은 TTL로도 중복 수집을 크게 줄일 수 있다.
-
-| 항목 | 설계 |
+| 환경변수 | 용도 |
 |---|---|
-| 캐시 키 | 정규화된 종목명 + 정렬 방식 (`삼성전자:date`) |
-| TTL | 수 분 단위 — 시의성과 응답 속도의 균형점 |
-| 저장 대상 | 파싱 완료된 문서(본문 추출 후) — 가장 비싼 연산을 재사용 |
-| 무효화 | TTL 만료 시 자동 폐기, 동일 종목 재질문 시 갱신 |
+| `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET` | 뉴스 수집 |
+| `VLLM_BASE_URL`, `VLLM_API_KEY` | Qwen 라우터의 호환 API 주소·키 |
+| `ERIC_CHATAGENT_OPENROUTER_KEY` | 선택: fallback 자유 답변 |
+| `ERIC_CHATAGENT_OPENROUTER_MODEL` | 선택: 사용할 모델 ID. 코드 기본값을 쓰려면 빈 값 대신 항목을 생략 |
+| `GOOGLE_API_KEY` | 선택: Gemini 검색 품질 평가·비교 |
+| `LANGSMITH_TRACING`, `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT` | 선택: 추적 |
+| `ERIC_NEWS_CUTOFF_DAYS` | 최근 기사 기준, 기본 5일 |
+| `ERIC_QUESTION_CHUNK_TTL_HOURS` | RSS 색인 스크립트의 질문 청크 TTL, 기본 6시간 |
+| `ERIC_HISTORY_MAX_TOKENS` | 이력 예산, 기본 120토큰, 최신 턴 예외 |
 
-캐시 히트 시 네이버 API 호출과 본문 추출을 모두 건너뛰므로, 연속 질문의 체감 속도가 크게 달라진다.
+라우터가 정상 동작하려면 `Qwen/Qwen2.5-1.5B-Instruct`를 제공하는 vLLM 엔드포인트가 필요합니다. vLLM은 앱의 CPU 의존성과 별도 환경에서 운영합니다. 라우터가 없으면 모든 질문은 fallback 경로로 이동합니다.
 
-### 개선 3 — 수집·인덱싱 규모 조정
+### 모델 파일 준비
 
-| 파라미터 | 조정 | 효과 |
-|---|---|---|
-| 수집 기사 수 | 축소 | HTTP 요청 횟수 감소 |
-| 청크 크기 | 확대 | 임베딩 호출 횟수 감소 |
-| `top_k` | 축소 | 컨텍스트 길이 감소 → 생성 시간 단축 |
-
-### 결과
-
-| 구간 | 개선 전 | 개선 후  |
-|---|---|-----------------|
-| 본문 추출 | 순차 10건 | 병렬 5-way + 타임아웃 |
-| 반복 질문 | 매번 재수집 | 캐시 히트 시 생략      |
-| 전체 응답 | 99.8초 | 2.93초  |
-
-<br>
-
-## 자동 평가 파이프라인
-
-RAG 시스템은 출력이 매번 달라 기존 단위 테스트로 검증할 수 없다. 프롬프트나 파라미터를 바꿨을 때 좋아졌는지 나빠졌는지 판단할 기준이 필요해 평가 스크립트를 별도로 구성했다.
-
-```mermaid
-flowchart LR
-    TS[(질문셋)] --> RUN[배치 실행]
-    RUN --> SEARCH[뉴스 수집 인덱싱]
-    SEARCH --> RET[벡터 검색]
-
-    RET --> JUDGE[Gemini 검색 품질 평가]
-    RET --> GEN[답변 생성]
-    GEN --> RULE[규칙 기반 생성 품질 평가]
-
-    JUDGE --> REP[리포트 CSV]
-    RULE --> REP
-
-    style JUDGE fill:#fff4e6,stroke:#f5a623,stroke-width:2px,color:#111111
-    style RULE fill:#e8f8e8,stroke:#5cb85c,stroke-width:2px,color:#111111
-    style REP fill:#ffe8e8,stroke:#d9534f,stroke-width:2px,color:#111111
-```
-
-
-**두 축으로 나눠 평가한 이유**: 검색 품질("이 문서가 질문에 적합한가")은 의미적 판단이 필요해 LLM-as-judge(Gemini)가 적합하고, 생성 품질("반복·근거성·형식이 정상인가")은 재현 가능한 결정적 지표가 더 중요해 규칙 기반으로 분리했다. 후자는 API 비용·한도와 무관하게 언제든 동일한 기준으로 회귀 검증을 돌릴 수 있다.
-
-### 평가 지표
-
-| 지표 | 측정 방법 | 왜 필요한가 |
-|---|---|---|
-| 검색 품질 | Gemini가 질문–컨텍스트 적합성을 5점 척도로 채점 (keyword_search, relevance, context_usefulness 등) | 검색이 실패하면 이후 파이프라인이 무의미하다 |
-| 반복률 | 답변 내 고유 토큰 비율 (`len(set) / len`) | 소규모 모델의 대표적 실패 모드인 반복 루프를 자동 탐지 |
-| 근거성 (Groundedness) | 답변에 등장한 핵심 어휘가 `contexts`에 존재하는 비율 | 환각을 정량화하는 핵심 지표 |
-
-### 자체 모델 · 대형 모델 비교 실험
-
-Stage 5 파인튜닝 이후에도 남아 있던 생성 품질 문제의 원인을 분리하기 위해, 동일한 검색 결과(컨텍스트)를 기준으로 자체 모델(KoreanGPT_news_v2, 42M)과 대형 모델(Gemini 3.6 Flash)의 답변을 나란히 평가했다.
-
-| 지표 | KoreanGPT (42M) | Gemini 3.6 Flash |
-|---|---|---|
-| 어휘 다양성 (repetition_ratio) | 0.564 ~ 0.929 | 0.902 ~ 0.983 |
-| 근거성 (groundedness) | 0.000 ~ 0.054 | 0.447 ~ 0.568 |
-| 생성 통과율 | 0 / 5 | 5 / 5 |
-
-**해석**: 두 모델에게 완전히 동일한 뉴스 컨텍스트를 주었다는 점이 핵심이다. 검색 품질 변수를 통제한 상태에서도 근거성이 10배 이상 벌어졌다는 것은, Stage 5에서 설계한 "근거 기반 응답" 학습 방향 자체는 유효했으나 42M 파라미터로는 500자 규모의 긴 컨텍스트를 읽고 압축·요약하는 능력이 구조적으로 부족하다는 뜻이다. 실제로 학습 데이터(정제된 150자 내외 컨텍스트)와 서빙 시 컨텍스트(원문 500자 청크)의 길이·형태 차이가 이 격차를 키운 것으로 판단하며, 컨텍스트 정제 강화와 모델 스케일업을 다음 개선 지점으로 특정했다.
-
-이 실험은 직접 만든 모델의 한계를 감으로 판단하지 않고 수치로 규명했다는 근거이며, 라우터에 vLLM으로 공개 가중치 모델을 서빙하는 구조를 이미 갖춘 만큼 생성 단계도 동일한 방식으로 확장할 수 있는 여지를 남겨두었다.
-
-### 평가셋 구성
-
-| 유형 | 목적 |
-|---|---|
-| 종목 명시 질문 | 정상 경로의 기본 성능 |
-| 별칭·줄임말 질문 (`삼전`, `하닉`) | 질문 재작성 모듈 검증 |
-| 시장 전체 질문 (종목 미포함) | 검색 확장성 검증 |
+현재 Dockerfile과 같은 방식으로 Hugging Face 저장소에서 모델 파일을 내려받습니다.
 
 ```bash
-PYTHONPATH=src uv run python -m model.rag.evaluate_rag
+uv run python -c "from huggingface_hub import snapshot_download; snapshot_download('Dongju-00/eric-chatagent', local_dir='.')"
+uv run python main.py
 ```
 
-<br>
+기본 위치는 `src/model/data/sp_korean.model`과 `src/model/checkpoints/`의 세 가중치 파일입니다. UI는 `http://localhost:8000`, API 문서는 `http://localhost:8000/docs`입니다.
 
-## 디렉토리 구조
+경로는 [paths.py](src/model/paths.py)에서 해석합니다. 저장소 밖의 자산을 사용할 때는 다음 값을 지정할 수 있습니다.
 
-```
-eric-chatagent/
-├── main.py                       # 진입점 (uvicorn 실행, host 0.0.0.0)
-├── Dockerfile                    # 앱 이미지 (빌드 시 HF에서 모델 주입)
-├── docker-compose.yml            # 모델 서버용
-├── docker-compose-web.yml        # 웹 서버용 (nginx)
-├── nginx.conf                    # 리버스 프록시 · 타임아웃 설정
-├── .dockerignore                 # .venv, .env, 대용량 학습 데이터 제외
-├── .github/workflows/ci.yml      # CI/CD 4-job 파이프라인
-├── pyproject.toml                # 의존성 파일 설정
-├── .gitignore
-├── .dockerignore
-├── .env                          # 검색을 위한 NAVERAPI, 평가, 라우터에 필요할 수 있는 GoogleAPI
-├── .env.example                  # .env 설명
-│
-│
-└── src/
-    ├── app/
-    │   ├── app.py                # FastAPI 진입점 + 엔드포인트 + 정적 파일 마운트
-    │   └── static/
-    │       ├── index.html        # 카카오톡 스타일 채팅 UI
-    │       └── app.js            # 세션 관리 · 메시지 렌더링 · API 통신
-    │
-    └── model/
-        ├── paths.py              # 모든 경로의 단일 출처 (ERIC_* 환경변수로 override)
-        ├── train/
-        │   ├── model.py          # KoreanGPT · Block · Attention 구현, generate()
-        │   ├── tokenizer.py      # smalltalk, stock_news 파인튜닝
-        │   ├── train.py          # 모델 학습 및 로그 출력
-        │   ├── train_utils.py    # batch와 early stopping 구현
-        │   └── sp_tokenizer.py   # SentencePiece 학습·로드
-        ├── embed/
-        │   └── embedder.py       # KoreanGPT 기반 문서·질문 임베딩
-        ├── store/
-        │   └── vector_store.py   # 뉴스 수집·본문추출·청킹·인덱싱·검색·캐싱
-        ├── rag/
-        │   ├── search.py         # 네이버 뉴스 API 클라이언트
-        │   ├── evaluate_rag.py   # 자동 평가 파이프라인
-        │   └── baseline.py       # LangChain LLM 래퍼 (KoreanGPTLLM), 프롬프트
-        ├── graph/
-        │   ├── graph.py          # LangGraph StateGraph 조립 · 노드 정의
-        │   ├── query_rewrite.py  # 질문 → 검색어 변환
-        ├── serving/
-        │   └── vllm_serve.py     # 라우터용 vLLM 서버 (Modal)
-        ├── scripts/
-        │   ├── _bootstrap.py     # 스크립트 직접 실행 시 src/를 sys.path에 추가
-        │   ├── prepare_pretrain.py  # Stage 1 사전학습 코퍼스 구성
-        │   ├── prepare_finetune.py  # Stage 2 QA 데이터 분할
-        │   └── finetune_news.py  # Stage 5 추가 파인튜닝
-        ├── data/                 # 토크나이저 (HF 주입)
-        │   ├── news/             # Stage 5 추가 파인튜닝 데이터
-        │   └── stock/            # 상장사 별칭·의도·키워드 사전 (JSON)
-        └── checkpoints/          # 가중치 (HF 주입)
-```
-
-<br>
-
-## 배포 파이프라인
-
-```mermaid
-flowchart LR
-    Push[git push main] --> Test
-
-    subgraph GHA["GitHub Actions"]
-        direction TB
-        Test[test<br/>uv sync 검증] --> Build[build-and-push<br/>이미지 빌드]
-        Build --> DM[deploy-model<br/>SSH · pull · up]
-        DM --> DW[deploy-web<br/>nginx 갱신]
-    end
-
-    HF[(HF Hub<br/>가중치)] -.->|빌드 시 주입| Build
-    Build -->|push| DH[(Docker Hub)]
-    DH -.->|pull| EC2M[Model 서버]
-    DM --> EC2M
-    DW --> EC2W[Web 서버]
-
-    style GHA fill:#f0f0f5,stroke:#6c757d,stroke-width:2px,color:#111111
-```
-
-**모델 배포를 분리한 이유**: 초기에는 모델 가중치를 로컬에서 이미지에 직접 복사했는데, `.gitignore`와 `.dockerignore`가 서로 다른 시점에 작동한다는 걸 놓쳐 CI 환경에서만 빌드가 실패했다. Hugging Face에 모델을 업로드하고 Dockerfile에서 빌드 시 자동으로 내려받는 구조로 바꿔 이 문제를 근본적으로 해소했다.
-
-| 자산 | 위치 | 이유 |
-|---|---|---|
-| 소스 코드 | Git | 버전 관리 대상 |
-| 모델 가중치 | Hugging Face Hub | 대용량 바이너리, Git에 부적합 |
-| 실행 이미지 | Docker Hub | 코드 + 의존성 + 모델의 완성체 |
-| 자동 배포 | Git Actions| CI/CD를 사용한 WorkFlow |
-| 배포용 비밀값 | GitHub Secrets | 워크플로가 서버 접속·인증에 사용 |
-| 실행용 환경변수 | 서버의 `.env` | 이미지가 공개되어도 키는 안전 |
-
-### GitHub Secrets
-
-| 이름 | 설명 |
+| 변수 | 기본값 |
 |---|---|
-| `DOCKER_USERNAME` / `DOCKER_TOKEN` | Docker Hub 인증 |
-| `MODEL_SERVER_HOST` / `WEB_SERVER_HOST` | 각 EC2 주소 |
-| `SERVER_USER` | EC2 사용자명 (`ubuntu`) |
-| `SSH_PRIVATE_KEY` | 접속용 `.pem` 전문 |
-
-<br>
-
-## 환경 설정
-
-```
-# .env
-NAVER_CLIENT_ID=...
-NAVER_CLIENT_SECRET=...
-GOOGLE_API_KEY=...                # 검색 품질 평가(LLM-judge)용
-
-# 라우터 서빙 - 설정 시 vLLM 사용, 미설정 또는 호출 실패 시 기본 안내 응답
-VLLM_BASE_URL=http://localhost:8001/v1
-VLLM_API_KEY=...
-```
-
-### 경로 재지정 (선택)
-
-모든 경로는 `src/model/paths.py`에서 한 번만 해석한다. 기본값은 `pyproject.toml`이 있는 저장소 루트를 찾아 유도하므로 어느 디렉터리에서 실행해도 동일하게 동작한다. 데이터나 벡터 DB를 저장소 밖에 두려면 아래 환경변수로 덮어쓴다.
-
-| 환경변수 | 기본값 |
-|---|---|
-| `ERIC_PROJECT_ROOT` | `pyproject.toml`이 있는 상위 디렉터리 |
+| `ERIC_PROJECT_ROOT` | `pyproject.toml`이 있는 프로젝트 |
 | `ERIC_MODEL_ROOT` | `<project>/src/model` |
 | `ERIC_DATA_DIR` | `<model>/data` |
 | `ERIC_CHECKPOINT_DIR` | `<model>/checkpoints` |
 | `ERIC_CHROMA_PATH` | `<project>/storage/chroma` |
-| `ERIC_SP_PREFIX` | `<data>/sp_korean` (확장자 없는 prefix) |
+| `ERIC_SP_PREFIX` | `<data>/sp_korean`, 확장자 없는 prefix |
 
-```bash
-# 예: 벡터 DB를 외부 볼륨에 두고 실행
-ERIC_CHROMA_PATH=/mnt/data/chroma uv run python main.py
-```
+### API
 
-## 로컬
-
-### 실행
-
-```bash
-uv sync --locked                 # pyproject.toml + uv.lock 기준 의존성 설치
-```
-
-의존성은 `pyproject.toml`에서 관리하고 `uv.lock`으로 고정합니다. CI와 Docker도 `uv sync --locked`를 사용합니다.
-
-#### 모델 파일 준비
-
-가중치는 용량 문제로 저장소에 포함되지 않습니다.
-
-```bash
-uv run python -c "from huggingface_hub import snapshot_download; \
-    snapshot_download('Dongju-00/eric-chatagent', local_dir='.')"
-```
-
-`src/model/data/`(토크나이저)와 `src/model/checkpoints/`(가중치)에 자동으로 배치됩니다.
-
-### 서버 실행
-
-```bash
-uv run python main.py
-```
-
-| | |
+| 엔드포인트 | 동작 |
 |---|---|
-| 채팅 UI | http://localhost:8000 |
-| API 문서 | http://localhost:8000/docs |
-
-### 라우터를 vLLM으로 서빙 (권장)
-
-```bash
-# vLLM 서버 기동
-vllm serve Qwen/Qwen2.5-1.5B-Instruct --port 8001
-
-# 챗봇 실행 시 환경변수 지정
-VLLM_BASE_URL=http://localhost:8001/v1 \
-uv run python main.py
-```
-
-`VLLM_BASE_URL`을 설정하지 않거나 호출에 실패하면 기본 안내 응답을 반환한다. 라우터 모델명은 `src/model/graph/graph.py`의 `MODEL_ID`로 지정한다.
-
-### 평가 실행
+| `POST /agent/chat` | 질문 처리와 세션 ID 반환 |
+| `GET /health` | 프로세스·그래프 준비 상태 |
+| `GET /` | 채팅 UI |
 
 ```bash
-PYTHONPATH=src uv run python -m model.rag.evaluate_rag
+curl -X POST http://localhost:8000/agent/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"question":"삼성전자 주가 알려줘","thread_id":"session-example"}'
 ```
 
-### Docker 실행
+응답에는 `question`, `answer`, `route`, `trace`, `contexts`, `question_id`, `thread_id`가 포함됩니다. 같은 `thread_id`를 재사용하면 세션 상태가 이어지고, 생략하면 서버가 새 ID를 발급합니다. 주식 경로의 trace는 `router_node → rewrite_query_node → search_news_node → retrieve_news_node → generate_node → record_history_node`입니다.
+
+## Colab 학습과 기록
+
+- [뉴스 멀티턴 노트북](notebooks/colab/eric_news_multiturn_colab.ipynb)
+- [스몰톡 멀티턴 노트북](notebooks/colab/eric_smalltalk_multiturn_colab.ipynb)
+
+노트북은 준비된 데이터 ZIP·토크나이저·초기 가중치를 검증하고, Drive의 `eric-chatagent/models/<실행별 폴더>/`에 best와 재개 상태를 저장합니다. 데이터 ZIP은 Drive의 프로젝트 루트 또는 `data/`에서 찾고 없으면 업로드를 요청합니다. 데이터 원본·ZIP은 별도로 준비해야 하며 공개 코드만으로 학습 데이터를 자동 확보하지는 않습니다.
+
+원본 검증·분할·ZIP 생성은 [prepare_colab_finetune.py](src/model/scripts/prepare_colab_finetune.py), 노트북 생성은 [build_colab_notebooks.py](src/model/scripts/build_colab_notebooks.py)가 담당합니다. 답변 마스킹·배치는 [finetune_data.py](src/model/train/finetune_data.py), 전후 평가는 [finetune_metrics.py](src/model/train/finetune_metrics.py)에 구현했습니다.
+
+실행별 산출물에는 `config.json`, `dataset_audit.json`, `evaluation_cases.json`, `before_metrics.json`, `after_metrics.json`, `comparison.json/.csv`, `manual_review.csv`, `training_summary.json`, `training_history.json`, best 가중치와 `last.resume.pt`가 있습니다. 데이터·평가 프로토콜·체크포인트 해시로 결과의 대응을 확인합니다. 개별 대화·원본 측정 파일·모델 바이너리는 소스와 별도로 보관합니다.
+
+## 검증과 운영 스크립트
 
 ```bash
-docker compose up -d                              # 모델 서버
-docker compose -f docker-compose-web.yml up -d    # 웹 서버 (nginx)
+# 로컬 테스트: 세션 테스트에 토크나이저가 필요하며,
+# 실제 리소스 적재 검증에는 가중치도 필요합니다.
+PYTHONPATH=src uv run --locked python -m unittest discover -s tests
+
+# 생성·검색 진단: 실제 API 호출과 스토어 색인이 발생합니다.
+PYTHONPATH=src uv run --locked python -m model.rag.evaluate_rag
+
+# RSS 색인과 만료 질문 청크 정리: 스토어를 변경합니다.
+PYTHONPATH=src uv run --locked python src/model/scripts/ingest_rss.py
 ```
 
-### EC2 배포
+이번 변경을 검증한 로컬 환경에서 테스트 95개가 통과했습니다. [CI 워크플로](.github/workflows/ci.yml)의 현재 `test` job은 `uv sync --locked` 설치 검증이며, 위 단위 테스트 전체를 자동 실행하는 설정은 아직 포함하지 않습니다.
 
-**서버 초기 세팅** — Docker 설치와 Hub 로그인은 워크플로가 자동 처리합니다.
+[measure_retrieval.py](measurements/measure_retrieval.py)는 뉴스 수집·검색, [measure_startup.py](measurements/measure_startup.py)는 시작 비용을 측정합니다. 두 스크립트는 실제 자원·스토어를 사용할 수 있으므로 필요하면 `ERIC_CHROMA_PATH`로 측정용 저장소를 분리합니다. [measure_finetune_data.py](measurements/measure_finetune_data.py)는 준비된 ZIP의 데이터 구조만 감사하며 모델 성능을 측정하지 않습니다.
+
+## 배포
+
+Dockerfile은 CPU PyTorch 의존성을 설치하고 빌드 시 Hugging Face의 가중치·토크나이저를 주입합니다. `main` 푸시 시 GitHub Actions가 의존성 설치 검증, 이미지 빌드·Docker Hub 푸시, 모델 서버, 웹 서버 순서로 배포합니다. 기능 브랜치 푸시만으로 운영 배포가 실행되지는 않습니다.
 
 ```bash
-scp -i <key>.pem docker-compose.yml .env ubuntu@<model-host>:~/eric-chatagent/
+docker compose up -d
+docker compose -f docker-compose-web.yml up -d
 ```
 
-**체크리스트**
+모델 서버는 `.env`와 `storage` 볼륨을 사용합니다. 워크플로가 요구하는 Secrets는 `DOCKER_USERNAME`, `DOCKER_TOKEN`, `MODEL_SERVER_HOST`, `WEB_SERVER_HOST`, `SERVER_USER`, `SSH_PRIVATE_KEY`입니다. 서버의 실행용 `.env`는 별도로 준비합니다.
 
-- [ ] 보안 그룹 — 웹: `22`, `80` / 모델: `22`, `8000`(웹 서버 보안그룹에서만)
-- [ ] 웹 서버에 Elastic IP 연결 (도메인 A 레코드 고정)
-- [ ] 모델 인스턴스 타입 `t3.medium` 이상
+과거 2026-07-30 변경 기록의 이미지 크기는 8.6GB → 약 1.5GB입니다. 이미지 크기 변화는 런타임 메모리·응답 속도 개선 수치와 구분합니다.
 
-권장 사양: t3.medium (2 vCPU, 4GB RAM), EBS 30GB 이상
-볼륨 마운트: `storage/chroma`(벡터 DB)
+## 주요 코드
 
-### 추가 파인튜닝
-
-```bash
-uv run python src/model/scripts/finetune_news.py
+```text
+src/app/                         FastAPI·채팅 UI
+src/model/resources.py           프로세스별 리소스 생성
+src/model/graph/                 라우팅·검색 흐름·세션
+src/model/news/                  네이버 후보 필터·본문 추출·RSS
+src/model/store/                 Chroma 색인·검색·TTL
+src/model/llm/                   OpenRouter fallback
+src/model/rag/                   LLM 래퍼·프롬프트·진단
+src/model/train/                 모델·토크나이저·SFT·평가
+src/model/scripts/               데이터 준비·RSS 색인·노트북 생성
+notebooks/colab/                 뉴스·스몰톡 학습 노트북
+measurements/                    측정 스크립트
+tests/                           리소스·검색·세션·학습 데이터 회귀 검증
 ```
 
-<br>
+## 남은 한계
 
-## API
-
-| 엔드포인트 | 설명 |
-|---|---|
-| `POST /agent/chat` | 메인 — 라우팅 후 답변 반환 |
-| `GET /health` | 서버·그래프 로딩 상태 |
-| `GET /` | 웹 UI |
-| `GET /docs` | Swagger UI |
-
-**Request**
-
-```json
-{ "question": "삼성전자 주가 알려줘", "thread_id": "session-f703c100" }
-```
-
-`thread_id`를 생략하면 새 세션이 발급되고, 같은 값을 재사용하면 대화가 이어집니다.
-
-**Response**
-
-```json
-{
-  "question": "삼성전자 주가 알려줘",
-  "answer": "제공된 참고 뉴스에 따르면 ...",
-  "route": "stock_rag",
-  "trace": ["router_node", "rewrite_query_node", "search_news_node",
-            "retrieve_news_node", "generate_node"],
-  "contexts": ["제목: ... \n작성일: ... \n내용: ..."],
-  "question_id": "q_20260804_095923_bcde9dc6",
-  "thread_id": "session-f703c100"
-}
-```
-
-`route`·`trace`·`contexts`를 함께 반환해 어떤 경로로 어떤 근거를 사용했는지 클라이언트에서 즉시 확인할 수 있다. 이 필드들은 자동 평가 파이프라인의 입력으로도 그대로 사용된다.
-
-<br>
-
-## 카카오톡 채널 확장 계획
-
-웹 UI를 카카오톡 컨벤션으로 구현한 것은 최종 목표가 **카카오톡 채널 챗봇**이기 때문이다. 현재 API는 이미 `question` / `thread_id`를 받아 `answer`를 반환하는 단순한 계약이므로, 스킬 서버 어댑터만 추가하면 이식할 수 있다.
-
-```mermaid
-flowchart LR
-    KT([카카오톡 사용자]) -->|발화| CH[카카오톡 채널]
-    CH -->|스킬 요청 JSON| SKILL[스킬 서버<br/>어댑터]
-    SKILL -->|question, thread_id| API[기존 /agent/chat]
-    API -->|answer| SKILL
-    SKILL -->|SimpleText 응답| CH
-    CH --> KT
-
-    style SKILL fill:#fee500,stroke:#3c1e1e,stroke-width:2px,color:#111111
-    style API fill:#e8f4f8,stroke:#4a90d9,stroke-width:2px,color:#111111
-```
-
-| 항목 | 현재 | 카카오톡 이식 시 |
-|---|---|---|
-| 세션 식별 | `thread_id` (클라이언트 발급) | 카카오 `userRequest.user.id`로 매핑 |
-| 응답 형식 | JSON `answer` | 스킬 응답 규격(`SimpleText` / `BasicCard`)으로 변환 |
-| 응답 시간 | 제한 없음 | **5초 제한** → 콜백 API로 비동기 응답 |
-| 뉴스 출처 | `contexts` 배열 | `ListCard`로 기사 링크 노출 |
-
-**선결 과제**: 카카오 스킬 서버는 5초 내 응답이 원칙이다. 이 제약이 성능 최적화의 직접적인 동기가 됐고, 본문 추출 병렬화와 종목별 캐싱은 이식을 위한 전제 조건을 확보하는 작업이기도 하다.
-
-<br>
-
-## 트러블슈팅
-
-<details>
-<summary><b>OOM 장애 — 사용하지 않는 의존성이 만든 문제</b></summary>
-
-<br>
-
-**증상**: 컨테이너가 시작 직후 `Exited (137)`로 종료 (커널 OOM Kill)
-
-**분석**: 메모리 사용처를 추적한 결과, GPU가 없는 서버인데 **CUDA 빌드 PyTorch**가 설치되어 nvidia 라이브러리만 2GB 이상을 차지하고 있었다. GPU가 없으므로 어차피 CPU로 연산하고 있었고, 사용하지 않는 의존성을 짐처럼 지고 있던 셈이다.
-
-**해결**: `pyproject.toml`에서 torch를 CPU 빌드로 고정
-
-```toml
-[tool.uv.sources]
-torch = { index = "pytorch-cpu" }
-
-[[tool.uv.index]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-explicit = true
-```
-
-코드는 이미 `torch.cuda.is_available()`로 분기하고 있어 수정 없이 동작했다. 이미지 크기 8.6GB에서 대폭 축소되어 빌드·배포 시간도 함께 단축됐다. 이 경험이 이후 **라우터 모델을 vLLM으로 외부 분리**하는 결정으로 이어졌다.
-
-</details>
-
-<details>
-<summary><b>응답 지연 — 100초 타임아웃</b></summary>
-
-<br>
-
-**증상**: nginx 504. 모델 서버에서 직접 측정하니 응답에 **99.8초** 소요
-
-**분석**: 기사마다 본문을 순차로 HTTP 요청. 응답이 느린 사이트 하나가 전체를 붙잡는 구조
-
-**해결**: [성능 최적화](#성능-최적화) 섹션 참고 — 병렬화 · 타임아웃 · 캐싱 · 규모 조정
-
-</details>
-
-<details>
-<summary><b>생성 붕괴 — 동일 구절 무한 반복</b></summary>
-
-<br>
-
-**증상**
-
-```
-"...추가 매도 판단에는 추가 매도 판단에는 추가 매도 판단에는..."
-```
-
-**분석**: `repetition_penalty` 미적용 상태. 소규모 모델은 반복 루프에 특히 취약하다
-
-**해결**: `temperature` 0.3 / `top_k` 10 / `repetition_penalty` 1.3 적용. 페널티 적용 범위를 생성 구간 전체로 확장. 이후 평가 파이프라인의 **반복률 지표**로 회귀를 자동 감지하도록 했다
-
-</details>
-
-<br>
-
-## 알려진 한계
-
-| 항목 | 내용 |
-|---|---|
-| 환각 | 42M 규모의 한계로 컨텍스트에 없는 내용을 생성하는 경우가 있음 — 근거성 지표로 정량 추적 중 |
-| 문장 완성도 | 조사·어미가 부자연스러운 출력이 발생 |
-| 임베더 변별력 | 생성 모델 전용 구조로 유사도 순위가 부정확 (distance 분포 측정으로 확인) |
-| 학습·서빙 분포 차이 | 파인튜닝 데이터의 컨텍스트가 실제 서빙 청크보다 짧고 정제되어 있음 |
-
-## 로드맵
-
-- ✅ nginx 리버스 프록시 · 웹/모델 서버 분리
-- ✅ 질문 재작성 모듈 (별칭 사전 · 의도 추출)
-- ✅ 생성 파라미터 튜닝
-- ✅ RAG 추가 파인튜닝
-- ✅ CPU 빌드 전환으로 이미지 경량화
-- ✅ vLLM 라우터 서빙 — 메모리 격리 · 처리량 개선
-- ✅ 라우팅 정확도 · 답변 근거성 자동 평가 파이프라인
-- ✅ 응답 속도 개선 (본문 추출 병렬화 · 종목별 캐싱)
-- ⬜ 카카오톡 채널 챗봇 이식 — 스킬 서버 어댑터 + 콜백 응답
-- ⬜ 대조 학습 기반 임베더 재학습
-
-
-<br>
-
----
+- 자체 모델의 반복·근거 밖 생성과 문맥 참조 실패가 남아 있습니다. 모델 규모만을 원인으로 확정한 실험은 아닙니다.
+- 생성 모델을 전용한 임베딩은 관련·무관 문서의 거리 분포가 겹쳐 규칙 필터를 병행합니다.
+- 뉴스 QA는 발췌·템플릿 기반이며, 사람 검수 독립 평가와 참조 의존 대화 보강은 후속 과제입니다.
+- 검색 라이브 표본, 외부 모델의 3질문·3턴, 초기 생성 5질문을 운영 전체 성능으로 확대하지 않습니다.
+- 외부 모델의 사실성·페르소나, 장기 세션·동시 요청, 뉴스 날짜·출처 일치는 추가 검증이 필요합니다.
+- 카카오톡 채널 연동과 대조 학습 임베더는 향후 작업이며 현재 구현 성과에 포함하지 않습니다.
 
 ## 데이터 출처
 
-- **네이버 뉴스 검색 API** — 실시간 뉴스 수집 ([개발자센터](https://developers.naver.com/))
-- **한국어 위키백과 · 나무위키** — Stage 1 사전학습 코퍼스
-
-자세한 개발 과정: [회고](./docs/회고.md) · 변경 이력: [CHANGELOG.md](./docs/CHANGELOG.md)
+- 네이버 뉴스 검색 API와 기사 원문
+- RSS 뉴스 피드
+- 한국어 위키백과·나무위키 사전학습 텍스트
+- AIHub SNS 대화와 별도 작성한 합성 전이 템플릿
